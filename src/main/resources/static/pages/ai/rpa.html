@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RPA 데이터 수집 현황 - ezpark</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+  <style>
+    :root{--sw:260px;--pri:#0d6efd;--bg:#f0f2f8;--sbg:#0f1923;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Pretendard Variable','Noto Sans KR',sans-serif;background:var(--bg);}
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--sbg);display:flex;flex-direction:column;z-index:100;}
+    .sb-h{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .sb-b{font-size:1.4rem;font-weight:900;color:#fff;text-decoration:none;}
+    .sb-b span{color:#6ea8fe;}
+    .sb-n{flex:1;overflow-y:auto;padding:14px 0;}
+    .ns{padding:10px 18px 4px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;}
+    .nl{display:flex;align-items:center;gap:10px;padding:10px 18px;color:rgba(255,255,255,.45);text-decoration:none;font-size:.88rem;border-left:3px solid transparent;transition:all .2s;}
+    .nl i{font-size:.9rem;width:18px;text-align:center;}
+    .nl:hover{color:#fff;background:rgba(255,255,255,.04);}
+    .nl.active{color:#fff;border-left-color:var(--pri);background:rgba(13,110,253,.1);}
+    .sb-f{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);}
+    .ui{display:flex;align-items:center;gap:10px;}
+    .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pri),#0dcaf0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;}
+    .un{font-size:.82rem;font-weight:600;color:#fff;}
+    .ur{font-size:.68rem;color:rgba(255,255,255,.35);}
+    .blo{background:none;border:none;color:rgba(255,255,255,.35);font-size:.9rem;cursor:pointer;}
+    .blo:hover{color:#dc3545;}
+    .main{margin-left:var(--sw);min-height:100vh;}
+    .topbar{background:#fff;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9ecef;position:sticky;top:0;z-index:50;}
+    .topbar-t{font-size:1rem;font-weight:700;}
+    .ib{width:36px;height:36px;border-radius:9px;border:1.5px solid #e9ecef;background:#fff;display:flex;align-items:center;justify-content:center;color:#6c757d;cursor:pointer;transition:all .2s;}
+    .ib:hover{border-color:var(--pri);color:var(--pri);}
+    .content{padding:24px;}
+    .gc{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+    .gh{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:center;}
+    .gh h6{font-weight:700;font-size:.92rem;margin:0;}
+    .gb{padding:20px;}
+
+    /* TASK CARDS */
+    .task-card{background:#fff;border-radius:14px;border:1.5px solid #e9ecef;padding:18px 20px;transition:transform .2s,box-shadow .2s,border-color .2s;}
+    .task-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.07);border-color:#0d6efd;}
+    .task-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+    .task-name{font-size:.92rem;font-weight:700;color:#0f1923;}
+    .task-sub{font-size:.75rem;color:#6c757d;margin-top:2px;}
+    .task-prog{margin-bottom:10px;}
+    .prog-wrap{height:7px;background:#f0f2f8;border-radius:4px;overflow:hidden;}
+    .prog-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+    .task-meta{display:flex;justify-content:space-between;font-size:.75rem;color:#6c757d;}
+
+    /* PIPELINE */
+    .pipeline{display:flex;align-items:center;gap:0;}
+    .pipe-step{flex:1;text-align:center;position:relative;}
+    .pipe-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.95rem;margin:0 auto 6px;transition:all .3s;}
+    .pipe-dot.done{background:#198754;color:#fff;box-shadow:0 0 12px rgba(25,135,84,.35);}
+    .pipe-dot.active{background:#0d6efd;color:#fff;box-shadow:0 0 12px rgba(13,110,253,.4);animation:pulse-dot .8s infinite alternate;}
+    .pipe-dot.wait{background:#e9ecef;color:#adb5bd;}
+    @keyframes pulse-dot{0%{box-shadow:0 0 8px rgba(13,110,253,.3)} 100%{box-shadow:0 0 18px rgba(13,110,253,.6)}}
+    .pipe-label{font-size:.72rem;font-weight:600;color:#6c757d;}
+    .pipe-label.active-label{color:#0d6efd;}
+    .pipe-line{height:2px;background:#e9ecef;flex:0 0 30px;margin-bottom:22px;}
+    .pipe-line.done{background:#198754;}
+
+    /* LOG TERMINAL */
+    .terminal{background:#0f1923;border-radius:12px;padding:16px;font-family:'Courier New',monospace;font-size:.78rem;line-height:1.7;max-height:220px;overflow-y:auto;}
+    .t-line{margin:0;}
+    .t-line .ts{color:#475569;}
+    .t-line .info{color:#22c55e;}
+    .t-line .warn{color:#fbbf24;}
+    .t-line .err{color:#f87171;}
+    .t-line .debug{color:#94a3b8;}
+    .cursor::after{content:'▊';animation:blink .7s infinite;}
+    @keyframes blink{0%,100%{opacity:1} 50%{opacity:0}}
+
+    /* STAT SM */
+    .sm-stat{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.04);text-align:center;}
+    .sm-stat .n{font-size:1.4rem;font-weight:900;}
+    .sm-stat .l{font-size:.72rem;color:#6c757d;margin-top:2px;}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-h"><a class="sb-b" href="../../index.html">ez<span>park</span></a></div>
+  <nav class="sb-n">
+    <div class="ns">메인</div>
+    <a href="../admin/dashboard.html" class="nl"><i class="bi bi-speedometer2"></i>대시보드</a>
+    <div class="ns">서비스</div>
+    <a href="../service/map.html"         class="nl"><i class="bi bi-map"></i>실시간 주차 지도</a>
+    <a href="../service/reservation.html" class="nl"><i class="bi bi-calendar2-check"></i>예약 시스템</a>
+    <a href="../service/payment.html"     class="nl"><i class="bi bi-credit-card"></i>결제 및 정산</a>
+    <a href="../service/history.html"     class="nl"><i class="bi bi-clock-history"></i>이용 내역</a>
+    <a href="../service/vehicle.html"     class="nl"><i class="bi bi-car-front"></i>차량 관리</a>
+    <div class="ns">AI & 데이터</div>
+    <a href="monitoring.html" class="nl"><i class="bi bi-camera-video"></i>AI 모니터링</a>
+    <a href="forecast.html"   class="nl"><i class="bi bi-graph-up-arrow"></i>수요 예측</a>
+    <a href="logs.html"       class="nl"><i class="bi bi-list-ul"></i>인지 로그</a>
+    <a href="stats.html"      class="nl"><i class="bi bi-bar-chart-line"></i>K-AI 통계</a>
+    <a href="rpa.html"        class="nl active"><i class="bi bi-robot"></i>RPA 현황</a>
+    <div class="ns">설정</div>
+    <a href="../admin/faq.html"     class="nl"><i class="bi bi-question-circle"></i>FAQ & 지원</a>
+    <a href="../auth/settings.html" class="nl"><i class="bi bi-gear"></i>시스템 설정</a>
+  </nav>
+  <div class="sb-f"><div class="ui">
+    <div class="av" id="av">D</div>
+    <div style="flex:1"><div class="un" id="ud">관리자</div><div class="ur">Admin</div></div>
+    <button class="blo" id="blo"><i class="bi bi-box-arrow-right"></i></button>
+  </div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-2">
+      <span class="topbar-t"><i class="bi bi-robot me-2 text-primary"></i>RPA 데이터 수집 현황</span>
+      <span style="font-size:.72rem;color:#22c55e;font-weight:700;display:flex;align-items:center;gap:4px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;animation:blink .9s infinite;display:inline-block;"></span> 3개 작업 실행 중
+      </span>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm btn-outline-success rounded-3" style="font-size:.78rem;"><i class="bi bi-play-fill me-1"></i>전체 실행</button>
+      <div class="ib"><i class="bi bi-arrow-clockwise"></i></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STAT ROW -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="sm-stat"><div class="n text-primary">6</div><div class="l">등록된 RPA 작업</div></div></div>
+      <div class="col-6 col-md-3"><div class="sm-stat"><div class="n text-success">3</div><div class="l">실행 중</div></div></div>
+      <div class="col-6 col-md-3"><div class="sm-stat"><div class="n" style="color:#b08000;">1</div><div class="l">예약됨</div></div></div>
+      <div class="col-6 col-md-3"><div class="sm-stat"><div class="n text-muted">2</div><div class="l">일시 중지</div></div></div>
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="gc mb-3">
+      <div class="gh"><h6><i class="bi bi-diagram-3 me-2 text-primary"></i>데이터 수집 파이프라인 (K-AI 교통 수집)</h6></div>
+      <div class="gb">
+        <div class="pipeline">
+          <div class="pipe-step"><div class="pipe-dot done"><i class="bi bi-cloud-download-fill"></i></div><div class="pipe-label">데이터 수집<br><small>(Requests)</small></div></div>
+          <div class="pipe-line done"></div>
+          <div class="pipe-step"><div class="pipe-dot done"><i class="bi bi-scissors"></i></div><div class="pipe-label">HTML 파싱<br><small>(BeautifulSoup)</small></div></div>
+          <div class="pipe-line done"></div>
+          <div class="pipe-step"><div class="pipe-dot active"><i class="bi bi-table"></i></div><div class="pipe-label active-label">데이터 정제<br><small>(Pandas)</small></div></div>
+          <div class="pipe-line"></div>
+          <div class="pipe-step"><div class="pipe-dot wait"><i class="bi bi-graph-up"></i></div><div class="pipe-label">AI 분석<br><small>(Scikit-learn)</small></div></div>
+          <div class="pipe-line"></div>
+          <div class="pipe-step"><div class="pipe-dot wait"><i class="bi bi-database-fill-up"></i></div><div class="pipe-label">DB 저장<br><small>(TiDB)</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASK CARDS -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-6 col-xl-4">
+        <div class="task-card">
+          <div class="task-header">
+            <div><div class="task-name"><i class="bi bi-robot me-2 text-primary"></i>K-AI 교통정보 수집</div><div class="task-sub">Playwright + BeautifulSoup · 15분마다 실행</div></div>
+            <span class="badge bg-primary rounded-pill">실행 중</span>
+          </div>
+          <div class="task-prog">
+            <div class="d-flex justify-content-between mb-1" style="font-size:.75rem;"><span>진행률</span><span class="text-primary fw-bold">67%</span></div>
+            <div class="prog-wrap"><div class="prog-fill" style="width:67%;background:#0d6efd;"></div></div>
+          </div>
+          <div class="task-meta"><span>수집: 3,420건</span><span>오류: 0건</span><span>다음: 8분 후</span></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-4">
+        <div class="task-card">
+          <div class="task-header">
+            <div><div class="task-name"><i class="bi bi-building me-2 text-success"></i>지자체 주차 현황 수집</div><div class="task-sub">공공데이터포털 API · 30분마다 실행</div></div>
+            <span class="badge bg-success rounded-pill">실행 중</span>
+          </div>
+          <div class="task-prog">
+            <div class="d-flex justify-content-between mb-1" style="font-size:.75rem;"><span>진행률</span><span class="text-success fw-bold">92%</span></div>
+            <div class="prog-wrap"><div class="prog-fill" style="width:92%;background:#198754;"></div></div>
+          </div>
+          <div class="task-meta"><span>수집: 820건</span><span>오류: 2건</span><span>다음: 22분 후</span></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-4">
+        <div class="task-card">
+          <div class="task-header">
+            <div><div class="task-name"><i class="bi bi-cloud-sun me-2" style="color:#8b5cf6;"></i>기상청 날씨 수집</div><div class="task-sub">기상청 API · 1시간마다 실행</div></div>
+            <span class="badge bg-primary rounded-pill">실행 중</span>
+          </div>
+          <div class="task-prog">
+            <div class="d-flex justify-content-between mb-1" style="font-size:.75rem;"><span>진행률</span><span style="color:#8b5cf6;" class="fw-bold">100%</span></div>
+            <div class="prog-wrap"><div class="prog-fill" style="width:100%;background:#8b5cf6;"></div></div>
+          </div>
+          <div class="task-meta"><span>수집: 48건</span><span>오류: 0건</span><span>다음: 42분 후</span></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-4">
+        <div class="task-card" style="opacity:.7;">
+          <div class="task-header">
+            <div><div class="task-name"><i class="bi bi-calendar-event me-2 text-warning"></i>행사/이벤트 수집</div><div class="task-sub">문화포털 크롤링 · 일 1회 실행</div></div>
+            <span class="badge bg-warning text-dark rounded-pill">예약됨</span>
+          </div>
+          <div class="task-prog">
+            <div class="d-flex justify-content-between mb-1" style="font-size:.75rem;"><span>다음 실행</span><span class="text-warning fw-bold">오전 02:00</span></div>
+            <div class="prog-wrap"><div class="prog-fill" style="width:0%;background:#ffc107;"></div></div>
+          </div>
+          <div class="task-meta"><span>마지막: 2시간 전</span><span>수집: 156건</span><span>오류: 0건</span></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-4">
+        <div class="task-card" style="opacity:.5;">
+          <div class="task-header">
+            <div><div class="task-name"><i class="bi bi-pause-circle me-2 text-muted"></i>국가교통정보 수집</div><div class="task-sub">NTIC API · 일시 중지</div></div>
+            <span class="badge bg-secondary rounded-pill">중지</span>
+          </div>
+          <div class="task-prog">
+            <div class="d-flex justify-content-between mb-1" style="font-size:.75rem;"><span>상태</span><span class="text-muted fw-bold">수동 중지됨</span></div>
+            <div class="prog-wrap"><div class="prog-fill" style="width:0%;background:#adb5bd;"></div></div>
+          </div>
+          <div class="task-meta"><span>마지막: 3일 전</span><span>수집: 0건</span><span>—</span></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-4">
+        <div class="task-card" style="opacity:.5;">
+          <div class="task-header">
+            <div><div class="task-name"><i class="bi bi-pause-circle me-2 text-muted"></i>민간 주차장 데이터</div><div class="task-sub">협약 주차장 API · 일시 중지</div></div>
+            <span class="badge bg-secondary rounded-pill">중지</span>
+          </div>
+          <div class="task-prog">
+            <div class="d-flex justify-content-between mb-1" style="font-size:.75rem;"><span>상태</span><span class="text-muted fw-bold">API 키 갱신 필요</span></div>
+            <div class="prog-wrap"><div class="prog-fill" style="width:0%;background:#adb5bd;"></div></div>
+          </div>
+          <div class="task-meta"><span>마지막: 7일 전</span><span>수집: 0건</span><span>—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TERMINAL LOG -->
+    <div class="gc">
+      <div class="gh"><h6><i class="bi bi-terminal me-2"></i>실시간 수집 로그</h6><small class="text-muted">Python 3.11 · 실행 로그</small></div>
+      <div class="gb p-3">
+        <div class="terminal" id="terminal">
+          <p class="t-line"><span class="ts">[03:52:10]</span> <span class="info">[INFO]</span> <span class="debug"> K-AI 교통정보 수집 시작 (Playwright)</span></p>
+          <p class="t-line"><span class="ts">[03:52:11]</span> <span class="info">[INFO]</span> <span class="debug"> 페이지 접속 완료: https://its.go.kr/opendata/...</span></p>
+          <p class="t-line"><span class="ts">[03:52:13]</span> <span class="info">[INFO]</span> <span class="debug"> BeautifulSoup 파싱 중... 총 342개 요소 감지</span></p>
+          <p class="t-line"><span class="ts">[03:52:15]</span> <span class="info">[INFO]</span> <span class="debug"> Pandas DataFrame 생성: shape=(342, 8)</span></p>
+          <p class="t-line"><span class="ts">[03:52:16]</span> <span class="warn">[WARN]</span> <span class="debug"> 결측값 감지: 교통속도 컬럼 3건 → 평균값으로 대체</span></p>
+          <p class="t-line"><span class="ts">[03:52:17]</span> <span class="info">[INFO]</span> <span class="debug"> 데이터 정제 완료: 342/342건 처리</span></p>
+          <p class="t-line"><span class="ts">[03:52:18]</span> <span class="info">[INFO]</span> <span class="debug"> Scikit-learn 예측 모델 입력 데이터 전처리 중...</span></p>
+          <p class="t-line"><span class="ts">[03:52:19]</span> <span class="info">[INFO]</span> <span class="debug"> TiDB 연결 성공: tidb.cloud:4000</span></p>
+          <p class="t-line"><span class="ts">[03:52:20]</span> <span class="info">[INFO]</span> <span class="debug"> INSERT 완료: traffic_data 테이블 342건 저장</span></p>
+          <p class="t-line"><span class="ts">[03:52:21]</span> <span class="info">[INFO]</span> <span class="debug"> ✅ K-AI 교통정보 수집 완료. 다음 실행: 8분 후</span></p>
+          <p class="t-line cursor"><span class="ts">[03:52:22]</span> <span class="debug"> $ _</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function(){
+    if(!sessionStorage.getItem('ez_logged_in')) window.location.replace('../auth/login.html');
+    const u=sessionStorage.getItem('ez_user')||'관리자';
+    document.getElementById('ud').textContent=u;
+    document.getElementById('av').textContent=u.charAt(0).toUpperCase();
+  })();
+  document.getElementById('blo').addEventListener('click',()=>{sessionStorage.clear();window.location.href='../../index.html';});
+
+  // SIMULATE TERMINAL LOG
+  const terminal=document.getElementById('terminal');
+  const newLogs=[
+    {ts:'[03:52:35]',cls:'info',msg:' [INFO]  지자체 주차 현황 수집 완료: 820건'},
+    {ts:'[03:52:40]',cls:'info',msg:' [INFO]  기상 데이터 업데이트: 맑음, 기온 24°C'},
+    {ts:'[03:52:48]',cls:'warn',msg:' [WARN]  B구역 CCTV 데이터 패킷 손실 감지'},
+    {ts:'[03:52:55]',cls:'info',msg:' [INFO]  데이터 파이프라인 상태: 정상 운행 중'},
+  ];
+  let li=0;
+  setInterval(()=>{
+    if(li<newLogs.length){
+      const l=newLogs[li++];
+      const p=document.createElement('p');
+      p.className='t-line';
+      p.innerHTML=`<span class="ts">${l.ts}</span><span class="${l.cls}">${l.msg}</span>`;
+      terminal.querySelector('.cursor').before(p);
+      terminal.scrollTop=terminal.scrollHeight;
+    }
+  },4000);
+</script>
+</body>
+</html>

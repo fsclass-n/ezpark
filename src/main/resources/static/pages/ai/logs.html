@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>이동체 인지 로그 - ezpark</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+  <style>
+    :root{--sw:260px;--pri:#0d6efd;--bg:#f0f2f8;--sbg:#0f1923;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Pretendard Variable','Noto Sans KR',sans-serif;background:var(--bg);}
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--sbg);display:flex;flex-direction:column;z-index:100;}
+    .sb-h{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .sb-b{font-size:1.4rem;font-weight:900;color:#fff;text-decoration:none;}
+    .sb-b span{color:#6ea8fe;}
+    .sb-n{flex:1;overflow-y:auto;padding:14px 0;}
+    .ns{padding:10px 18px 4px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;}
+    .nl{display:flex;align-items:center;gap:10px;padding:10px 18px;color:rgba(255,255,255,.45);text-decoration:none;font-size:.88rem;border-left:3px solid transparent;transition:all .2s;}
+    .nl i{font-size:.9rem;width:18px;text-align:center;}
+    .nl:hover{color:#fff;background:rgba(255,255,255,.04);}
+    .nl.active{color:#fff;border-left-color:var(--pri);background:rgba(13,110,253,.1);}
+    .sb-f{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);}
+    .ui{display:flex;align-items:center;gap:10px;}
+    .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pri),#0dcaf0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;}
+    .un{font-size:.82rem;font-weight:600;color:#fff;}
+    .ur{font-size:.68rem;color:rgba(255,255,255,.35);}
+    .blo{background:none;border:none;color:rgba(255,255,255,.35);font-size:.9rem;cursor:pointer;}
+    .blo:hover{color:#dc3545;}
+    .main{margin-left:var(--sw);min-height:100vh;}
+    .topbar{background:#fff;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9ecef;position:sticky;top:0;z-index:50;}
+    .topbar-t{font-size:1rem;font-weight:700;}
+    .ib{width:36px;height:36px;border-radius:9px;border:1.5px solid #e9ecef;background:#fff;display:flex;align-items:center;justify-content:center;color:#6c757d;cursor:pointer;transition:all .2s;}
+    .ib:hover{border-color:var(--pri);color:var(--pri);}
+    .content{padding:24px;}
+    .gc{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+    .gh{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:center;}
+    .gh h6{font-weight:700;font-size:.92rem;margin:0;}
+    .gb{padding:20px;}
+    .stat-sm{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.04);text-align:center;}
+    .stat-sm .n{font-size:1.5rem;font-weight:900;line-height:1;}
+    .stat-sm .l{font-size:.72rem;color:#6c757d;margin-top:3px;}
+
+    /* LOG TABLE */
+    .log-table th{font-size:.78rem;font-weight:700;color:#6c757d;background:#f8f9fc;white-space:nowrap;}
+    .log-table td{font-size:.83rem;vertical-align:middle;}
+    .plate{font-family:'Courier New',monospace;font-weight:700;background:#f0f2f8;padding:3px 8px;border-radius:6px;font-size:.85rem;letter-spacing:1px;}
+    .live-row td{background:rgba(13,110,253,.03);}
+
+    /* FILTER */
+    .filter-bar{background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:16px;}
+
+    /* DETAIL DRAWER */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:flex-end;justify-content:flex-end;}
+    .drawer-overlay.show{display:flex;}
+    .drawer{width:380px;height:100%;background:#fff;box-shadow:-4px 0 20px rgba(0,0,0,.12);padding:0;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;}
+    .drawer.open{transform:translateX(0);}
+    .drawer-head{padding:18px 22px;border-bottom:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:center;}
+    .drawer-body{flex:1;overflow-y:auto;padding:20px 22px;}
+    .dt-row{margin-bottom:14px;}
+    .dt-row .dt-l{font-size:.72rem;color:#6c757d;font-weight:600;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px;}
+    .dt-row .dt-v{font-size:.88rem;color:#0f1923;font-weight:500;}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-h"><a class="sb-b" href="../../index.html">ez<span>park</span></a></div>
+  <nav class="sb-n">
+    <div class="ns">메인</div>
+    <a href="../admin/dashboard.html" class="nl"><i class="bi bi-speedometer2"></i>대시보드</a>
+    <div class="ns">서비스</div>
+    <a href="../service/map.html"         class="nl"><i class="bi bi-map"></i>실시간 주차 지도</a>
+    <a href="../service/reservation.html" class="nl"><i class="bi bi-calendar2-check"></i>예약 시스템</a>
+    <a href="../service/payment.html"     class="nl"><i class="bi bi-credit-card"></i>결제 및 정산</a>
+    <a href="../service/history.html"     class="nl"><i class="bi bi-clock-history"></i>이용 내역</a>
+    <a href="../service/vehicle.html"     class="nl"><i class="bi bi-car-front"></i>차량 관리</a>
+    <div class="ns">AI & 데이터</div>
+    <a href="monitoring.html" class="nl"><i class="bi bi-camera-video"></i>AI 모니터링</a>
+    <a href="forecast.html"   class="nl"><i class="bi bi-graph-up-arrow"></i>수요 예측</a>
+    <a href="logs.html"       class="nl active"><i class="bi bi-list-ul"></i>인지 로그</a>
+    <a href="stats.html"      class="nl"><i class="bi bi-bar-chart-line"></i>K-AI 통계</a>
+    <a href="rpa.html"        class="nl"><i class="bi bi-robot"></i>RPA 현황</a>
+    <div class="ns">설정</div>
+    <a href="../admin/faq.html"     class="nl"><i class="bi bi-question-circle"></i>FAQ & 지원</a>
+    <a href="../auth/settings.html" class="nl"><i class="bi bi-gear"></i>시스템 설정</a>
+  </nav>
+  <div class="sb-f"><div class="ui">
+    <div class="av" id="av">D</div>
+    <div style="flex:1"><div class="un" id="ud">관리자</div><div class="ur">Admin</div></div>
+    <button class="blo" id="blo"><i class="bi bi-box-arrow-right"></i></button>
+  </div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-t"><i class="bi bi-list-ul me-2 text-primary"></i>이동체 인지 로그</span>
+    <div class="d-flex gap-2">
+      <div class="ib" title="새로고침"><i class="bi bi-arrow-clockwise"></i></div>
+      <div class="ib" title="Excel 내보내기"><i class="bi bi-file-earmark-excel"></i></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STAT ROW -->
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-3"><div class="stat-sm"><div class="n text-primary">1,240</div><div class="l">오늘 총 인지 건수</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-sm"><div class="n text-success">1,214</div><div class="l">정상 인식</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-sm"><div class="n text-warning">23</div><div class="l">번호판 미인식</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-sm"><div class="n text-danger">3</div><div class="l">비인가 차량 감지</div></div></div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-bar d-flex flex-wrap gap-2 align-items-center">
+      <select class="form-select form-select-sm rounded-3" style="width:auto;font-size:.82rem;">
+        <option>전체 유형</option><option>차량 인식</option><option>번호판 미인식</option><option>비인가 차량</option><option>보행자</option>
+      </select>
+      <select class="form-select form-select-sm rounded-3" style="width:auto;font-size:.82rem;">
+        <option>전체 카메라</option><option>CAM-01 A구역</option><option>CAM-02 B구역</option><option>CAM-03 C구역</option><option>CAM-04 D구역</option><option>CAM-05 정산소</option>
+      </select>
+      <input type="date" class="form-control form-control-sm rounded-3" style="width:auto;font-size:.82rem;" value="2026-07-07"/>
+      <input type="text" class="form-control form-control-sm rounded-3" placeholder="번호판 검색..." style="width:160px;font-size:.82rem;"/>
+      <button class="btn btn-primary btn-sm rounded-3" style="font-size:.82rem;">검색</button>
+    </div>
+
+    <!-- LOG TABLE -->
+    <div class="gc">
+      <div class="gh">
+        <h6><i class="bi bi-table me-2"></i>인지 로그 목록 <span class="badge bg-primary-subtle text-primary ms-2" style="font-size:.7rem;">1,240건</span></h6>
+        <small class="text-muted">클릭하여 상세 보기</small>
+      </div>
+      <div class="gb p-0">
+        <div class="table-responsive">
+          <table class="table table-hover log-table mb-0">
+            <thead><tr><th class="ps-4">시간</th><th>카메라</th><th>유형</th><th>번호판</th><th>신뢰도</th><th>구역/슬롯</th><th>상태</th><th>처리</th></tr></thead>
+            <tbody id="log-tbody"></tbody>
+          </table>
+        </div>
+        <!-- PAGINATION -->
+        <div class="d-flex justify-content-between align-items-center px-4 py-3" style="border-top:1px solid #f0f2f5;">
+          <small class="text-muted">총 1,240건 중 1-20건 표시</small>
+          <nav><ul class="pagination pagination-sm mb-0">
+            <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">···</a></li>
+            <li class="page-item"><a class="page-link" href="#">62</a></li>
+            <li class="page-item"><a class="page-link" href="#">다음</a></li>
+          </ul></nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawer-overlay">
+  <div class="drawer" id="drawer">
+    <div class="drawer-head">
+      <h6 class="mb-0 fw-bold">인지 로그 상세</h6>
+      <button class="btn btn-sm btn-outline-secondary rounded-3" id="close-drawer">닫기</button>
+    </div>
+    <div class="drawer-body" id="drawer-body">
+      <div class="dt-row"><div class="dt-l">시간</div><div class="dt-v" id="dt-time">—</div></div>
+      <div class="dt-row"><div class="dt-l">카메라</div><div class="dt-v" id="dt-cam">—</div></div>
+      <div class="dt-row"><div class="dt-l">유형</div><div class="dt-v" id="dt-type">—</div></div>
+      <div class="dt-row"><div class="dt-l">번호판</div><div class="dt-v" id="dt-plate">—</div></div>
+      <div class="dt-row"><div class="dt-l">AI 신뢰도</div><div class="dt-v" id="dt-conf">—</div></div>
+      <div class="dt-row"><div class="dt-l">구역/슬롯</div><div class="dt-v" id="dt-zone">—</div></div>
+      <div class="dt-row"><div class="dt-l">처리 상태</div><div class="dt-v" id="dt-status">—</div></div>
+      <div class="dt-row"><div class="dt-l">캡처 이미지</div>
+        <div style="background:#f0f2f8;border-radius:10px;height:140px;display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:.82rem;margin-top:4px;">
+          <i class="bi bi-image me-2"></i>캡처 이미지 (AI 분석 연동 예정)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function(){
+    if(!sessionStorage.getItem('ez_logged_in')) window.location.replace('../auth/login.html');
+    const u=sessionStorage.getItem('ez_user')||'관리자';
+    document.getElementById('ud').textContent=u;
+    document.getElementById('av').textContent=u.charAt(0).toUpperCase();
+  })();
+  document.getElementById('blo').addEventListener('click',()=>{sessionStorage.clear();window.location.href='../../index.html';});
+
+  // DUMMY LOG DATA
+  const logs=[
+    {time:'03:52:10',cam:'CAM-02',type:'비인가 차량',plate:'??-????',conf:88,zone:'B구역 2층',status:'경고'},
+    {time:'03:50:34',cam:'CAM-01',type:'차량 인식',plate:'12가3456',conf:97,zone:'A구역 A-03',status:'입차 완료'},
+    {time:'03:49:18',cam:'CAM-04',type:'차량 인식',plate:'78나5678',conf:94,zone:'D구역 D-08',status:'출차 완료'},
+    {time:'03:47:02',cam:'CAM-05',type:'보행자',plate:'—',conf:87,zone:'정산소 앞',status:'정상'},
+    {time:'03:45:55',cam:'CAM-03',type:'번호판 미인식',plate:'미인식',conf:42,zone:'C구역 C-11',status:'수동 확인'},
+    {time:'03:44:12',cam:'CAM-01',type:'차량 인식',plate:'34다7890',conf:99,zone:'A구역 A-07',status:'입차 완료'},
+    {time:'03:43:05',cam:'CAM-02',type:'차량 인식',plate:'56라1234',conf:95,zone:'B구역 B-12',status:'입차 완료'},
+    {time:'03:41:48',cam:'CAM-03',type:'차량 인식',plate:'90마5678',conf:96,zone:'C구역 C-04',status:'입차 완료'},
+    {time:'03:40:22',cam:'CAM-04',type:'차량 인식',plate:'11바2345',conf:93,zone:'D구역 D-02',status:'출차 완료'},
+    {time:'03:38:55',cam:'CAM-01',type:'번호판 미인식',plate:'미인식',conf:38,zone:'A구역 입구',status:'수동 확인'},
+    {time:'03:37:30',cam:'CAM-05',type:'보행자',plate:'—',conf:82,zone:'정산소 앞',status:'정상'},
+    {time:'03:35:14',cam:'CAM-02',type:'차량 인식',plate:'22사6789',conf:98,zone:'B구역 B-07',status:'입차 완료'},
+    {time:'03:33:02',cam:'CAM-03',type:'비인가 차량',plate:'??-????',conf:81,zone:'C구역 입구',status:'경고'},
+    {time:'03:31:45',cam:'CAM-04',type:'차량 인식',plate:'33아3456',conf:91,zone:'D구역 D-11',status:'출차 완료'},
+    {time:'03:29:58',cam:'CAM-01',type:'차량 인식',plate:'44자7890',conf:96,zone:'A구역 A-15',status:'입차 완료'},
+    {time:'03:28:12',cam:'CAM-02',type:'번호판 미인식',plate:'미인식',conf:44,zone:'B구역 출구',status:'수동 확인'},
+    {time:'03:26:35',cam:'CAM-03',type:'차량 인식',plate:'55차1234',conf:97,zone:'C구역 C-08',status:'입차 완료'},
+    {time:'03:24:48',cam:'CAM-04',type:'차량 인식',plate:'66카5678',conf:94,zone:'D구역 D-05',status:'출차 완료'},
+    {time:'03:22:01',cam:'CAM-05',type:'보행자',plate:'—',conf:79,zone:'정산소 앞',status:'정상'},
+    {time:'03:20:22',cam:'CAM-01',type:'차량 인식',plate:'77타2345',conf:99,zone:'A구역 A-01',status:'입차 완료'},
+  ];
+
+  const typeConf={
+    '차량 인식':'<span class="badge bg-primary-subtle text-primary">차량 인식</span>',
+    '번호판 미인식':'<span class="badge bg-warning-subtle text-warning">미인식</span>',
+    '비인가 차량':'<span class="badge bg-danger-subtle text-danger">비인가</span>',
+    '보행자':'<span class="badge bg-secondary-subtle text-secondary">보행자</span>'
+  };
+  const statusConf={
+    '입차 완료':'<span class="badge bg-success rounded-pill">입차 완료</span>',
+    '출차 완료':'<span class="badge bg-primary rounded-pill">출차 완료</span>',
+    '경고':'<span class="badge bg-danger rounded-pill">⚠ 경고</span>',
+    '수동 확인':'<span class="badge bg-warning text-dark rounded-pill">수동 확인</span>',
+    '정상':'<span class="badge bg-secondary rounded-pill">정상</span>'
+  };
+
+  const tbody=document.getElementById('log-tbody');
+  logs.forEach((l,i)=>{
+    const tr=document.createElement('tr');
+    if(l.type==='비인가 차량') tr.style.background='rgba(220,53,69,.04)';
+    tr.innerHTML=`
+      <td class="ps-4" style="font-size:.78rem;color:#6c757d;white-space:nowrap;">${l.time}</td>
+      <td><span style="font-size:.8rem;font-weight:600;">${l.cam}</span></td>
+      <td>${typeConf[l.type]||l.type}</td>
+      <td><span class="plate">${l.plate}</span></td>
+      <td><span style="font-size:.82rem;font-weight:700;color:${l.conf>=90?'#198754':l.conf>=60?'#b08000':'#dc3545'}">${l.conf}%</span></td>
+      <td style="font-size:.8rem;">${l.zone}</td>
+      <td>${statusConf[l.status]||l.status}</td>
+      <td><button class="btn btn-sm btn-outline-secondary rounded-3 detail-btn" data-i="${i}" style="font-size:.72rem;padding:3px 10px;">상세</button></td>`;
+    tbody.appendChild(tr);
+  });
+
+  // DRAWER
+  const overlay=document.getElementById('drawer-overlay');
+  const drawer=document.getElementById('drawer');
+  document.querySelectorAll('.detail-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const l=logs[+btn.dataset.i];
+      document.getElementById('dt-time').textContent=l.time;
+      document.getElementById('dt-cam').textContent=l.cam;
+      document.getElementById('dt-type').textContent=l.type;
+      document.getElementById('dt-plate').textContent=l.plate;
+      document.getElementById('dt-conf').textContent=l.conf+'%';
+      document.getElementById('dt-zone').textContent=l.zone;
+      document.getElementById('dt-status').textContent=l.status;
+      overlay.classList.add('show');
+      setTimeout(()=>drawer.classList.add('open'),10);
+    });
+  });
+  function closeDrawer(){drawer.classList.remove('open');setTimeout(()=>overlay.classList.remove('show'),300);}
+  document.getElementById('close-drawer').addEventListener('click',closeDrawer);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closeDrawer();});
+</script>
+</body>
+</html>
