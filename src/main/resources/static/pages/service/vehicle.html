@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>차량 및 월정기권 관리 - ezpark</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+  <style>
+    :root{--sw:260px;--pri:#0d6efd;--bg:#f0f2f8;--sbg:#0f1923;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Pretendard Variable','Noto Sans KR',sans-serif;background:var(--bg);}
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--sbg);display:flex;flex-direction:column;z-index:100;}
+    .sb-h{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .sb-b{font-size:1.4rem;font-weight:900;color:#fff;text-decoration:none;}
+    .sb-b span{color:#6ea8fe;}
+    .sb-n{flex:1;overflow-y:auto;padding:14px 0;}
+    .ns{padding:10px 18px 4px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;}
+    .nl{display:flex;align-items:center;gap:10px;padding:10px 18px;color:rgba(255,255,255,.45);text-decoration:none;font-size:.88rem;border-left:3px solid transparent;transition:all .2s;}
+    .nl i{font-size:.9rem;width:18px;text-align:center;}
+    .nl:hover{color:#fff;background:rgba(255,255,255,.04);}
+    .nl.active{color:#fff;border-left-color:var(--pri);background:rgba(13,110,253,.1);}
+    .sb-f{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);}
+    .ui{display:flex;align-items:center;gap:10px;}
+    .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pri),#0dcaf0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;}
+    .un{font-size:.82rem;font-weight:600;color:#fff;}
+    .ur{font-size:.68rem;color:rgba(255,255,255,.35);}
+    .blo{background:none;border:none;color:rgba(255,255,255,.35);font-size:.9rem;cursor:pointer;}
+    .blo:hover{color:#dc3545;}
+    .main{margin-left:var(--sw);min-height:100vh;}
+    .topbar{background:#fff;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9ecef;position:sticky;top:0;z-index:50;}
+    .topbar-t{font-size:1rem;font-weight:700;}
+    .ib{width:36px;height:36px;border-radius:9px;border:1.5px solid #e9ecef;background:#fff;display:flex;align-items:center;justify-content:center;color:#6c757d;cursor:pointer;transition:all .2s;}
+    .ib:hover{border-color:var(--pri);color:var(--pri);}
+    .content{padding:24px;}
+    .gc{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+    .gh{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:center;}
+    .gh h6{font-weight:700;font-size:.92rem;margin:0;}
+    .gb{padding:20px;}
+
+    .car-card{border:1.5px solid #e9ecef;border-radius:12px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;transition:all .2s;}
+    .car-card:hover{border-color:var(--pri);box-shadow:0 4px 12px rgba(13,110,253,.08);}
+    .car-plate{font-size:1.4rem;font-weight:800;color:#0f1923;font-family:'Courier New',monospace;letter-spacing:1px;}
+    .car-model{font-size:.85rem;color:#6c757d;}
+    .car-tag{font-size:.7rem;padding:3px 10px;border-radius:20px;font-weight:700;}
+    .car-tag.main-car{background:rgba(13,110,253,.1);color:#0d6efd;}
+    .car-tag.sub-car{background:#f0f2f8;color:#6c757d;}
+
+    .pass-card{background:linear-gradient(135deg,#0d6efd,#0dcaf0);border-radius:14px;padding:24px;color:#fff;box-shadow:0 8px 24px rgba(13,110,253,.25);position:relative;overflow:hidden;}
+    .pass-card::after{content:'\F23A';font-family:'bootstrap-icons';position:absolute;right:-20px;bottom:-30px;font-size:8rem;opacity:.1;transform:rotate(-15deg);}
+    .pass-badge{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:16px;}
+    .pass-title{font-size:1.3rem;font-weight:800;margin-bottom:6px;}
+    .pass-info{font-size:.85rem;opacity:.9;margin-bottom:20px;}
+    .pass-price{font-size:1.6rem;font-weight:900;}
+    .pass-price span{font-size:.85rem;font-weight:500;opacity:.8;}
+
+    .plan-table th{font-size:.8rem;color:#6c757d;background:#f8f9fc;font-weight:700;text-align:center;}
+    .plan-table td{font-size:.85rem;text-align:center;vertical-align:middle;}
+    .plan-table td.text-start{text-align:left;}
+
+    .add-form{background:#f8f9fc;border-radius:12px;padding:16px;margin-top:16px;display:none;}
+    .add-form.show{display:block;}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-h"><a class="sb-b" href="../../index.html">ez<span>park</span></a></div>
+  <nav class="sb-n">
+    <div class="ns">메인</div>
+    <a href="../admin/dashboard.html" class="nl"><i class="bi bi-speedometer2"></i>대시보드</a>
+    <div class="ns">서비스</div>
+    <a href="map.html"         class="nl"><i class="bi bi-map"></i>실시간 주차 지도</a>
+    <a href="reservation.html" class="nl"><i class="bi bi-calendar2-check"></i>예약 시스템</a>
+    <a href="payment.html"     class="nl"><i class="bi bi-credit-card"></i>결제 및 정산</a>
+    <a href="history.html"     class="nl"><i class="bi bi-clock-history"></i>이용 내역</a>
+    <a href="vehicle.html"     class="nl active"><i class="bi bi-car-front"></i>차량 관리</a>
+    <div class="ns">AI & 데이터</div>
+    <a href="../ai/monitoring.html" class="nl"><i class="bi bi-camera-video"></i>AI 모니터링</a>
+    <a href="../ai/forecast.html"   class="nl"><i class="bi bi-graph-up-arrow"></i>수요 예측</a>
+    <a href="../ai/logs.html"       class="nl"><i class="bi bi-list-ul"></i>인지 로그</a>
+    <a href="../ai/stats.html"      class="nl"><i class="bi bi-bar-chart-line"></i>K-AI 통계</a>
+    <a href="../ai/rpa.html"        class="nl"><i class="bi bi-robot"></i>RPA 현황</a>
+    <div class="ns">설정</div>
+    <a href="../admin/faq.html"     class="nl"><i class="bi bi-question-circle"></i>FAQ & 지원</a>
+    <a href="../auth/settings.html" class="nl"><i class="bi bi-gear"></i>시스템 설정</a>
+  </nav>
+  <div class="sb-f"><div class="ui">
+    <div class="av" id="av">D</div>
+    <div style="flex:1"><div class="un" id="ud">관리자</div><div class="ur">Admin</div></div>
+    <button class="blo" id="blo"><i class="bi bi-box-arrow-right"></i></button>
+  </div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-t"><i class="bi bi-car-front me-2 text-primary"></i>차량 및 월정기권 관리</span>
+  </div>
+
+  <div class="content">
+    <div class="row g-4">
+      <!-- LEFT: VEHICLES -->
+      <div class="col-lg-7">
+        <div class="gc h-100">
+          <div class="gh">
+            <h6><i class="bi bi-car-front-fill me-2"></i>등록된 차량</h6>
+            <span class="badge bg-primary-subtle text-primary">2대</span>
+          </div>
+          <div class="gb">
+            <div class="car-card">
+              <div class="d-flex align-items-center gap-3">
+                <div style="width:48px;height:48px;background:#f0f2f8;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#0d6efd;"><i class="bi bi-car-front-fill"></i></div>
+                <div>
+                  <div class="car-plate">12가 3456 <span class="car-tag main-car ms-2">대표차량</span></div>
+                  <div class="car-model">현대 쏘나타 · 중형</div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary rounded-3">수정</button>
+                <button class="btn btn-sm btn-outline-danger rounded-3"><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+
+            <div class="car-card">
+              <div class="d-flex align-items-center gap-3">
+                <div style="width:48px;height:48px;background:#f0f2f8;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#6c757d;"><i class="bi bi-car-front-fill"></i></div>
+                <div>
+                  <div class="car-plate">78나 5678 <span class="car-tag sub-car ms-2">추가차량</span></div>
+                  <div class="car-model">현대 그랜저 · 대형</div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary rounded-3">수정</button>
+                <button class="btn btn-sm btn-outline-danger rounded-3"><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+
+            <button class="btn btn-outline-primary w-100 rounded-3 mt-2" id="btn-add-car" style="border-style:dashed;padding:12px;font-weight:600;"><i class="bi bi-plus-lg me-1"></i> 차량 추가 등록</button>
+
+            <!-- ADD FORM -->
+            <div class="add-form" id="add-form">
+              <h6 style="font-weight:700;font-size:.9rem;margin-bottom:12px;">새 차량 등록</h6>
+              <div class="row g-2 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label" style="font-size:.8rem;font-weight:600;">차량번호</label>
+                  <input type="text" class="form-control form-control-sm rounded-3" placeholder="예: 12가 3456"/>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label" style="font-size:.8rem;font-weight:600;">차종</label>
+                  <input type="text" class="form-control form-control-sm rounded-3" placeholder="예: 현대 쏘나타"/>
+                </div>
+                <div class="col-sm-6 mt-2">
+                  <label class="form-label" style="font-size:.8rem;font-weight:600;">구분</label>
+                  <select class="form-select form-select-sm rounded-3">
+                    <option>경형</option><option>소형</option><option selected>중형</option><option>대형</option><option>SUV</option>
+                  </select>
+                </div>
+                <div class="col-sm-6 mt-2 d-flex align-items-end">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="chk-main"/>
+                    <label class="form-check-label" for="chk-main" style="font-size:.85rem;">대표 차량으로 설정</label>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-sm btn-secondary rounded-3 px-3" id="btn-cancel-car">취소</button>
+                <button class="btn btn-sm btn-primary rounded-3 px-3">등록 완료</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: PASS -->
+      <div class="col-lg-5">
+        <div class="gc h-100">
+          <div class="gh">
+            <h6><i class="bi bi-ticket-perforated-fill me-2"></i>월정기권 관리</h6>
+          </div>
+          <div class="gb">
+            <!-- CURRENT PASS -->
+            <div class="pass-card">
+              <div class="pass-badge"><i class="bi bi-check-circle-fill me-1"></i> 구독 중</div>
+              <div class="pass-title">베이직 플랜 (지하 1층)</div>
+              <div class="pass-info">
+                <div class="mb-1"><i class="bi bi-geo-alt me-2"></i>A구역 / B구역 이용 가능</div>
+                <div><i class="bi bi-calendar-event me-2"></i>2026.07.01 ~ 2026.07.31</div>
+              </div>
+              <div class="d-flex justify-content-between align-items-end">
+                <div class="pass-price">35,000<span>원 / 월</span></div>
+                <button class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3 shadow-sm">결제 관리</button>
+              </div>
+            </div>
+
+            <hr style="margin:24px 0;border-color:#e9ecef;"/>
+
+            <h6 style="font-weight:700;font-size:.9rem;margin-bottom:12px;">플랜 업그레이드</h6>
+            <div class="table-responsive">
+              <table class="table plan-table table-bordered">
+                <thead>
+                  <tr>
+                    <th class="text-start">제공 서비스</th>
+                    <th>베이직</th>
+                    <th>프리미엄</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-start fw-bold">월 요금</td>
+                    <td>35,000원</td>
+                    <td class="text-primary fw-bold">50,000원</td>
+                  </tr>
+                  <tr>
+                    <td class="text-start">이용 구역</td>
+                    <td>지하 1층</td>
+                    <td>전 구역</td>
+                  </tr>
+                  <tr>
+                    <td class="text-start">지정 주차면</td>
+                    <td class="text-muted"><i class="bi bi-dash"></i></td>
+                    <td class="text-success"><i class="bi bi-check-lg"></i> 1면 배정</td>
+                  </tr>
+                  <tr>
+                    <td class="text-start">세차 할인</td>
+                    <td class="text-muted"><i class="bi bi-dash"></i></td>
+                    <td class="text-success">월 1회 무료</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td><button class="btn btn-sm btn-secondary w-100 rounded-3 disabled">이용 중</button></td>
+                    <td><button class="btn btn-sm btn-primary w-100 rounded-3">변경하기</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function(){
+    if(!sessionStorage.getItem('ez_logged_in')) window.location.replace('../auth/login.html');
+    const u=sessionStorage.getItem('ez_user')||'관리자';
+    document.getElementById('ud').textContent=u;
+    document.getElementById('av').textContent=u.charAt(0).toUpperCase();
+  })();
+  document.getElementById('blo').addEventListener('click',()=>{sessionStorage.clear();window.location.href='../../index.html';});
+
+  document.getElementById('btn-add-car').addEventListener('click',()=>{
+    document.getElementById('add-form').classList.add('show');
+    document.getElementById('btn-add-car').style.display='none';
+  });
+  document.getElementById('btn-cancel-car').addEventListener('click',()=>{
+    document.getElementById('add-form').classList.remove('show');
+    document.getElementById('btn-add-car').style.display='block';
+  });
+</script>
+</body>
+</html>

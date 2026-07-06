@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>주차 예약 시스템 - ezpark</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+  <style>
+    :root{--sw:260px;--pri:#0d6efd;--bg:#f0f2f8;--sbg:#0f1923;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Pretendard Variable','Noto Sans KR',sans-serif;background:var(--bg);}
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--sbg);display:flex;flex-direction:column;z-index:100;}
+    .sb-h{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .sb-b{font-size:1.4rem;font-weight:900;color:#fff;text-decoration:none;}
+    .sb-b span{color:#6ea8fe;}
+    .sb-n{flex:1;overflow-y:auto;padding:14px 0;}
+    .ns{padding:10px 18px 4px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;}
+    .nl{display:flex;align-items:center;gap:10px;padding:10px 18px;color:rgba(255,255,255,.45);text-decoration:none;font-size:.88rem;border-left:3px solid transparent;transition:all .2s;}
+    .nl i{font-size:.9rem;width:18px;text-align:center;}
+    .nl:hover{color:#fff;background:rgba(255,255,255,.04);}
+    .nl.active{color:#fff;border-left-color:var(--pri);background:rgba(13,110,253,.1);}
+    .sb-f{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);}
+    .ui{display:flex;align-items:center;gap:10px;}
+    .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pri),#0dcaf0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;}
+    .un{font-size:.82rem;font-weight:600;color:#fff;}
+    .ur{font-size:.68rem;color:rgba(255,255,255,.35);}
+    .blo{background:none;border:none;color:rgba(255,255,255,.35);font-size:.9rem;cursor:pointer;}
+    .blo:hover{color:#dc3545;}
+    .main{margin-left:var(--sw);min-height:100vh;}
+    .topbar{background:#fff;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9ecef;position:sticky;top:0;z-index:50;}
+    .topbar-t{font-size:1rem;font-weight:700;}
+    .content{padding:24px;}
+    .gc{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+    .gh{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:center;}
+    .gh h6{font-weight:700;font-size:.92rem;margin:0;}
+    .gb{padding:20px;}
+
+    .form-label{font-size:.85rem;font-weight:700;color:#0f1923;}
+    .zone-select{display:flex;gap:10px;margin-bottom:20px;}
+    .zone-btn{flex:1;padding:12px;border:1.5px solid #e9ecef;border-radius:12px;background:#fff;font-weight:700;color:#6c757d;transition:all .2s;text-align:center;cursor:pointer;}
+    .zone-btn:hover{border-color:var(--pri);color:var(--pri);background:rgba(13,110,253,.04);}
+    .zone-btn.selected{border-color:var(--pri);background:rgba(13,110,253,.08);color:var(--pri);}
+    .zone-btn .zs-sub{font-size:.7rem;font-weight:500;display:block;margin-top:2px;}
+
+    .time-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px;}
+    .time-btn{padding:8px 0;border:1px solid #e9ecef;border-radius:8px;background:#fff;font-size:.8rem;font-weight:600;color:#495057;transition:all .2s;cursor:pointer;}
+    .time-btn:hover:not(.disabled){border-color:var(--pri);color:var(--pri);}
+    .time-btn.selected{background:var(--pri);color:#fff;border-color:var(--pri);}
+    .time-btn.disabled{background:#f8f9fc;color:#adb5bd;cursor:not-allowed;text-decoration:line-through;border-color:#f0f2f5;}
+
+    .summary-card{background:#f8f9fc;border:1px solid #e9ecef;border-radius:14px;padding:20px;}
+    .sum-row{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:12px;color:#495057;}
+    .sum-row.total{border-top:1px dashed #ced4da;padding-top:14px;margin-top:14px;font-size:1.1rem;font-weight:800;color:#0f1923;}
+    .btn-submit{width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#0d6efd,#198754);color:#fff;font-weight:800;font-size:1rem;border:none;box-shadow:0 4px 15px rgba(13,110,253,.3);transition:transform .2s;}
+    .btn-submit:hover{transform:translateY(-2px);}
+
+    .rc-list{display:flex;flex-direction:column;gap:12px;margin-top:24px;}
+    .rc-item{background:#fff;border:1px solid #e9ecef;border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;}
+    .rc-title{font-size:.85rem;font-weight:700;color:#0f1923;margin-bottom:4px;}
+    .rc-info{font-size:.75rem;color:#6c757d;}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-h"><a class="sb-b" href="../../index.html">ez<span>park</span></a></div>
+  <nav class="sb-n">
+    <div class="ns">메인</div>
+    <a href="../admin/dashboard.html" class="nl"><i class="bi bi-speedometer2"></i>대시보드</a>
+    <div class="ns">서비스</div>
+    <a href="map.html"         class="nl"><i class="bi bi-map"></i>실시간 주차 지도</a>
+    <a href="reservation.html" class="nl active"><i class="bi bi-calendar2-check"></i>예약 시스템</a>
+    <a href="payment.html"     class="nl"><i class="bi bi-credit-card"></i>결제 및 정산</a>
+    <a href="history.html"     class="nl"><i class="bi bi-clock-history"></i>이용 내역</a>
+    <a href="vehicle.html"     class="nl"><i class="bi bi-car-front"></i>차량 관리</a>
+    <div class="ns">AI & 데이터</div>
+    <a href="../ai/monitoring.html" class="nl"><i class="bi bi-camera-video"></i>AI 모니터링</a>
+    <a href="../ai/forecast.html"   class="nl"><i class="bi bi-graph-up-arrow"></i>수요 예측</a>
+    <a href="../ai/logs.html"       class="nl"><i class="bi bi-list-ul"></i>인지 로그</a>
+    <a href="../ai/stats.html"      class="nl"><i class="bi bi-bar-chart-line"></i>K-AI 통계</a>
+    <a href="../ai/rpa.html"        class="nl"><i class="bi bi-robot"></i>RPA 현황</a>
+    <div class="ns">설정</div>
+    <a href="../admin/faq.html"     class="nl"><i class="bi bi-question-circle"></i>FAQ & 지원</a>
+    <a href="../auth/settings.html" class="nl"><i class="bi bi-gear"></i>시스템 설정</a>
+  </nav>
+  <div class="sb-f"><div class="ui">
+    <div class="av" id="av">D</div>
+    <div style="flex:1"><div class="un" id="ud">관리자</div><div class="ur">Admin</div></div>
+    <button class="blo" id="blo"><i class="bi bi-box-arrow-right"></i></button>
+  </div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-t"><i class="bi bi-calendar2-check me-2 text-primary"></i>주차 예약 시스템</span>
+  </div>
+
+  <div class="content">
+    <div class="row g-4">
+      <!-- LEFT FORM -->
+      <div class="col-lg-7">
+        <div class="gc h-100">
+          <div class="gh"><h6><i class="bi bi-pencil-square me-2 text-primary"></i>예약 정보 입력</h6></div>
+          <div class="gb">
+            <label class="form-label">구역 선택</label>
+            <div class="zone-select">
+              <div class="zone-btn selected">A구역<span class="zs-sub text-success">여유 (12면)</span></div>
+              <div class="zone-btn">B구역<span class="zs-sub text-warning">혼잡 (2면)</span></div>
+              <div class="zone-btn" style="opacity:.6;cursor:not-allowed;">C구역<span class="zs-sub text-danger">만차</span></div>
+              <div class="zone-btn">D구역<span class="zs-sub text-success">여유 (8면)</span></div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">이용 날짜</label>
+                <input type="date" class="form-control rounded-3 p-2" id="res-date" value="2026-07-08"/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">이용 시간 (단위)</label>
+                <select class="form-select rounded-3 p-2" id="res-dur">
+                  <option value="2000">1시간</option>
+                  <option value="4000" selected>2시간</option>
+                  <option value="6000">3시간</option>
+                  <option value="15000">1일권 (24시간)</option>
+                </select>
+              </div>
+            </div>
+
+            <label class="form-label">입차 예정 시간 (선택한 날짜 기준)</label>
+            <div class="time-grid" id="time-grid">
+              <button class="time-btn disabled">08:00</button>
+              <button class="time-btn disabled">09:00</button>
+              <button class="time-btn selected">10:00</button>
+              <button class="time-btn">11:00</button>
+              <button class="time-btn">12:00</button>
+              <button class="time-btn disabled">13:00</button>
+              <button class="time-btn">14:00</button>
+              <button class="time-btn">15:00</button>
+              <button class="time-btn">16:00</button>
+              <button class="time-btn">17:00</button>
+              <button class="time-btn disabled">18:00</button>
+              <button class="time-btn disabled">19:00</button>
+              <button class="time-btn">20:00</button>
+              <button class="time-btn">21:00</button>
+              <button class="time-btn">22:00</button>
+            </div>
+
+            <label class="form-label mt-2">차량 번호</label>
+            <input type="text" class="form-control rounded-3 p-2 mb-2" value="12가 3456" id="res-car"/>
+            <small class="text-muted d-block mb-3">등록된 대표 차량 번호가 자동으로 입력되었습니다.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SUMMARY -->
+      <div class="col-lg-5">
+        <div class="gc" style="position:sticky;top:80px;">
+          <div class="gh"><h6><i class="bi bi-receipt me-2 text-primary"></i>결제 요약</h6></div>
+          <div class="gb">
+            <div class="summary-card">
+              <div class="sum-row"><span class="fw-bold">예약 구역</span><span>A구역 (지하 1층)</span></div>
+              <div class="sum-row"><span class="fw-bold">차량 번호</span><span>12가 3456</span></div>
+              <div class="sum-row"><span class="fw-bold">이용 날짜</span><span id="sum-date">2026.07.08 (수)</span></div>
+              <div class="sum-row"><span class="fw-bold">이용 시간</span><span>10:00 ~ 12:00 (2시간)</span></div>
+              <div class="sum-row"><span class="fw-bold">기본 요금</span><span>4,000원</span></div>
+              <div class="sum-row"><span class="fw-bold text-success">할인 혜택 (친환경)</span><span class="text-success">-2,000원</span></div>
+              <div class="sum-row total"><span>최종 결제 금액</span><span class="text-primary">2,000원</span></div>
+            </div>
+
+            <button class="btn-submit mt-3" onclick="alert('예약이 확정되었습니다!\n카카오톡으로 모바일 티켓이 발송됩니다.');">예약 확정 및 결제하기</button>
+
+            <!-- RECENT -->
+            <h6 style="font-weight:700;font-size:.9rem;margin-top:32px;margin-bottom:8px;">최근 예약 내역</h6>
+            <div class="rc-list">
+              <div class="rc-item">
+                <div>
+                  <div class="rc-title"><span class="badge bg-success-subtle text-success me-2">예약완료</span>B구역</div>
+                  <div class="rc-info">2026.07.10 (금) 14:00~16:00</div>
+                </div>
+                <button class="btn btn-sm btn-outline-danger rounded-3 px-3">취소</button>
+              </div>
+              <div class="rc-item">
+                <div>
+                  <div class="rc-title"><span class="badge bg-secondary-subtle text-secondary me-2">이용완료</span>A구역</div>
+                  <div class="rc-info">2026.07.05 (일) 09:00~11:30</div>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary rounded-3 px-3 disabled">완료</button>
+              </div>
+              <div class="rc-item">
+                <div>
+                  <div class="rc-title"><span class="badge bg-danger-subtle text-danger me-2">예약취소</span>C구역</div>
+                  <div class="rc-info">2026.07.01 (수) 18:00~20:00</div>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary rounded-3 px-3 disabled">취소됨</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function(){
+    if(!sessionStorage.getItem('ez_logged_in')) window.location.replace('../auth/login.html');
+    const u=sessionStorage.getItem('ez_user')||'관리자';
+    document.getElementById('ud').textContent=u;
+    document.getElementById('av').textContent=u.charAt(0).toUpperCase();
+  })();
+  document.getElementById('blo').addEventListener('click',()=>{sessionStorage.clear();window.location.href='../../index.html';});
+
+  // UI interactions
+  document.querySelectorAll('.zone-btn:not([style])').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('selected'));
+      this.classList.add('selected');
+    });
+  });
+  document.querySelectorAll('.time-btn:not(.disabled)').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('selected'));
+      this.classList.add('selected');
+    });
+  });
+  document.getElementById('res-date').addEventListener('change',function(){
+    document.getElementById('sum-date').textContent=this.value.replace(/-/g,'.');
+  });
+</script>
+</body>
+</html>

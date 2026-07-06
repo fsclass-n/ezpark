@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>시스템 설정 - ezpark</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+  <style>
+    :root{--sw:260px;--pri:#0d6efd;--bg:#f0f2f8;--sbg:#0f1923;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Pretendard Variable','Noto Sans KR',sans-serif;background:var(--bg);}
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--sbg);display:flex;flex-direction:column;z-index:100;}
+    .sb-h{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .sb-b{font-size:1.4rem;font-weight:900;color:#fff;text-decoration:none;}
+    .sb-b span{color:#6ea8fe;}
+    .sb-n{flex:1;overflow-y:auto;padding:14px 0;}
+    .ns{padding:10px 18px 4px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;}
+    .nl{display:flex;align-items:center;gap:10px;padding:10px 18px;color:rgba(255,255,255,.45);text-decoration:none;font-size:.88rem;border-left:3px solid transparent;transition:all .2s;}
+    .nl i{font-size:.9rem;width:18px;text-align:center;}
+    .nl:hover{color:#fff;background:rgba(255,255,255,.04);}
+    .nl.active{color:#fff;border-left-color:var(--pri);background:rgba(13,110,253,.1);}
+    .sb-f{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);}
+    .ui{display:flex;align-items:center;gap:10px;}
+    .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pri),#0dcaf0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;}
+    .un{font-size:.82rem;font-weight:600;color:#fff;}
+    .ur{font-size:.68rem;color:rgba(255,255,255,.35);}
+    .blo{background:none;border:none;color:rgba(255,255,255,.35);font-size:.9rem;cursor:pointer;}
+    .blo:hover{color:#dc3545;}
+    .main{margin-left:var(--sw);min-height:100vh;}
+    .topbar{background:#fff;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9ecef;position:sticky;top:0;z-index:50;}
+    .topbar-t{font-size:1rem;font-weight:700;}
+    .content{padding:24px;}
+    .gc{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);display:flex;min-height:600px;overflow:hidden;}
+    
+    /* VERTICAL TABS */
+    .v-tabs{width:220px;background:#f8f9fc;border-right:1px solid #e9ecef;padding:24px 0;}
+    .v-tabs .nav-link{color:#6c757d;font-weight:600;padding:12px 24px;border-radius:0;border-left:3px solid transparent;text-align:left;font-size:.9rem;}
+    .v-tabs .nav-link.active{background:#fff;color:#0d6efd;border-left-color:#0d6efd;}
+    .v-tabs .nav-link:hover:not(.active){color:#0d6efd;}
+
+    .tab-content{flex:1;padding:32px 40px;}
+    .s-title{font-size:1.1rem;font-weight:800;color:#0f1923;margin-bottom:24px;display:flex;align-items:center;gap:8px;}
+    .form-label{font-size:.85rem;font-weight:600;color:#495057;}
+    .avatar-lg{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#0d6efd,#0dcaf0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:2rem;}
+    
+    .setting-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #f0f2f5;}
+    .setting-row:last-child{border-bottom:none;}
+    .sr-info .sr-title{font-size:.9rem;font-weight:600;color:#0f1923;}
+    .sr-info .sr-desc{font-size:.8rem;color:#6c757d;margin-top:2px;}
+    
+    .login-table th{font-size:.8rem;background:#f8f9fc;color:#6c757d;font-weight:600;}
+    .login-table td{font-size:.85rem;vertical-align:middle;}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-h"><a class="sb-b" href="../../index.html">ez<span>park</span></a></div>
+  <nav class="sb-n">
+    <div class="ns">메인</div>
+    <a href="../admin/dashboard.html" class="nl"><i class="bi bi-speedometer2"></i>대시보드</a>
+    <div class="ns">서비스</div>
+    <a href="../service/map.html"         class="nl"><i class="bi bi-map"></i>실시간 주차 지도</a>
+    <a href="../service/reservation.html" class="nl"><i class="bi bi-calendar2-check"></i>예약 시스템</a>
+    <a href="../service/payment.html"     class="nl"><i class="bi bi-credit-card"></i>결제 및 정산</a>
+    <a href="../service/history.html"     class="nl"><i class="bi bi-clock-history"></i>이용 내역</a>
+    <a href="../service/vehicle.html"     class="nl"><i class="bi bi-car-front"></i>차량 관리</a>
+    <div class="ns">AI & 데이터</div>
+    <a href="../ai/monitoring.html" class="nl"><i class="bi bi-camera-video"></i>AI 모니터링</a>
+    <a href="../ai/forecast.html"   class="nl"><i class="bi bi-graph-up-arrow"></i>수요 예측</a>
+    <a href="../ai/logs.html"       class="nl"><i class="bi bi-list-ul"></i>인지 로그</a>
+    <a href="../ai/stats.html"      class="nl"><i class="bi bi-bar-chart-line"></i>K-AI 통계</a>
+    <a href="../ai/rpa.html"        class="nl"><i class="bi bi-robot"></i>RPA 현황</a>
+    <div class="ns">설정</div>
+    <a href="../admin/faq.html" class="nl"><i class="bi bi-question-circle"></i>FAQ & 지원</a>
+    <a href="settings.html"     class="nl active"><i class="bi bi-gear"></i>시스템 설정</a>
+  </nav>
+  <div class="sb-f"><div class="ui">
+    <div class="av" id="av">D</div>
+    <div style="flex:1"><div class="un" id="ud">관리자</div><div class="ur">Admin</div></div>
+    <button class="blo" id="blo"><i class="bi bi-box-arrow-right"></i></button>
+  </div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-t"><i class="bi bi-gear me-2 text-primary"></i>시스템 설정</span>
+  </div>
+
+  <div class="content">
+    <div class="gc">
+      <!-- VERTICAL TABS -->
+      <div class="v-tabs nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#v-profile" type="button">프로필 관리</button>
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-security" type="button">계정 보안</button>
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-noti" type="button">알림 설정</button>
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#v-sync" type="button">연동 서비스</button>
+      </div>
+
+      <!-- TAB CONTENT -->
+      <div class="tab-content w-100">
+
+        <!-- PROFILE TAB -->
+        <div class="tab-pane fade show active" id="v-profile">
+          <div class="s-title"><i class="bi bi-person-circle text-primary"></i> 내 프로필</div>
+          
+          <div class="d-flex align-items-center gap-4 mb-4">
+            <div class="avatar-lg" id="avatar-lg">D</div>
+            <div>
+              <button class="btn btn-sm btn-outline-primary rounded-3 mb-1 px-3">사진 변경</button>
+              <div style="font-size:.75rem;color:#6c757d;">JPG, PNG 포맷 지원 (최대 5MB)</div>
+            </div>
+          </div>
+
+          <div class="row g-4" style="max-width:600px;">
+            <div class="col-sm-6">
+              <label class="form-label">이름</label>
+              <input type="text" class="form-control rounded-3" value="관리자" id="pf-name"/>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">이메일 (로그인 ID)</label>
+              <input type="email" class="form-control rounded-3" value="demo@ezpark.kr" disabled/>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">연락처</label>
+              <input type="text" class="form-control rounded-3" value="010-1234-5678"/>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">소속 기관/회사</label>
+              <input type="text" class="form-control rounded-3" value="ezpark 운영센터"/>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">직책</label>
+              <input type="text" class="form-control rounded-3" value="시스템 관리자"/>
+            </div>
+            <div class="col-12 mt-4 text-end">
+              <button class="btn btn-primary px-4 rounded-3 fw-bold" id="btn-save">변경사항 저장</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECURITY TAB -->
+        <div class="tab-pane fade" id="v-security">
+          <div class="s-title"><i class="bi bi-shield-lock text-primary"></i> 계정 보안</div>
+          
+          <h6 style="font-weight:700;font-size:.95rem;margin-bottom:16px;">비밀번호 변경</h6>
+          <div class="row g-3" style="max-width:400px;margin-bottom:32px;">
+            <div class="col-12">
+              <input type="password" class="form-control rounded-3" placeholder="현재 비밀번호"/>
+            </div>
+            <div class="col-12">
+              <input type="password" class="form-control rounded-3" placeholder="새 비밀번호 (8자 이상 영문+숫자)"/>
+            </div>
+            <div class="col-12">
+              <input type="password" class="form-control rounded-3" placeholder="새 비밀번호 확인"/>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-secondary rounded-3">비밀번호 업데이트</button>
+            </div>
+          </div>
+
+          <hr style="border-color:#e9ecef;margin:24px 0;"/>
+
+          <h6 style="font-weight:700;font-size:.95rem;margin-bottom:8px;">2단계 인증 (2FA)</h6>
+          <div class="setting-row">
+            <div class="sr-info">
+              <div class="sr-title">로그인 2단계 인증 활성화</div>
+              <div class="sr-desc">새로운 기기에서 로그인할 때 이메일 또는 SMS로 인증 코드를 요구합니다.</div>
+            </div>
+            <div class="form-check form-switch fs-5 m-0">
+              <input class="form-check-input" type="checkbox" role="switch"/>
+            </div>
+          </div>
+
+          <hr style="border-color:#e9ecef;margin:24px 0;"/>
+
+          <h6 style="font-weight:700;font-size:.95rem;margin-bottom:12px;">최근 로그인 기록</h6>
+          <table class="table login-table table-bordered mb-0" style="max-width:600px;">
+            <thead><tr><th>날짜 및 시간</th><th>IP 주소</th><th>브라우저/기기</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr><td>2026.07.07 03:40</td><td>192.168.0.12</td><td>Chrome / Windows</td><td><span class="badge bg-success">현재 접속</span></td></tr>
+              <tr><td>2026.07.06 14:22</td><td>211.234.xx.xx</td><td>Safari / iOS</td><td><span class="badge bg-secondary">성공</span></td></tr>
+              <tr><td>2026.07.05 09:10</td><td>192.168.0.12</td><td>Chrome / Windows</td><td><span class="badge bg-secondary">성공</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- NOTIFICATION TAB -->
+        <div class="tab-pane fade" id="v-noti">
+          <div class="s-title"><i class="bi bi-bell text-primary"></i> 알림 설정</div>
+
+          <h6 style="font-weight:700;font-size:.95rem;margin-bottom:12px;">수신 채널 설정</h6>
+          <div class="card card-body border-0 bg-light rounded-4 mb-4">
+            <div class="setting-row pt-0 border-0 pb-2">
+              <div class="sr-info">
+                <div class="sr-title">이메일 알림</div>
+              </div>
+              <div class="form-check form-switch fs-5 m-0"><input class="form-check-input" type="checkbox" checked/></div>
+            </div>
+            <div class="setting-row border-0 py-2">
+              <div class="sr-info">
+                <div class="sr-title">SMS/카카오톡 알림</div>
+              </div>
+              <div class="form-check form-switch fs-5 m-0"><input class="form-check-input" type="checkbox" checked/></div>
+            </div>
+            <div class="setting-row border-0 py-2 pb-0">
+              <div class="sr-info">
+                <div class="sr-title">웹 브라우저 푸시 알림</div>
+              </div>
+              <div class="form-check form-switch fs-5 m-0"><input class="form-check-input" type="checkbox"/></div>
+            </div>
+          </div>
+
+          <h6 style="font-weight:700;font-size:.95rem;margin-bottom:12px;">항목별 알림 설정</h6>
+          <div class="setting-row pt-0">
+            <div class="sr-info">
+              <div class="sr-title">비인가 차량 감지 알림 (관리자용)</div>
+              <div class="sr-desc">AI 모니터링이 비인가 차량을 감지했을 때 즉시 알림을 받습니다.</div>
+            </div>
+            <div class="form-check form-switch fs-5 m-0"><input class="form-check-input" type="checkbox" checked/></div>
+          </div>
+          <div class="setting-row">
+            <div class="sr-info">
+              <div class="sr-title">구역 만차 경고 알림 (관리자용)</div>
+              <div class="sr-desc">특정 구역의 주차 혼잡도가 95%를 초과할 때 알림을 받습니다.</div>
+            </div>
+            <div class="form-check form-switch fs-5 m-0"><input class="form-check-input" type="checkbox" checked/></div>
+          </div>
+          <div class="setting-row">
+            <div class="sr-info">
+              <div class="sr-title">예약 리마인드 알림</div>
+              <div class="sr-desc">예약 시간 30분 전 안내 알림을 받습니다.</div>
+            </div>
+            <div class="form-check form-switch fs-5 m-0"><input class="form-check-input" type="checkbox" checked/></div>
+          </div>
+          <div class="setting-row">
+            <div class="sr-info">
+              <div class="sr-title">정기권 만료 안내 알림</div>
+              <div class="sr-desc">월정기권 만료 7일 전 및 1일 전 갱신 안내 알림을 받습니다.</div>
+            </div>
+            <div class="form-check form-switch fs-5 m-0"><input class="form-check-input" type="checkbox" checked/></div>
+          </div>
+
+        </div>
+
+        <!-- SYNC TAB -->
+        <div class="tab-pane fade" id="v-sync">
+          <div class="s-title"><i class="bi bi-link-45deg text-primary"></i> 연동 서비스 관리</div>
+          <p class="text-muted" style="font-size:.85rem;margin-bottom:24px;">ezpark 플랫폼과 연계된 외부 서비스(데이터 수집, 인증 등) 목록입니다.</p>
+
+          <div class="card border-0 shadow-sm mb-3 rounded-4 p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" height="24" alt="google"/>
+                <div>
+                  <div style="font-weight:700;font-size:.9rem;">Google 계정 연동</div>
+                  <div style="font-size:.75rem;color:#6c757d;">간편 로그인 및 캘린더 예약 연동</div>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-outline-danger rounded-pill px-3">연결 해제</button>
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm mb-3 rounded-4 p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <div style="width:40px;height:40px;background:#f8f9fc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#198754;"><i class="bi bi-database"></i></div>
+                <div>
+                  <div style="font-weight:700;font-size:.9rem;">공공데이터포털 연동 API</div>
+                  <div style="font-size:.75rem;color:#6c757d;">RPA 수집용 교통/기상 데이터 (정상 작동 중)</div>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">키 갱신</button>
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm mb-3 rounded-4 p-3 opacity-50">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <div style="width:40px;height:40px;background:#f8f9fc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#6f42c1;"><i class="bi bi-slack"></i></div>
+                <div>
+                  <div style="font-weight:700;font-size:.9rem;">Slack 알림 연동</div>
+                  <div style="font-size:.75rem;color:#6c757d;">관리자 채널 시스템 알림 수신</div>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-primary rounded-pill px-3">연결하기</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function(){
+    if(!sessionStorage.getItem('ez_logged_in')) window.location.replace('../auth/login.html');
+    const u=sessionStorage.getItem('ez_user')||'관리자';
+    document.getElementById('ud').textContent=u;
+    document.getElementById('avatar-lg').textContent=u.charAt(0).toUpperCase();
+    document.getElementById('av').textContent=u.charAt(0).toUpperCase();
+    document.getElementById('pf-name').value=u;
+  })();
+  document.getElementById('blo').addEventListener('click',()=>{sessionStorage.clear();window.location.href='../../index.html';});
+  document.getElementById('btn-save').addEventListener('click',()=>{
+    const newName=document.getElementById('pf-name').value;
+    sessionStorage.setItem('ez_user',newName);
+    alert('프로필이 성공적으로 저장되었습니다.');
+    window.location.reload();
+  });
+</script>
+</body>
+</html>

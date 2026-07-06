@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FAQ & 고객 지원 - ezpark</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+  <style>
+    :root{--sw:260px;--pri:#0d6efd;--bg:#f0f2f8;--sbg:#0f1923;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Pretendard Variable','Noto Sans KR',sans-serif;background:var(--bg);}
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--sbg);display:flex;flex-direction:column;z-index:100;}
+    .sb-h{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .sb-b{font-size:1.4rem;font-weight:900;color:#fff;text-decoration:none;}
+    .sb-b span{color:#6ea8fe;}
+    .sb-n{flex:1;overflow-y:auto;padding:14px 0;}
+    .ns{padding:10px 18px 4px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;}
+    .nl{display:flex;align-items:center;gap:10px;padding:10px 18px;color:rgba(255,255,255,.45);text-decoration:none;font-size:.88rem;border-left:3px solid transparent;transition:all .2s;}
+    .nl i{font-size:.9rem;width:18px;text-align:center;}
+    .nl:hover{color:#fff;background:rgba(255,255,255,.04);}
+    .nl.active{color:#fff;border-left-color:var(--pri);background:rgba(13,110,253,.1);}
+    .sb-f{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);}
+    .ui{display:flex;align-items:center;gap:10px;}
+    .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pri),#0dcaf0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;}
+    .un{font-size:.82rem;font-weight:600;color:#fff;}
+    .ur{font-size:.68rem;color:rgba(255,255,255,.35);}
+    .blo{background:none;border:none;color:rgba(255,255,255,.35);font-size:.9rem;cursor:pointer;}
+    .blo:hover{color:#dc3545;}
+    .main{margin-left:var(--sw);min-height:100vh;}
+    .topbar{background:#fff;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9ecef;position:sticky;top:0;z-index:50;}
+    .topbar-t{font-size:1rem;font-weight:700;}
+    .content{padding:24px;}
+    .gc{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+    .gh{padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:center;}
+    .gb{padding:24px;}
+
+    /* TABS */
+    .nav-tabs .nav-link{color:#6c757d;font-weight:600;border:none;border-bottom:3px solid transparent;padding:12px 20px;}
+    .nav-tabs .nav-link:hover{color:#0d6efd;}
+    .nav-tabs .nav-link.active{color:#0d6efd;border-bottom-color:#0d6efd;background:none;}
+    .nav-tabs{border-bottom:1px solid #dee2e6;margin-bottom:24px;}
+
+    /* FAQ ACCORDION */
+    .filter-btn{padding:6px 16px;border-radius:20px;border:1.5px solid #e9ecef;background:#fff;font-size:.8rem;font-weight:600;color:#6c757d;transition:all .2s;}
+    .filter-btn.active,.filter-btn:hover{background:#0d6efd;border-color:#0d6efd;color:#fff;}
+    .accordion-item{border:1px solid #e9ecef;border-radius:12px!important;margin-bottom:10px;overflow:hidden;}
+    .accordion-button{font-weight:600;font-size:.95rem;color:#0f1923;background:#fff;box-shadow:none!important;padding:16px 20px;}
+    .accordion-button:not(.collapsed){color:#0d6efd;background:#f8f9fc;}
+    .accordion-body{font-size:.88rem;color:#495057;line-height:1.6;padding:16px 20px;background:#fff;}
+
+    /* NOTICE LIST */
+    .notice-item{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #f0f2f5;cursor:pointer;}
+    .notice-item:hover .nt-title{color:#0d6efd;}
+    .notice-item:last-child{border-bottom:none;}
+    .nt-badge{font-size:.7rem;padding:3px 8px;border-radius:4px;font-weight:700;margin-right:10px;}
+    .nt-title{font-size:.9rem;font-weight:600;color:#0f1923;transition:color .2s;}
+    .nt-date{font-size:.8rem;color:#94a3b8;}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-h"><a class="sb-b" href="../../index.html">ez<span>park</span></a></div>
+  <nav class="sb-n">
+    <div class="ns">메인</div>
+    <a href="../admin/dashboard.html" class="nl"><i class="bi bi-speedometer2"></i>대시보드</a>
+    <div class="ns">서비스</div>
+    <a href="../service/map.html"         class="nl"><i class="bi bi-map"></i>실시간 주차 지도</a>
+    <a href="../service/reservation.html" class="nl"><i class="bi bi-calendar2-check"></i>예약 시스템</a>
+    <a href="../service/payment.html"     class="nl"><i class="bi bi-credit-card"></i>결제 및 정산</a>
+    <a href="../service/history.html"     class="nl"><i class="bi bi-clock-history"></i>이용 내역</a>
+    <a href="../service/vehicle.html"     class="nl"><i class="bi bi-car-front"></i>차량 관리</a>
+    <div class="ns">AI & 데이터</div>
+    <a href="../ai/monitoring.html" class="nl"><i class="bi bi-camera-video"></i>AI 모니터링</a>
+    <a href="../ai/forecast.html"   class="nl"><i class="bi bi-graph-up-arrow"></i>수요 예측</a>
+    <a href="../ai/logs.html"       class="nl"><i class="bi bi-list-ul"></i>인지 로그</a>
+    <a href="../ai/stats.html"      class="nl"><i class="bi bi-bar-chart-line"></i>K-AI 통계</a>
+    <a href="../ai/rpa.html"        class="nl"><i class="bi bi-robot"></i>RPA 현황</a>
+    <div class="ns">설정</div>
+    <a href="faq.html"              class="nl active"><i class="bi bi-question-circle"></i>FAQ & 지원</a>
+    <a href="../auth/settings.html" class="nl"><i class="bi bi-gear"></i>시스템 설정</a>
+  </nav>
+  <div class="sb-f"><div class="ui">
+    <div class="av" id="av">D</div>
+    <div style="flex:1"><div class="un" id="ud">관리자</div><div class="ur">Admin</div></div>
+    <button class="blo" id="blo"><i class="bi bi-box-arrow-right"></i></button>
+  </div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-t"><i class="bi bi-question-circle me-2 text-primary"></i>FAQ & 고객 지원</span>
+  </div>
+
+  <div class="content">
+    <div class="gc">
+      <div class="gb pt-2">
+        <!-- TABS -->
+        <ul class="nav nav-tabs" id="supportTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-faq" type="button">자주 묻는 질문(FAQ)</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-qna" type="button">1:1 문의</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-notice" type="button">공지사항</button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- FAQ TAB -->
+          <div class="tab-pane fade show active" id="tab-faq">
+            <div class="d-flex flex-wrap gap-2 mb-4">
+              <button class="filter-btn active">전체</button>
+              <button class="filter-btn">결제/요금</button>
+              <button class="filter-btn">예약/이용</button>
+              <button class="filter-btn">AI 모니터링</button>
+              <button class="filter-btn">계정 관리</button>
+            </div>
+
+            <div class="accordion" id="faqAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">주차 예약은 얼마나 미리 할 수 있나요?</button></h2>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">주차 예약은 이용 예정 시간으로부터 <strong>최대 14일 전</strong>부터 <strong>최소 1시간 전</strong>까지 가능합니다. 단, 실시간 AI 수요 예측에 따라 특정 시간대의 예약 가능 슬롯이 제한될 수 있습니다.</div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">AI 번호판 인식이 안 될 경우 어떻게 하나요?</button></h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">폭우나 눈, 번호판 훼손 등으로 AI 인식이 실패할 경우, 정산소 앞 호출 버튼을 눌러 관리자에게 연결해 주세요. 시스템 관리자가 수동으로 캡처 이미지를 확인하여 처리해 드립니다.</div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">월정기권 환불은 어떻게 신청하나요?</button></h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">월정기권 환불은 [차량 관리] > [월정기권 관리] 메뉴에서 신청하실 수 있습니다. 이용 개시일 전에는 전액 환불되며, 이용 개시 후에는 사용 일수 및 위약금을 공제한 잔액이 환불됩니다. 자세한 산정 방식은 약관을 참조해 주세요.</div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">비인가 차량 감지 시 어떻게 처리되나요?</button></h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">지정 주차 구역(예: 프리미엄 전용, 장애인 전용)에 권한이 없는 차량이 진입할 경우, AI 시스템이 즉각 감지하여 관리자에게 알림을 발송합니다. 해당 차량 소유주에게는 이동 주차 안내 메시지가 발송되며, 미이동 시 추가 요금이 부과될 수 있습니다.</div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">결제 수단을 변경하고 싶습니다.</button></h2>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">[결제 및 정산] > [결제 수단 관리] 메뉴에서 새로운 신용카드나 간편결제를 등록하고 기본 결제 수단으로 변경할 수 있습니다. 변경된 결제 수단은 다음 자동 결제부터 적용됩니다.</div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">주차 요금 할인 쿠폰은 어디서 받나요?</button></h2>
+                <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">이벤트로 지급되는 쿠폰은 [결제 및 정산] > [포인트/할인] 탭에서 확인 가능합니다. 또한 제휴 상가에서 제공하는 주차 할인 바코드를 소지하신 경우, 출차 전 정산기나 앱에 바코드를 스캔하여 할인받을 수 있습니다.</div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">장애인 주차 구역 이용 방법</button></h2>
+                <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">장애인 주차 구역을 이용하시려면 사전에 [차량 관리]에서 장애인 차량 표지를 등록해야 합니다. 승인 후 시스템에 등록되며, 미등록 차량이 해당 구역에 주차할 경우 AI 모니터링을 통해 경고 알림 및 단속 대상이 됩니다.</div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">앱/서비스 오류 신고 방법</button></h2>
+                <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">서비스 이용 중 오류를 발견하신 경우, 이 페이지의 [1:1 문의] 탭을 통해 스크린샷과 함께 오류 내용을 남겨주시면 신속하게 조치하겠습니다.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1:1 QNA TAB -->
+          <div class="tab-pane fade" id="tab-qna">
+            <div class="row g-4">
+              <div class="col-lg-7">
+                <h6 style="font-weight:700;margin-bottom:16px;"><i class="bi bi-pencil-square me-2"></i>새 문의 작성</h6>
+                <div class="card card-body border-0 bg-light rounded-4">
+                  <div class="mb-3">
+                    <label class="form-label" style="font-size:.85rem;font-weight:600;">문의 유형</label>
+                    <select class="form-select rounded-3">
+                      <option>시스템 오류</option><option>결제/환불</option><option>예약 취소</option><option>기타</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" style="font-size:.85rem;font-weight:600;">제목</label>
+                    <input type="text" class="form-control rounded-3" placeholder="문의 제목을 입력하세요"/>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" style="font-size:.85rem;font-weight:600;">내용</label>
+                    <textarea class="form-control rounded-3" rows="5" placeholder="상세 내용을 입력해 주세요. (스크린샷 첨부 시 더 빠른 처리가 가능합니다)"></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <input type="file" class="form-control form-control-sm rounded-3"/>
+                  </div>
+                  <div class="text-end">
+                    <button class="btn btn-primary rounded-3 px-4">문의 접수</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-5">
+                <h6 style="font-weight:700;margin-bottom:16px;"><i class="bi bi-clock-history me-2"></i>최근 문의 내역</h6>
+                <div class="list-group">
+                  <div class="list-group-item border-0 border-bottom bg-transparent py-3 px-0">
+                    <div class="d-flex justify-content-between mb-1">
+                      <span class="badge bg-success">답변완료</span>
+                      <small class="text-muted">2026.07.05</small>
+                    </div>
+                    <div style="font-size:.9rem;font-weight:600;color:#0f1923;margin-bottom:4px;">어제 C구역 주차 요금 중복 결제 건</div>
+                    <p style="font-size:.8rem;color:#6c757d;margin:0;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">환불 처리 완료되었습니다. 이용에 불편을 드려 죄송합니다.</p>
+                  </div>
+                  <div class="list-group-item border-0 border-bottom bg-transparent py-3 px-0">
+                    <div class="d-flex justify-content-between mb-1">
+                      <span class="badge bg-warning text-dark">처리중</span>
+                      <small class="text-muted">2026.07.07</small>
+                    </div>
+                    <div style="font-size:.9rem;font-weight:600;color:#0f1923;margin-bottom:4px;">차량 등록 시 사진 첨부 오류 발생</div>
+                    <p style="font-size:.8rem;color:#6c757d;margin:0;">모바일 환경에서 차량 등록 시 이미지가 업로드 되지 않습니다...</p>
+                  </div>
+                  <div class="list-group-item border-0 bg-transparent py-3 px-0">
+                    <div class="d-flex justify-content-between mb-1">
+                      <span class="badge bg-secondary">접수</span>
+                      <small class="text-muted">방금 전</small>
+                    </div>
+                    <div style="font-size:.9rem;font-weight:600;color:#0f1923;margin-bottom:4px;">정기권 결제 카드 변경 관련 문의</div>
+                    <p style="font-size:.8rem;color:#6c757d;margin:0;">이번 달 결제될 카드를 미리 변경했는데 정상 적용되나요?</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTICE TAB -->
+          <div class="tab-pane fade" id="tab-notice">
+            <div class="notice-item">
+              <div class="d-flex align-items-center">
+                <span class="nt-badge bg-danger">중요</span>
+                <span class="nt-title">ezpark 서버 정기 점검 안내 (7/15 02:00 ~ 04:00)</span>
+              </div>
+              <span class="nt-date">2026.07.05</span>
+            </div>
+            <div class="notice-item">
+              <div class="d-flex align-items-center">
+                <span class="nt-badge bg-primary">일반</span>
+                <span class="nt-title">여름 휴가철 A구역 주차 요금 특별 할인 이벤트</span>
+              </div>
+              <span class="nt-date">2026.07.01</span>
+            </div>
+            <div class="notice-item">
+              <div class="d-flex align-items-center">
+                <span class="nt-badge bg-primary">일반</span>
+                <span class="nt-title">신규 AI 번호판 인식 모델(v2.1) 적용 완료 안내</span>
+              </div>
+              <span class="nt-date">2026.06.28</span>
+            </div>
+            <div class="notice-item">
+              <div class="d-flex align-items-center">
+                <span class="nt-badge bg-primary">일반</span>
+                <span class="nt-title">개인정보 처리방침 일부 개정 안내</span>
+              </div>
+              <span class="nt-date">2026.06.15</span>
+            </div>
+            <div class="notice-item">
+              <div class="d-flex align-items-center">
+                <span class="nt-badge bg-primary">일반</span>
+                <span class="nt-title">ezpark 스마트 주차관제 플랫폼 정식 오픈</span>
+              </div>
+              <span class="nt-date">2026.06.01</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function(){
+    if(!sessionStorage.getItem('ez_logged_in')) window.location.replace('../auth/login.html');
+    const u=sessionStorage.getItem('ez_user')||'관리자';
+    document.getElementById('ud').textContent=u;
+    document.getElementById('av').textContent=u.charAt(0).toUpperCase();
+  })();
+  document.getElementById('blo').addEventListener('click',()=>{sessionStorage.clear();window.location.href='../../index.html';});
+</script>
+</body>
+</html>
