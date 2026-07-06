@@ -1,105 +1,407 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ezpark - 스마트 주차관제 및 유도 시스템</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts: Pretendard -->
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/layout.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ezpark - 스마트 주차관제 및 유도 시스템</title>
+  <meta name="description" content="AI 기반 실시간 이동체 인지 영상 분석으로 주차 혼잡을 해결하는 스마트 주차관제 플랫폼, ezpark" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ─── Landing-only styles ─── */
+    body { font-family: 'Pretendard Variable', 'Noto Sans KR', sans-serif; scroll-behavior: smooth; }
+
+    /* HEADER */
+    .lp-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      padding: 16px 0;
+      background: rgba(10, 14, 26, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.3s;
+    }
+    .lp-header .brand { font-size: 1.5rem; font-weight: 800; color: #fff; text-decoration: none; letter-spacing: 1px; }
+    .lp-header .brand span { color: var(--ez-primary); }
+    .lp-header .nav-link { color: rgba(255,255,255,0.75); font-weight: 500; transition: color 0.2s; }
+    .lp-header .nav-link:hover { color: #fff; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0e1a 0%, #0d1b35 50%, #081426 100%);
+      display: flex; align-items: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 60% 50%, rgba(13,110,253,0.18) 0%, transparent 70%),
+                  radial-gradient(ellipse at 10% 80%, rgba(25,135,84,0.12) 0%, transparent 60%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 50px;
+      background: rgba(13,110,253,0.15); border: 1px solid rgba(13,110,253,0.4);
+      color: #6ea8fe; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.5px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 900; color: #fff;
+      line-height: 1.15; margin-bottom: 24px;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(90deg, #6ea8fe, #0dcaf0);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p.lead { color: rgba(255,255,255,0.65); font-size: 1.15rem; line-height: 1.75; margin-bottom: 40px; }
+    .hero-visual {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 32px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-stat { text-align: center; padding: 16px 0; }
+    .hero-stat .num { font-size: 2.2rem; font-weight: 900; color: #fff; line-height: 1; }
+    .hero-stat .num.green { color: #20c997; }
+    .hero-stat .num.blue  { color: #6ea8fe; }
+    .hero-stat .label { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .hero-map-placeholder {
+      background: linear-gradient(145deg, rgba(13,110,253,0.1), rgba(25,135,84,0.08));
+      border: 1px dashed rgba(13,110,253,0.3); border-radius: 12px;
+      height: 200px; display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.3); font-size: 0.88rem;
+      margin-top: 16px;
+    }
+
+    /* SECTION SHARED */
+    section { padding: 100px 0; }
+    .section-title { font-size: 2.2rem; font-weight: 800; color: #0f1923; }
+    .section-sub  { color: #6c757d; font-size: 1.05rem; margin-top: 12px; }
+
+    /* FEATURES */
+    .features { background: #f8f9fc; }
+    .feat-card {
+      background: #fff; border-radius: 16px; padding: 36px 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+      height: 100%;
+    }
+    .feat-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(13,110,253,0.12); }
+    .feat-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 20px;
+    }
+    .feat-card h5 { font-weight: 700; color: #0f1923; margin-bottom: 12px; }
+    .feat-card p  { color: #6c757d; font-size: 0.93rem; line-height: 1.7; margin: 0; }
+
+    /* HOW IT WORKS */
+    .how-it-works { background: #fff; }
+    .step-wrap { position: relative; }
+    .step-line {
+      position: absolute; top: 28px; left: calc(50% + 28px); right: 0;
+      height: 2px; background: linear-gradient(90deg, #0d6efd44, transparent);
+    }
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+      color: #fff; font-weight: 800; font-size: 1.3rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; box-shadow: 0 4px 16px rgba(13,110,253,0.35);
+    }
+    .step-card h6 { font-weight: 700; margin-bottom: 8px; color: #0f1923; }
+    .step-card p  { font-size: 0.88rem; color: #6c757d; margin: 0; }
+
+    /* STATS BAND */
+    .stats-band {
+      background: linear-gradient(135deg, #0d1b35, #0a0e1a);
+      color: #fff; padding: 80px 0;
+    }
+    .band-num { font-size: 3rem; font-weight: 900; color: #6ea8fe; }
+    .band-label { color: rgba(255,255,255,0.55); font-size: 0.9rem; margin-top: 4px; }
+
+    /* CTA */
+    .cta-section {
+      background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+      color: #fff; padding: 100px 0; text-align: center;
+    }
+    .cta-section h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 16px; }
+    .cta-section p  { font-size: 1.1rem; opacity: 0.85; margin-bottom: 40px; }
+
+    /* FOOTER */
+    footer {
+      background: #0a0e1a; color: rgba(255,255,255,0.45);
+      padding: 60px 0 30px;
+    }
+    footer .brand { font-size: 1.4rem; font-weight: 800; color: #fff; }
+    footer .brand span { color: #6ea8fe; }
+    footer a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.9rem; }
+    footer a:hover { color: #fff; }
+    footer .divider { border-color: rgba(255,255,255,0.07); margin: 40px 0 24px; }
+    footer .copy { font-size: 0.82rem; }
+
+    /* BTN OVERRIDES */
+    .btn-hero-primary {
+      background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+      color: #fff; border: none;
+      padding: 14px 36px; border-radius: 50px;
+      font-weight: 700; font-size: 1rem;
+      box-shadow: 0 4px 20px rgba(13,110,253,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(13,110,253,0.55); color:#fff; }
+    .btn-hero-outline {
+      background: transparent; color: rgba(255,255,255,0.8);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      padding: 14px 32px; border-radius: 50px;
+      font-weight: 600; font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .btn-hero-outline:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.06); }
+  </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3 class="logo-text">🚗 ezpark</h3>
-        </div>
-        <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link active" href="index.html">메인 대시보드</a></li>
-            <li class="nav-item"><a class="nav-link" href="pages/service/map.html">실시간 주차 지도</a></li>
-            <li class="nav-item"><a class="nav-link" href="pages/ai/monitoring.html">AI 영상 모니터링</a></li>
-            <li class="nav-item"><a class="nav-link" href="pages/admin/dashboard.html">관리자 설정</a></li>
-        </ul>
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<header class="lp-header" id="lp-header">
+  <div class="container">
+    <nav class="d-flex justify-content-between align-items-center">
+      <a class="brand" href="index.html">ez<span>park</span></a>
+      <ul class="nav gap-1 d-none d-md-flex">
+        <li><a class="nav-link px-3" href="#features">기능</a></li>
+        <li><a class="nav-link px-3" href="#how">이용 방법</a></li>
+        <li><a class="nav-link px-3" href="#stats">통계</a></li>
+      </ul>
+      <div class="d-flex gap-2">
+        <a href="pages/auth/login.html" class="btn btn-outline-light rounded-pill px-4" style="font-weight:600;">로그인</a>
+        <a href="pages/auth/register.html" class="btn btn-primary rounded-pill px-4" style="font-weight:600;">시작하기</a>
+      </div>
     </nav>
+  </div>
+</header>
 
-    <!-- Main Content -->
-    <div class="main-content" id="main-content">
-        <!-- Top Navbar -->
-        <header class="top-navbar d-flex justify-content-between align-items-center mb-4">
-            <button class="btn btn-outline-secondary d-md-none" id="menu-toggle">☰</button>
-            <h4 class="mb-0 fw-bold">메인 대시보드</h4>
-            <div class="user-profile">
-                <a href="pages/auth/login.html" class="btn btn-primary rounded-pill px-4">로그인</a>
-            </div>
-        </header>
-
-        <!-- Dashboard Widgets -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <h6 class="text-muted">전체 주차면 수</h6>
-                    <h2 class="fw-bold text-dark">1,200 <span class="fs-6 fw-normal">면</span></h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left-color: var(--primary-color);">
-                    <h6 class="text-muted">현재 이용 중</h6>
-                    <h2 class="fw-bold text-primary">845 <span class="fs-6 fw-normal">대</span></h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left-color: var(--secondary-color);">
-                    <h6 class="text-muted">잔여 주차 공간</h6>
-                    <h2 class="fw-bold text-success">355 <span class="fs-6 fw-normal">면</span></h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left-color: var(--accent-color);">
-                    <h6 class="text-muted">혼잡도</h6>
-                    <h2 class="fw-bold text-danger">70% <span class="fs-6 fw-normal text-muted">여유로움</span></h2>
-                </div>
-            </div>
+<!-- ══════════════════ HERO SECTION ══════════════════ -->
+<section class="hero" id="home">
+  <div class="container position-relative">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-6">
+        <div class="hero-badge">
+          <i class="bi bi-camera-video-fill"></i> K-AI 연계 영상 인지 분석 플랫폼
         </div>
-
-        <div class="row g-4">
-            <!-- Main Chart Area -->
-            <div class="col-lg-8">
-                <div class="glass-card h-100 p-4">
-                    <h5 class="fw-bold mb-3">시간대별 주차 수요 예측</h5>
-                    <div class="chart-placeholder d-flex align-items-center justify-content-center text-muted rounded" style="height: 300px; background-color: #f1f3f5;">
-                        [ 차트 영역 ] - Plotly 또는 Chart.js 연동 예정
-                    </div>
-                </div>
-            </div>
-            <!-- Notifications / Logs -->
-            <div class="col-lg-4">
-                <div class="glass-card h-100 p-4">
-                    <h5 class="fw-bold mb-3">실시간 알림</h5>
-                    <ul class="list-group list-group-flush bg-transparent">
-                        <li class="list-group-item bg-transparent px-0 border-light border-bottom">
-                            <span class="badge bg-danger rounded-pill me-2">경고</span> B구역 2층 비인가 차량 감지
-                            <div class="text-muted small mt-1">방금 전</div>
-                        </li>
-                        <li class="list-group-item bg-transparent px-0 border-light border-bottom">
-                            <span class="badge bg-success rounded-pill me-2">안내</span> A구역 만차 해제
-                            <div class="text-muted small mt-1">10분 전</div>
-                        </li>
-                        <li class="list-group-item bg-transparent px-0 border-light">
-                            <span class="badge bg-primary rounded-pill me-2">시스템</span> AI 영상 분석 모듈 업데이트 완료
-                            <div class="text-muted small mt-1">1시간 전</div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        <h1>주차 걱정 없는 세상,<br><span class="highlight">AI가 안내합니다</span></h1>
+        <p class="lead">실시간 CCTV 이동체 인지 기술과 K-AI 빅데이터 분석으로 빈 주차 공간을 자동 탐지하고, 운전자에게 최적 경로를 즉시 제공합니다.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="pages/auth/login.html" class="btn-hero-primary btn">대시보드 접속 <i class="bi bi-arrow-right ms-1"></i></a>
+          <a href="#how" class="btn-hero-outline btn">이용 방법 보기</a>
         </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-visual">
+          <div class="row text-center g-3 mb-2">
+            <div class="col-4">
+              <div class="hero-stat">
+                <div class="num green">355</div>
+                <div class="label">잔여 주차 공간</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="hero-stat">
+                <div class="num blue">98.2%</div>
+                <div class="label">AI 인지 정확도</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="hero-stat">
+                <div class="num" style="color:#ffc107;">0.3s</div>
+                <div class="label">평균 감지 속도</div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-map-placeholder">
+            <span><i class="bi bi-geo-alt me-2"></i>실시간 주차 유도 맵 — AI 연동 예정</span>
+          </div>
+          <div class="row mt-3 g-2 text-center" style="font-size:0.78rem; color:rgba(255,255,255,0.4);">
+            <div class="col-4"><i class="bi bi-circle-fill text-success me-1" style="font-size:0.5rem;"></i>A구역 여유</div>
+            <div class="col-4"><i class="bi bi-circle-fill text-warning me-1" style="font-size:0.5rem;"></i>B구역 혼잡</div>
+            <div class="col-4"><i class="bi bi-circle-fill text-danger me-1" style="font-size:0.5rem;"></i>C구역 만차</div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+</section>
 
-    <!-- Bootstrap & Custom JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/main.js"></script>
+<!-- ══════════════════ FEATURES SECTION ══════════════════ -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">ezpark 핵심 기능</h2>
+      <p class="section-sub">AI 기술과 빅데이터로 만드는 차세대 주차 경험</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(13,110,253,0.1); color:#0d6efd;"><i class="bi bi-camera-video"></i></div>
+          <h5>AI 이동체 인지</h5>
+          <p>CCTV 영상을 실시간 분석하여 차량 및 보행자를 0.3초 이내에 인식. TensorFlow 기반 딥러닝 모델 적용.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(25,135,84,0.1); color:#198754;"><i class="bi bi-map"></i></div>
+          <h5>실시간 유도 맵</h5>
+          <p>주차 구역별 실시간 공간 현황을 시각화하여 운전자에게 최적 경로 및 빈 공간을 즉시 안내합니다.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(220,53,69,0.1); color:#dc3545;"><i class="bi bi-graph-up-arrow"></i></div>
+          <h5>수요 예측 리포트</h5>
+          <p>K-AI 연계 교통 빅데이터와 과거 이용 패턴을 분석, 시간대별 주차 수요를 사전에 예측합니다.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(255,193,7,0.1); color:#ffc107;"><i class="bi bi-calendar2-check"></i></div>
+          <h5>스마트 예약 시스템</h5>
+          <p>원하는 날짜와 시간에 주차 공간을 사전 예약하고, 자동 결제 및 할인 혜택을 제공합니다.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(13,202,240,0.1); color:#0dcaf0;"><i class="bi bi-robot"></i></div>
+          <h5>RPA 자동 수집</h5>
+          <p>공공 교통 데이터 및 K-AI 데이터를 Playwright 기반 RPA로 자동 수집·정제하여 AI 모델에 공급합니다.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(111,66,193,0.1); color:#6f42c1;"><i class="bi bi-shield-check"></i></div>
+          <h5>비인가 차량 감지</h5>
+          <p>번호판 미인식, 불법 주차, 이상 행동 등을 실시간으로 감지하고 즉시 관리자에게 알림을 전송합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ HOW IT WORKS ══════════════════ -->
+<section class="how-it-works" id="how">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">이용 방법</h2>
+      <p class="section-sub">단 4단계로 스마트 주차를 경험하세요</p>
+    </div>
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3 step-card">
+        <div class="step-num">1</div>
+        <h6>회원가입 / 로그인</h6>
+        <p>빠른 소셜 로그인 또는 이메일로 계정을 생성합니다.</p>
+      </div>
+      <div class="col-6 col-md-3 step-card">
+        <div class="step-num">2</div>
+        <h6>차량 등록</h6>
+        <p>내 차량 번호를 등록하면 입출차 시 자동으로 번호판이 인식됩니다.</p>
+      </div>
+      <div class="col-6 col-md-3 step-card">
+        <div class="step-num">3</div>
+        <h6>실시간 현황 확인</h6>
+        <p>대시보드에서 주차 지도와 수요 예측 리포트를 실시간으로 확인합니다.</p>
+      </div>
+      <div class="col-6 col-md-3 step-card">
+        <div class="step-num">4</div>
+        <h6>자동 결제 완료</h6>
+        <p>출차 시 사전 등록된 결제 수단으로 자동 정산이 처리됩니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ STATS BAND ══════════════════ -->
+<section class="stats-band" id="stats">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-6 col-md-3">
+        <div class="band-num">1,200+</div>
+        <div class="band-label">관리 주차면 수</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="band-num">98.2%</div>
+        <div class="band-label">AI 인지 정확도</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="band-num">70%</div>
+        <div class="band-label">평균 혼잡도 감소율</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="band-num">24/7</div>
+        <div class="band-label">무중단 실시간 모니터링</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CTA SECTION ══════════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <h2>지금 바로 시작하세요</h2>
+    <p>스마트 주차관제 시스템으로 운영 효율을 극대화하고<br class="d-none d-md-block"> 고객 만족도를 높이세요.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="pages/auth/register.html" class="btn btn-light text-primary fw-bold px-5 py-3 rounded-pill fs-6">무료로 시작하기 <i class="bi bi-arrow-right ms-1"></i></a>
+      <a href="pages/auth/login.html"    class="btn btn-outline-light fw-600 px-5 py-3 rounded-pill fs-6" style="font-weight:600;">로그인</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer>
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-lg-4">
+        <div class="brand mb-3">ez<span>park</span></div>
+        <p style="font-size:0.9rem; line-height:1.7;">AI 기반 스마트 주차관제 및 유도 시스템.<br>K-AI 연계 영상 분석으로 주차 혼잡을 해결합니다.</p>
+      </div>
+      <div class="col-6 col-lg-2">
+        <p class="text-white fw-600 mb-3" style="font-weight:600; font-size:0.9rem;">서비스</p>
+        <ul class="list-unstyled d-flex flex-column gap-2">
+          <li><a href="pages/service/map.html">실시간 주차 지도</a></li>
+          <li><a href="pages/service/reservation.html">예약 시스템</a></li>
+          <li><a href="pages/service/payment.html">결제 및 정산</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <p class="text-white mb-3" style="font-weight:600; font-size:0.9rem;">AI & 데이터</p>
+        <ul class="list-unstyled d-flex flex-column gap-2">
+          <li><a href="pages/ai/monitoring.html">AI 모니터링</a></li>
+          <li><a href="pages/ai/forecast.html">수요 예측</a></li>
+          <li><a href="pages/ai/stats.html">K-AI 통계</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <p class="text-white mb-3" style="font-weight:600; font-size:0.9rem;">지원</p>
+        <ul class="list-unstyled d-flex flex-column gap-2">
+          <li><a href="pages/admin/faq.html">FAQ</a></li>
+          <li><a href="pages/auth/login.html">로그인</a></li>
+          <li><a href="pages/auth/register.html">회원가입</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="divider" />
+    <p class="copy text-center mb-0">© 2026 ezpark. All rights reserved. | 팀원: 김도윤, 이서진, 박민재</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Header 스크롤 투명도 처리
+  const header = document.getElementById('lp-header');
+  window.addEventListener('scroll', () => {
+    header.style.background = window.scrollY > 50
+      ? 'rgba(10,14,26,0.97)'
+      : 'rgba(10,14,26,0.82)';
+  });
+</script>
 </body>
 </html>

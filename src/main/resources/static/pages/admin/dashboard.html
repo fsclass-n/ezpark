@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 대시보드 - ezpark</title>
+  <meta name="description" content="ezpark 스마트 주차관제 메인 대시보드 - 실시간 현황 및 AI 분석" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <style>
+    :root {
+      --sidebar-w: 260px;
+      --primary: #0d6efd;
+      --success: #198754;
+      --danger: #dc3545;
+      --bg: #f0f2f8;
+      --card-bg: #fff;
+      --text: #0f1923;
+      --muted: #6c757d;
+      --sidebar-bg: #0f1923;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Pretendard Variable', 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      display: flex; flex-direction: column;
+      z-index: 100; transition: transform 0.3s ease;
+    }
+    .sidebar-header {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-brand { font-size: 1.45rem; font-weight: 900; color: #fff; text-decoration: none; }
+    .sidebar-brand span { color: #6ea8fe; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 16px 0; }
+    .nav-section { padding: 12px 20px 6px; font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 1.5px; text-transform: uppercase; }
+    .nav-item-link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 20px; color: rgba(255,255,255,0.55);
+      text-decoration: none; font-size: 0.91rem; font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-item-link i { font-size: 1.05rem; width: 20px; text-align: center; }
+    .nav-item-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item-link.active { color: #fff; border-left-color: var(--primary); background: rgba(13,110,253,0.12); }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #0dcaf0);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .user-name { font-size: 0.85rem; font-weight: 600; color: #fff; }
+    .user-role { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+    .btn-logout { background: none; border: none; color: rgba(255,255,255,0.4); font-size: 1rem; transition: color 0.2s; cursor: pointer; }
+    .btn-logout:hover { color: #dc3545; }
+
+    /* ── MAIN ── */
+    .main-wrap { margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* TOP BAR */
+    .topbar {
+      background: #fff; padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #e9ecef;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .icon-btn {
+      width: 38px; height: 38px; border-radius: 10px;
+      border: 1.5px solid #e9ecef; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); transition: all 0.2s; cursor: pointer; position: relative;
+    }
+    .icon-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .notif-dot {
+      position: absolute; top: 6px; right: 6px;
+      width: 8px; height: 8px; background: var(--danger); border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    .hamburger { display: none; }
+
+    /* CONTENT */
+    .content { padding: 28px; flex: 1; }
+    .page-heading { font-size: 1.4rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+    .page-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 28px; }
+
+    /* STAT CARDS */
+    .stat-card {
+      background: var(--card-bg); border-radius: 16px;
+      padding: 22px 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      display: flex; align-items: center; gap: 16px;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .stat-icon {
+      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .stat-info .num { font-size: 1.85rem; font-weight: 900; line-height: 1; }
+    .stat-info .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+    .stat-info .chg { font-size: 0.78rem; margin-top: 6px; font-weight: 600; }
+    .chg.up   { color: var(--success); }
+    .chg.down { color: var(--danger); }
+
+    /* GLASS CARD */
+    .glass-card {
+      background: var(--card-bg); border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04); overflow: hidden;
+    }
+    .card-header-custom {
+      padding: 18px 22px; border-bottom: 1px solid #f0f2f5;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-header-custom h6 { font-weight: 700; font-size: 0.95rem; margin: 0; }
+    .card-body-custom { padding: 22px; }
+
+    /* PARKING MAP */
+    .park-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+    .park-slot {
+      aspect-ratio: 1.6; border-radius: 8px; border: 2px solid;
+      display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700;
+      transition: transform 0.2s;
+    }
+    .park-slot:hover { transform: scale(1.08); }
+    .park-slot.free     { background: rgba(25,135,84,0.1); border-color: #198754; color: #198754; }
+    .park-slot.busy     { background: rgba(255,193,7,0.12); border-color: #ffc107; color: #b08000; }
+    .park-slot.full     { background: rgba(220,53,69,0.1); border-color: #dc3545; color: #dc3545; }
+    .park-slot.disabled { background: #f0f2f5; border-color: #dee2e6; color: #adb5bd; }
+
+    /* CHART PLACEHOLDER */
+    .chart-placeholder {
+      background: linear-gradient(135deg, #f8f9fc, #f0f2f8);
+      border-radius: 12px; height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 0.85rem; border: 1.5px dashed #dee2e6;
+    }
+
+    /* ALERT LIST */
+    .alert-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 0; border-bottom: 1px solid #f0f2f5;
+    }
+    .alert-item:last-child { border-bottom: none; }
+    .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .alert-item .al-title { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+    .alert-item .al-time  { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* PROGRESS BAR */
+    .zone-bar { margin-bottom: 14px; }
+    .zone-bar .zname { font-size: 0.83rem; font-weight: 600; color: var(--text); }
+    .zone-bar .zval  { font-size: 0.8rem; color: var(--muted); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-wrap { margin-left: 0; }
+      .hamburger { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="../../index.html">ez<span>park</span></a>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">메인</div>
+    <a href="dashboard.html" class="nav-item-link active"><i class="bi bi-speedometer2"></i> 대시보드</a>
+
+    <div class="nav-section">서비스</div>
+    <a href="../service/map.html"         class="nav-item-link"><i class="bi bi-map"></i> 실시간 주차 지도</a>
+    <a href="../service/reservation.html" class="nav-item-link"><i class="bi bi-calendar2-check"></i> 예약 시스템</a>
+    <a href="../service/payment.html"     class="nav-item-link"><i class="bi bi-credit-card"></i> 결제 및 정산</a>
+    <a href="../service/history.html"     class="nav-item-link"><i class="bi bi-clock-history"></i> 이용 내역</a>
+    <a href="../service/vehicle.html"     class="nav-item-link"><i class="bi bi-car-front"></i> 차량 관리</a>
+
+    <div class="nav-section">AI & 데이터</div>
+    <a href="../ai/monitoring.html" class="nav-item-link"><i class="bi bi-camera-video"></i> AI 모니터링</a>
+    <a href="../ai/forecast.html"   class="nav-item-link"><i class="bi bi-graph-up-arrow"></i> 수요 예측</a>
+    <a href="../ai/logs.html"       class="nav-item-link"><i class="bi bi-list-ul"></i> 인지 로그</a>
+    <a href="../ai/stats.html"      class="nav-item-link"><i class="bi bi-bar-chart-line"></i> K-AI 통계</a>
+    <a href="../ai/rpa.html"        class="nav-item-link"><i class="bi bi-robot"></i> RPA 현황</a>
+
+    <div class="nav-section">설정</div>
+    <a href="faq.html"              class="nav-item-link"><i class="bi bi-question-circle"></i> FAQ & 지원</a>
+    <a href="../auth/settings.html" class="nav-item-link"><i class="bi bi-gear"></i> 시스템 설정</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="avatar" id="avatar-initials">D</div>
+      <div style="flex:1;">
+        <div class="user-name" id="user-display">관리자</div>
+        <div class="user-role">Admin</div>
+      </div>
+      <button class="btn-logout" id="btn-logout" title="로그아웃"><i class="bi bi-box-arrow-right"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main-wrap">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-3">
+      <button class="icon-btn hamburger" id="hamburger"><i class="bi bi-list" style="font-size:1.2rem;"></i></button>
+      <span class="topbar-title">메인 대시보드</span>
+    </div>
+    <div class="topbar-right">
+      <div class="icon-btn">
+        <i class="bi bi-bell"></i>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="icon-btn"><i class="bi bi-search"></i></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <h1 class="page-heading">안녕하세요 👋</h1>
+    <p class="page-sub" id="greeting-sub">ezpark 대시보드에 오신 것을 환영합니다.</p>
+
+    <!-- STAT CARDS -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(13,110,253,0.1); color:var(--primary);">
+            <i class="bi bi-p-square-fill"></i>
+          </div>
+          <div class="stat-info">
+            <div class="num text-primary">1,200</div>
+            <div class="lbl">전체 주차면</div>
+            <div class="chg up"><i class="bi bi-arrow-up-short"></i>전체 등록 완료</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(220,53,69,0.1); color:var(--danger);">
+            <i class="bi bi-car-front-fill"></i>
+          </div>
+          <div class="stat-info">
+            <div class="num text-danger">845</div>
+            <div class="lbl">현재 이용 중</div>
+            <div class="chg down"><i class="bi bi-arrow-up-short"></i>전일 대비 +12대</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(25,135,84,0.1); color:var(--success);">
+            <i class="bi bi-signpost-split-fill"></i>
+          </div>
+          <div class="stat-info">
+            <div class="num text-success">355</div>
+            <div class="lbl">잔여 공간</div>
+            <div class="chg up"><i class="bi bi-arrow-down-short"></i>여유 있음</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,193,7,0.1); color:#b08000;">
+            <i class="bi bi-speedometer"></i>
+          </div>
+          <div class="stat-info">
+            <div class="num" style="color:#b08000;">70%</div>
+            <div class="lbl">현재 혼잡도</div>
+            <div class="chg up"><i class="bi bi-dash"></i>보통 수준</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: CHART + ALERTS -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-8">
+        <div class="glass-card">
+          <div class="card-header-custom">
+            <h6><i class="bi bi-graph-up me-2 text-primary"></i>시간대별 주차 수요 예측</h6>
+            <span class="badge bg-primary-subtle text-primary rounded-pill" style="font-size:0.72rem;">오늘</span>
+          </div>
+          <div class="card-body-custom">
+            <div class="chart-placeholder">
+              <div class="text-center">
+                <i class="bi bi-bar-chart-line fs-2 mb-2 d-block"></i>
+                Chart.js / Plotly 연동 예정 (더미 데이터)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="glass-card h-100">
+          <div class="card-header-custom">
+            <h6><i class="bi bi-bell me-2 text-danger"></i>실시간 알림</h6>
+            <span class="badge bg-danger rounded-pill" style="font-size:0.72rem;">3</span>
+          </div>
+          <div class="card-body-custom">
+            <div class="alert-item">
+              <div class="alert-dot" style="background:var(--danger);"></div>
+              <div>
+                <div class="al-title">B구역 2층 비인가 차량 감지</div>
+                <div class="al-time">방금 전 · AI 모니터링</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-dot" style="background:#ffc107;"></div>
+              <div>
+                <div class="al-title">C구역 만차 — 유도 경로 전환 중</div>
+                <div class="al-time">5분 전 · 주차 유도</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-dot" style="background:var(--success);"></div>
+              <div>
+                <div class="al-title">A구역 만차 해제 (34면 확보)</div>
+                <div class="al-time">12분 전 · 실시간 맵</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-dot" style="background:var(--primary);"></div>
+              <div>
+                <div class="al-title">AI 모델 v2.1 업데이트 완료</div>
+                <div class="al-time">1시간 전 · 시스템</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 3: PARKING MAP + ZONE STATUS -->
+    <div class="row g-3">
+      <div class="col-lg-7">
+        <div class="glass-card">
+          <div class="card-header-custom">
+            <h6><i class="bi bi-grid-3x3-gap me-2 text-success"></i>주차 공간 현황 (A구역)</h6>
+            <div style="font-size:0.75rem; color:var(--muted);">
+              <span class="me-2"><i class="bi bi-circle-fill text-success me-1" style="font-size:0.5rem;"></i>여유</span>
+              <span class="me-2"><i class="bi bi-circle-fill text-warning me-1" style="font-size:0.5rem;"></i>혼잡</span>
+              <span><i class="bi bi-circle-fill text-danger me-1" style="font-size:0.5rem;"></i>만차</span>
+            </div>
+          </div>
+          <div class="card-body-custom">
+            <div class="park-grid" id="park-grid"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="glass-card h-100">
+          <div class="card-header-custom">
+            <h6><i class="bi bi-bar-chart me-2 text-primary"></i>구역별 혼잡도</h6>
+          </div>
+          <div class="card-body-custom">
+            <div class="zone-bar">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="zname">A구역</span><span class="zval">42% 사용 중</span>
+              </div>
+              <div class="progress" style="height:8px; border-radius:6px;">
+                <div class="progress-bar bg-success" style="width:42%"></div>
+              </div>
+            </div>
+            <div class="zone-bar">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="zname">B구역</span><span class="zval">78% 사용 중</span>
+              </div>
+              <div class="progress" style="height:8px; border-radius:6px;">
+                <div class="progress-bar bg-warning" style="width:78%"></div>
+              </div>
+            </div>
+            <div class="zone-bar">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="zname">C구역</span><span class="zval">100% 만차</span>
+              </div>
+              <div class="progress" style="height:8px; border-radius:6px;">
+                <div class="progress-bar bg-danger" style="width:100%"></div>
+              </div>
+            </div>
+            <div class="zone-bar">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="zname">D구역</span><span class="zval">55% 사용 중</span>
+              </div>
+              <div class="progress" style="height:8px; border-radius:6px;">
+                <div class="progress-bar bg-primary" style="width:55%"></div>
+              </div>
+            </div>
+            <div class="zone-bar mb-0">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="zname">E구역 (장애인)</span><span class="zval">20% 사용 중</span>
+              </div>
+              <div class="progress" style="height:8px; border-radius:6px;">
+                <div class="progress-bar" style="width:20%; background:#6ea8fe;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // ── 로그인 인증 확인 ──
+  (function() {
+    const loggedIn = sessionStorage.getItem('ez_logged_in');
+    if (!loggedIn) {
+      window.location.replace('../auth/login.html');
+    }
+    const user = sessionStorage.getItem('ez_user') || '관리자';
+    document.getElementById('user-display').textContent = user;
+    document.getElementById('avatar-initials').textContent = user.charAt(0).toUpperCase();
+    document.getElementById('greeting-sub').textContent =
+      user + ' 님, 오늘도 좋은 하루 되세요! (' + new Date().toLocaleDateString('ko-KR') + ')';
+  })();
+
+  // ── 로그아웃 ──
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    sessionStorage.removeItem('ez_logged_in');
+    sessionStorage.removeItem('ez_user');
+    window.location.href = '../../index.html';
+  });
+
+  // ── 모바일 사이드바 ──
+  const hamburger = document.getElementById('hamburger');
+  const sidebar   = document.getElementById('sidebar');
+  hamburger.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+  // ── 주차 슬롯 더미 렌더링 ──
+  const states = ['free','free','free','busy','full','disabled','free','free','busy','free','full','free','free','busy','free','free','free','full','free','free','free','busy','free','free'];
+  const labels = states.map((s, i) => {
+    if (s === 'disabled') return 'X';
+    return 'A-' + String(i+1).padStart(2,'0');
+  });
+  const grid = document.getElementById('park-grid');
+  states.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'park-slot ' + s;
+    el.textContent = labels[i];
+    grid.appendChild(el);
+  });
+</script>
+</body>
+</html>
