@@ -1,5 +1,7 @@
 # ezpark - 주차관제 및 유도 시스템 비즈니스 플랫폼
 
+> **🚀 1단계 GitHub Pages 미리보기:** [https://fsclass-n.github.io/ezpark/src/main/resources/static/index.html](https://fsclass-n.github.io/ezpark/src/main/resources/static/index.html)
+
 ## 1. 작업 개요 (Project Overview)
 **ezpark**는 AI 모델 및 K-AI 데이터 분석을 활용하여 기업 수요를 반영한 스마트 주차관제 및 유도 시스템 비즈니스 플랫폼입니다. 주차장 내 이동체(차량 및 보행자) 인지 영상 데이터를 실시간으로 분석하여 빈 주차 공간으로의 유도를 최적화하고, 주차 수요 예측 및 기업 맞춤형 데이터 인사이트를 제공합니다.
 
