@@ -126,45 +126,35 @@
 
 ---
 
-## 7. 1단계 프론트엔드 배포용 폴더 구조 (Phase 1 Folder Structure)
-1단계에서는 Netlify를 통해 정적 웹 페이지를 배포합니다. HTML, CSS, JavaScript, Bootstrap 5 기반의 순수 프론트엔드 디렉토리 구조는 다음과 같이 구성됩니다.
+## 7. 프로젝트 통합 폴더 구조 (Phase 1~3 확장 대응형)
+향후 2단계(Spring Boot/Gradle)와 3단계(Python AI/RPA)로 원활하게 확장할 수 있도록 설계된 통합 폴더 구조입니다. 
+1단계 프론트엔드 작업은 `src/main/resources/static` 영역에서 이루어지며, Netlify 배포 시 해당 폴더를 Publish Directory로 지정하여 정적 페이지로 배포합니다. 2단계 진입 시 기존 구조를 그대로 활용해 백엔드에 쉽게 통합할 수 있습니다.
 
 ```text
 [ezpark]
- ├── public/                      # Netlify 배포 기준 최상위(Root) 폴더
- │    ├── assets/
- │    │    ├── css/
- │    │    │    ├── style.css     # 공통 스타일 가이드 적용 파일
- │    │    │    └── layout.css    # 대시보드 및 네비게이션 레이아웃
- │    │    ├── js/
- │    │    │    ├── main.js       # 공통 스크립트 및 UI 이벤트 처리
- │    │    │    ├── charts.js     # 차트 및 데이터 시각화 스크립트 (더미 데이터 연동)
- │    │    │    └── map.js        # 주차 지도 렌더링 스크립트
- │    │    └── images/            # 로고, 아이콘, 썸네일 등 이미지 에셋
- │    │
- │    ├── pages/                  # 메인 대시보드 외 서브 페이지 (총 14페이지)
- │    │    ├── auth/              # 로그인, 회원가입, 시스템 설정 등
- │    │    │    ├── login.html
- │    │    │    ├── register.html
- │    │    │    └── settings.html
- │    │    ├── service/           # 주차 지도, 예약, 결제, 내역 등
- │    │    │    ├── map.html
- │    │    │    ├── reservation.html
- │    │    │    ├── payment.html
- │    │    │    ├── history.html
- │    │    │    └── vehicle.html
- │    │    ├── admin/             # 관리자 설정, FAQ 관리 등
- │    │    │    ├── dashboard.html
- │    │    │    └── faq.html
- │    │    └── ai/                # AI 영상 모니터링, 통계, 로그, RPA 등
- │    │         ├── monitoring.html
- │    │         ├── forecast.html
- │    │         ├── logs.html
- │    │         ├── stats.html
- │    │         └── rpa.html
- │    │
- │    └── index.html              # 메인 랜딩 페이지 및 주요 대시보드 (1페이지)
+ ├── src/
+ │    └── main/
+ │         ├── java/com/ezpark/...   # [2단계] Spring Boot 백엔드 로직 (Controller, Service, Mapper 등)
+ │         └── resources/
+ │              ├── static/          # [1단계] 프론트엔드 에셋 및 정적 HTML (Netlify 배포 타겟 디렉토리)
+ │              │    ├── index.html  # 1단계 메인 랜딩 페이지 및 대시보드
+ │              │    ├── pages/      # 1단계 서브 페이지 (auth, service, admin, ai 총 14페이지)
+ │              │    ├── css/        # 공통 및 레이아웃 스타일시트
+ │              │    ├── js/         # UI 스크립트 및 차트/지도 더미 데이터 연동 스크립트
+ │              │    └── images/     # 로고 및 아이콘 에셋
+ │              │
+ │              ├── templates/       # [2단계] 백엔드 연동 시 static의 HTML을 이동하여 Thymeleaf 템플릿화
+ │              └── application.yml  # [2단계] Spring Boot 및 TiDB 데이터베이스 설정 파일
  │
- ├── netlify.toml                 # Netlify 배포 설정 파일 (필요시 라우팅 규칙 정의)
- └── readme.md                    # 프로젝트 명세서 (현재 파일)
+ ├── ai-rpa/                         # [3단계] RPA 및 AI 모델 영상 분석 모듈 (Python 3.11)
+ │    ├── requirements.txt           # Python 의존성 패키지 관리 (Numpy, Pandas, Tensorflow 등)
+ │    ├── crawler/                   # RPA 기반 K-AI 교통 데이터 수집 스크립트
+ │    ├── ai_vision/                 # 주차장 내 이동체(차량/보행자) 영상 인지 모델 추론 로직
+ │    └── data_analysis/             # 수요 예측 데이터 통계 및 시각화 생성 모듈
+ │
+ ├── build.gradle                    # [2단계] Gradle 빌드 설정 파일 (Spring Boot 3, 의존성 명시)
+ ├── settings.gradle                 # [2단계] Gradle 프로젝트 설정
+ ├── docker-compose.yml              # [2, 3단계] DB, AI 서버 로컬 테스트용 Docker 설정
+ ├── netlify.toml                    # [1단계] Netlify 배포 설정 파일 (publish = "src/main/resources/static")
+ └── readme.md                       # 프로젝트 명세서 (현재 파일)
 ```
