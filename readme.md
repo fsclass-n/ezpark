@@ -114,3 +114,57 @@
 - **레이아웃 (Layout):**
   - PC 환경: 사이드바(LNB) + 상단 헤더(GNB) + 메인 컨텐츠 영역의 일반적인 대시보드 레이아웃.
   - 모바일 환경: 최대 768px 시 사이드바를 숨기고 상단 햄버거 메뉴(Offcanvas)로 전환하는 반응형 웹 설계.
+
+---
+
+## 6. 단계별 구축 및 배포 계획 (Phased Development & Deployment)
+성공적인 비즈니스 플랫폼 구축을 위해 다음과 같이 3단계로 나누어 작업을 진행합니다.
+
+- **1단계 (Phase 1):** 프론트엔드 퍼블리싱 및 UI 구현, Netlify (넷틀리파이) 배포
+- **2단계 (Phase 2):** 백엔드(Spring Boot) 개발, 데이터베이스(TiDB) 연동 및 Render 배포
+- **3단계 (Phase 3):** RPA + AI 모델(구글 무료 서비스 활용) 연동, TiDB + AWS EC2 최종 통합 배포
+
+---
+
+## 7. 1단계 프론트엔드 배포용 폴더 구조 (Phase 1 Folder Structure)
+1단계에서는 Netlify를 통해 정적 웹 페이지를 배포합니다. HTML, CSS, JavaScript, Bootstrap 5 기반의 순수 프론트엔드 디렉토리 구조는 다음과 같이 구성됩니다.
+
+```text
+[ezpark]
+ ├── public/                      # Netlify 배포 기준 최상위(Root) 폴더
+ │    ├── assets/
+ │    │    ├── css/
+ │    │    │    ├── style.css     # 공통 스타일 가이드 적용 파일
+ │    │    │    └── layout.css    # 대시보드 및 네비게이션 레이아웃
+ │    │    ├── js/
+ │    │    │    ├── main.js       # 공통 스크립트 및 UI 이벤트 처리
+ │    │    │    ├── charts.js     # 차트 및 데이터 시각화 스크립트 (더미 데이터 연동)
+ │    │    │    └── map.js        # 주차 지도 렌더링 스크립트
+ │    │    └── images/            # 로고, 아이콘, 썸네일 등 이미지 에셋
+ │    │
+ │    ├── pages/                  # 메인 대시보드 외 서브 페이지 (총 14페이지)
+ │    │    ├── auth/              # 로그인, 회원가입, 시스템 설정 등
+ │    │    │    ├── login.html
+ │    │    │    ├── register.html
+ │    │    │    └── settings.html
+ │    │    ├── service/           # 주차 지도, 예약, 결제, 내역 등
+ │    │    │    ├── map.html
+ │    │    │    ├── reservation.html
+ │    │    │    ├── payment.html
+ │    │    │    ├── history.html
+ │    │    │    └── vehicle.html
+ │    │    ├── admin/             # 관리자 설정, FAQ 관리 등
+ │    │    │    ├── dashboard.html
+ │    │    │    └── faq.html
+ │    │    └── ai/                # AI 영상 모니터링, 통계, 로그, RPA 등
+ │    │         ├── monitoring.html
+ │    │         ├── forecast.html
+ │    │         ├── logs.html
+ │    │         ├── stats.html
+ │    │         └── rpa.html
+ │    │
+ │    └── index.html              # 메인 랜딩 페이지 및 주요 대시보드 (1페이지)
+ │
+ ├── netlify.toml                 # Netlify 배포 설정 파일 (필요시 라우팅 규칙 정의)
+ └── readme.md                    # 프로젝트 명세서 (현재 파일)
+```
