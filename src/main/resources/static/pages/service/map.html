@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>실시간 주차 지도 - ezpark</title>
+  <meta name="description" content="ezpark 실시간 주차 유도 맵 - 구역별 빈자리 현황 및 최적 경로 안내" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <style>
+    :root { --sidebar-w:260px; --primary:#0d6efd; --success:#198754; --danger:#dc3545; --warning:#ffc107; --bg:#f0f2f8; --sidebar-bg:#0f1923; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Pretendard Variable','Noto Sans KR',sans-serif; background:var(--bg); }
+
+    /* SIDEBAR (shared) */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); background:var(--sidebar-bg); display:flex; flex-direction:column; z-index:100; }
+    .sidebar-header { padding:28px 24px 20px; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .sidebar-brand { font-size:1.4rem; font-weight:900; color:#fff; text-decoration:none; }
+    .sidebar-brand span { color:#6ea8fe; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:16px 0; }
+    .nav-section { padding:12px 20px 6px; font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.25); letter-spacing:1.5px; text-transform:uppercase; }
+    .nav-item-link { display:flex; align-items:center; gap:12px; padding:11px 20px; color:rgba(255,255,255,0.55); text-decoration:none; font-size:0.9rem; font-weight:500; border-left:3px solid transparent; transition:all 0.2s; }
+    .nav-item-link i { font-size:1rem; width:20px; text-align:center; }
+    .nav-item-link:hover { color:#fff; background:rgba(255,255,255,0.05); }
+    .nav-item-link.active { color:#fff; border-left-color:var(--primary); background:rgba(13,110,253,0.12); }
+    .sidebar-footer { padding:16px 20px; border-top:1px solid rgba(255,255,255,0.06); }
+    .user-info { display:flex; align-items:center; gap:10px; }
+    .avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--primary),#0dcaf0); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.82rem; flex-shrink:0; }
+    .user-name { font-size:0.83rem; font-weight:600; color:#fff; }
+    .user-role { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+    .btn-logout { background:none; border:none; color:rgba(255,255,255,0.4); font-size:1rem; cursor:pointer; transition:color 0.2s; }
+    .btn-logout:hover { color:#dc3545; }
+
+    /* MAIN */
+    .main-wrap { margin-left:var(--sidebar-w); display:flex; flex-direction:column; height:100vh; }
+    .topbar { background:#fff; padding:14px 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e9ecef; flex-shrink:0; }
+    .topbar-title { font-size:1.05rem; font-weight:700; }
+    .icon-btn { width:38px; height:38px; border-radius:10px; border:1.5px solid #e9ecef; background:#fff; display:flex; align-items:center; justify-content:center; color:#6c757d; transition:all 0.2s; cursor:pointer; }
+    .icon-btn:hover { border-color:var(--primary); color:var(--primary); }
+
+    /* MAP LAYOUT */
+    .map-layout { display:flex; flex:1; overflow:hidden; }
+    .map-panel { flex:1; position:relative; overflow:hidden; background:#e8f4f0; }
+
+    /* SVG parking map */
+    .parking-svg-wrap { width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:20px; }
+    #parking-map { width:100%; max-width:800px; height:auto; }
+    .zone-label { font-size:14px; font-weight:800; fill:#0f1923; }
+
+    /* SLOT STYLES */
+    .slot { cursor:pointer; transition:opacity 0.15s; }
+    .slot:hover { opacity:0.8; }
+    .slot rect { rx:4; }
+    .slot.free   rect { fill:#d1fae5; stroke:#198754; stroke-width:1.5; }
+    .slot.busy   rect { fill:#fef9c3; stroke:#ffc107; stroke-width:1.5; }
+    .slot.full   rect { fill:#fee2e2; stroke:#dc3545; stroke-width:1.5; }
+    .slot.dis    rect { fill:#f1f5f9; stroke:#cbd5e1; stroke-width:1; }
+    .slot text  { font-size:9px; font-family:'Pretendard Variable',sans-serif; font-weight:600; text-anchor:middle; dominant-baseline:middle; }
+    .slot.free   text { fill:#15803d; }
+    .slot.busy   text { fill:#854d0e; }
+    .slot.full   text { fill:#991b1b; }
+    .slot.dis    text { fill:#94a3b8; }
+
+    /* road/path */
+    .road { fill:#c8d5e0; }
+    .road-line { stroke:#fff; stroke-width:1.5; stroke-dasharray:8,6; fill:none; }
+    .arrow-path { fill:#adb5bd; }
+
+    /* MAP LEGEND */
+    .map-legend { position:absolute; bottom:20px; left:20px; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); border-radius:12px; padding:12px 16px; box-shadow:0 4px 16px rgba(0,0,0,0.1); }
+    .legend-item { display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#0f1923; margin-bottom:5px; font-weight:500; }
+    .legend-item:last-child { margin-bottom:0; }
+    .legend-dot { width:12px; height:12px; border-radius:3px; flex-shrink:0; border:1.5px solid; }
+
+    /* MAP CONTROLS */
+    .map-controls { position:absolute; bottom:20px; right:20px; display:flex; flex-direction:column; gap:8px; }
+    .map-btn { width:38px; height:38px; border-radius:10px; background:#fff; border:1px solid #e9ecef; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; color:#495057; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.2s; }
+    .map-btn:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+    /* SLOT TOOLTIP */
+    .slot-tooltip { position:absolute; background:#0f1923; color:#fff; border-radius:10px; padding:10px 14px; font-size:0.8rem; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:200; min-width:150px; box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+    .slot-tooltip.show { opacity:1; }
+    .slot-tooltip .tt-title { font-weight:700; margin-bottom:4px; }
+    .slot-tooltip .tt-row { display:flex; justify-content:space-between; gap:12px; font-size:0.75rem; color:rgba(255,255,255,0.65); }
+
+    /* SIDE PANEL */
+    .side-panel { width:300px; background:#fff; border-left:1px solid #e9ecef; display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; }
+    .side-panel-header { padding:18px 20px; border-bottom:1px solid #f0f2f5; }
+    .side-panel-header h6 { font-weight:700; margin:0; font-size:0.95rem; }
+    .side-panel-body { flex:1; overflow-y:auto; padding:16px; }
+
+    /* ZONE SUMMARY CARDS */
+    .zone-card { border-radius:12px; padding:14px 16px; margin-bottom:10px; border:1.5px solid; cursor:pointer; transition:all 0.2s; }
+    .zone-card:hover { transform:translateX(3px); }
+    .zone-card.green { background:#f0fdf4; border-color:#86efac; }
+    .zone-card.yellow { background:#fefce8; border-color:#fde047; }
+    .zone-card.red { background:#fef2f2; border-color:#fca5a5; }
+    .zone-card.blue { background:#eff6ff; border-color:#93c5fd; }
+    .zone-name { font-size:0.9rem; font-weight:700; color:#0f1923; }
+    .zone-detail { font-size:0.78rem; color:#6c757d; margin-top:2px; }
+    .zone-bar-wrap { margin-top:8px; }
+    .zone-mini-bar { height:5px; border-radius:3px; background:#e9ecef; overflow:hidden; }
+    .zone-mini-fill { height:100%; border-radius:3px; transition:width 0.6s ease; }
+
+    /* ROUTE CARD */
+    .route-card { background:linear-gradient(135deg,#0d6efd,#0dcaf0); border-radius:14px; padding:16px; color:#fff; margin-bottom:12px; }
+    .route-card h6 { font-weight:700; margin-bottom:8px; font-size:0.9rem; }
+    .route-step { display:flex; align-items:center; gap:8px; font-size:0.8rem; margin-bottom:4px; }
+
+    /* REFRESH BADGE */
+    .live-badge { display:inline-flex; align-items:center; gap:5px; font-size:0.72rem; color:#198754; font-weight:600; }
+    .live-dot { width:7px; height:7px; border-radius:50%; background:#198754; animation:blink 1.2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    @media(max-width:768px) { .sidebar{transform:translateX(-100%);} .sidebar.open{transform:translateX(0);} .main-wrap{margin-left:0;} .side-panel{display:none;} }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="../../index.html">ez<span>park</span></a>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">메인</div>
+    <a href="../admin/dashboard.html" class="nav-item-link"><i class="bi bi-speedometer2"></i> 대시보드</a>
+    <div class="nav-section">서비스</div>
+    <a href="map.html"          class="nav-item-link active"><i class="bi bi-map"></i> 실시간 주차 지도</a>
+    <a href="reservation.html"  class="nav-item-link"><i class="bi bi-calendar2-check"></i> 예약 시스템</a>
+    <a href="payment.html"      class="nav-item-link"><i class="bi bi-credit-card"></i> 결제 및 정산</a>
+    <a href="history.html"      class="nav-item-link"><i class="bi bi-clock-history"></i> 이용 내역</a>
+    <a href="vehicle.html"      class="nav-item-link"><i class="bi bi-car-front"></i> 차량 관리</a>
+    <div class="nav-section">AI & 데이터</div>
+    <a href="../ai/monitoring.html" class="nav-item-link"><i class="bi bi-camera-video"></i> AI 모니터링</a>
+    <a href="../ai/forecast.html"   class="nav-item-link"><i class="bi bi-graph-up-arrow"></i> 수요 예측</a>
+    <a href="../ai/logs.html"       class="nav-item-link"><i class="bi bi-list-ul"></i> 인지 로그</a>
+    <a href="../ai/stats.html"      class="nav-item-link"><i class="bi bi-bar-chart-line"></i> K-AI 통계</a>
+    <a href="../ai/rpa.html"        class="nav-item-link"><i class="bi bi-robot"></i> RPA 현황</a>
+    <div class="nav-section">설정</div>
+    <a href="../admin/faq.html"     class="nav-item-link"><i class="bi bi-question-circle"></i> FAQ & 지원</a>
+    <a href="../auth/settings.html" class="nav-item-link"><i class="bi bi-gear"></i> 시스템 설정</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="avatar" id="avatar-i">D</div>
+      <div style="flex:1;">
+        <div class="user-name" id="user-d">관리자</div>
+        <div class="user-role">Admin</div>
+      </div>
+      <button class="btn-logout" id="btn-logout"><i class="bi bi-box-arrow-right"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-3">
+      <span class="topbar-title"><i class="bi bi-map me-2 text-primary"></i>실시간 주차 지도</span>
+      <span class="live-badge"><span class="live-dot"></span> 실시간 갱신 중</span>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      <select class="form-select form-select-sm rounded-3" id="floor-select" style="width:auto; font-size:0.82rem;">
+        <option value="1">지하 1층</option>
+        <option value="2">지하 2층</option>
+        <option value="3">지상 1층</option>
+      </select>
+      <div class="icon-btn"><i class="bi bi-bell"></i></div>
+    </div>
+  </div>
+
+  <!-- MAP + SIDE -->
+  <div class="map-layout">
+
+    <!-- PARKING MAP (SVG) -->
+    <div class="map-panel" id="map-panel">
+      <div class="parking-svg-wrap">
+        <svg id="parking-map" viewBox="0 0 820 540" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background -->
+          <rect width="820" height="540" fill="#dde8f0" rx="12"/>
+
+          <!-- ── ZONE A ── -->
+          <rect x="20" y="20" width="360" height="240" fill="#f0fdf4" rx="10" stroke="#86efac" stroke-width="1.5"/>
+          <text x="200" y="42" class="zone-label" text-anchor="middle">A구역 (지하 1층)</text>
+
+          <!-- A Row 1 -->
+          <g class="slot free" id="slot-A01" data-id="A-01" data-status="free">
+            <rect x="36" y="52" width="52" height="32" rx="4"/><text x="62" y="68">A-01</text>
+          </g>
+          <g class="slot free" id="slot-A02" data-id="A-02" data-status="free">
+            <rect x="95" y="52" width="52" height="32" rx="4"/><text x="121" y="68">A-02</text>
+          </g>
+          <g class="slot busy" id="slot-A03" data-id="A-03" data-status="busy">
+            <rect x="154" y="52" width="52" height="32" rx="4"/><text x="180" y="68">A-03</text>
+          </g>
+          <g class="slot full" id="slot-A04" data-id="A-04" data-status="full">
+            <rect x="213" y="52" width="52" height="32" rx="4"/><text x="239" y="68">A-04</text>
+          </g>
+          <g class="slot full" id="slot-A05" data-id="A-05" data-status="full">
+            <rect x="272" y="52" width="52" height="32" rx="4"/><text x="298" y="68">A-05</text>
+          </g>
+          <g class="slot free" id="slot-A06" data-id="A-06" data-status="free">
+            <rect x="331" y="52" width="38" height="32" rx="4"/><text x="350" y="68">A-06</text>
+          </g>
+
+          <!-- Road A -->
+          <rect x="36" y="90" width="333" height="18" class="road" rx="2"/>
+          <line x1="36" y1="99" x2="369" y2="99" class="road-line"/>
+
+          <!-- A Row 2 -->
+          <g class="slot free" id="slot-A07" data-id="A-07" data-status="free">
+            <rect x="36" y="114" width="52" height="32" rx="4"/><text x="62" y="130">A-07</text>
+          </g>
+          <g class="slot free" id="slot-A08" data-id="A-08" data-status="free">
+            <rect x="95" y="114" width="52" height="32" rx="4"/><text x="121" y="130">A-08</text>
+          </g>
+          <g class="slot free" id="slot-A09" data-id="A-09" data-status="free">
+            <rect x="154" y="114" width="52" height="32" rx="4"/><text x="180" y="130">A-09</text>
+          </g>
+          <g class="slot busy" id="slot-A10" data-id="A-10" data-status="busy">
+            <rect x="213" y="114" width="52" height="32" rx="4"/><text x="239" y="130">A-10</text>
+          </g>
+          <g class="slot full" id="slot-A11" data-id="A-11" data-status="full">
+            <rect x="272" y="114" width="52" height="32" rx="4"/><text x="298" y="130">A-11</text>
+          </g>
+          <g class="slot dis" id="slot-A12" data-id="A-12" data-status="dis">
+            <rect x="331" y="114" width="38" height="32" rx="4"/><text x="350" y="130">♿</text>
+          </g>
+
+          <!-- Road A2 -->
+          <rect x="36" y="152" width="333" height="18" class="road" rx="2"/>
+          <line x1="36" y1="161" x2="369" y2="161" class="road-line"/>
+
+          <!-- A Row 3 -->
+          <g class="slot free" id="slot-A13" data-id="A-13" data-status="free">
+            <rect x="36" y="176" width="52" height="32" rx="4"/><text x="62" y="192">A-13</text>
+          </g>
+          <g class="slot free" id="slot-A14" data-id="A-14" data-status="free">
+            <rect x="95" y="176" width="52" height="32" rx="4"/><text x="121" y="192">A-14</text>
+          </g>
+          <g class="slot busy" id="slot-A15" data-id="A-15" data-status="busy">
+            <rect x="154" y="176" width="52" height="32" rx="4"/><text x="180" y="192">A-15</text>
+          </g>
+          <g class="slot free" id="slot-A16" data-id="A-16" data-status="free">
+            <rect x="213" y="176" width="52" height="32" rx="4"/><text x="239" y="192">A-16</text>
+          </g>
+          <g class="slot full" id="slot-A17" data-id="A-17" data-status="full">
+            <rect x="272" y="176" width="52" height="32" rx="4"/><text x="298" y="192">A-17</text>
+          </g>
+          <g class="slot free" id="slot-A18" data-id="A-18" data-status="free">
+            <rect x="331" y="176" width="38" height="32" rx="4"/><text x="350" y="192">A-18</text>
+          </g>
+          <!-- Entry/Exit -->
+          <rect x="36" y="216" width="333" height="30" fill="#b0c4de" rx="4"/>
+          <text x="202" y="235" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">← 출구 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 입구 →</text>
+
+          <!-- ── ZONE B ── -->
+          <rect x="440" y="20" width="360" height="240" fill="#fefce8" rx="10" stroke="#fde047" stroke-width="1.5"/>
+          <text x="620" y="42" class="zone-label" text-anchor="middle">B구역 (지하 1층)</text>
+
+          <!-- B Row 1 -->
+          <g class="slot full" id="slot-B01" data-id="B-01" data-status="full">
+            <rect x="456" y="52" width="52" height="32" rx="4"/><text x="482" y="68">B-01</text>
+          </g>
+          <g class="slot full" id="slot-B02" data-id="B-02" data-status="full">
+            <rect x="515" y="52" width="52" height="32" rx="4"/><text x="541" y="68">B-02</text>
+          </g>
+          <g class="slot full" id="slot-B03" data-id="B-03" data-status="full">
+            <rect x="574" y="52" width="52" height="32" rx="4"/><text x="600" y="68">B-03</text>
+          </g>
+          <g class="slot busy" id="slot-B04" data-id="B-04" data-status="busy">
+            <rect x="633" y="52" width="52" height="32" rx="4"/><text x="659" y="68">B-04</text>
+          </g>
+          <g class="slot full" id="slot-B05" data-id="B-05" data-status="full">
+            <rect x="692" y="52" width="48" height="32" rx="4"/><text x="716" y="68">B-05</text>
+          </g>
+
+          <rect x="456" y="90" width="284" height="18" class="road" rx="2"/>
+          <line x1="456" y1="99" x2="740" y2="99" class="road-line"/>
+
+          <g class="slot full" id="slot-B06" data-id="B-06" data-status="full">
+            <rect x="456" y="114" width="52" height="32" rx="4"/><text x="482" y="130">B-06</text>
+          </g>
+          <g class="slot busy" id="slot-B07" data-id="B-07" data-status="busy">
+            <rect x="515" y="114" width="52" height="32" rx="4"/><text x="541" y="130">B-07</text>
+          </g>
+          <g class="slot full" id="slot-B08" data-id="B-08" data-status="full">
+            <rect x="574" y="114" width="52" height="32" rx="4"/><text x="600" y="130">B-08</text>
+          </g>
+          <g class="slot full" id="slot-B09" data-id="B-09" data-status="full">
+            <rect x="633" y="114" width="52" height="32" rx="4"/><text x="659" y="130">B-09</text>
+          </g>
+          <g class="slot full" id="slot-B10" data-id="B-10" data-status="full">
+            <rect x="692" y="114" width="48" height="32" rx="4"/><text x="716" y="130">B-10</text>
+          </g>
+
+          <rect x="456" y="152" width="284" height="18" class="road" rx="2"/>
+          <line x1="456" y1="161" x2="740" y2="161" class="road-line"/>
+
+          <g class="slot full" id="slot-B11" data-id="B-11" data-status="full">
+            <rect x="456" y="176" width="52" height="32" rx="4"/><text x="482" y="192">B-11</text>
+          </g>
+          <g class="slot free" id="slot-B12" data-id="B-12" data-status="free">
+            <rect x="515" y="176" width="52" height="32" rx="4"/><text x="541" y="192">B-12</text>
+          </g>
+          <g class="slot full" id="slot-B13" data-id="B-13" data-status="full">
+            <rect x="574" y="176" width="52" height="32" rx="4"/><text x="600" y="192">B-13</text>
+          </g>
+          <g class="slot busy" id="slot-B14" data-id="B-14" data-status="busy">
+            <rect x="633" y="176" width="52" height="32" rx="4"/><text x="659" y="192">B-14</text>
+          </g>
+          <g class="slot dis" id="slot-B15" data-id="B-15" data-status="dis">
+            <rect x="692" y="176" width="48" height="32" rx="4"/><text x="716" y="192">♿</text>
+          </g>
+          <rect x="456" y="216" width="284" height="30" fill="#b0c4de" rx="4"/>
+          <text x="598" y="235" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">← 출구 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 입구 →</text>
+
+          <!-- ── ZONE C ── -->
+          <rect x="20" y="285" width="360" height="230" fill="#fef2f2" rx="10" stroke="#fca5a5" stroke-width="1.5"/>
+          <text x="200" y="307" class="zone-label" text-anchor="middle">C구역 — 🚨 만차</text>
+
+          <g class="slot full"><rect x="36" y="316" width="52" height="32" rx="4"/><text x="62" y="332">C-01</text></g>
+          <g class="slot full"><rect x="95" y="316" width="52" height="32" rx="4"/><text x="121" y="332">C-02</text></g>
+          <g class="slot full"><rect x="154" y="316" width="52" height="32" rx="4"/><text x="180" y="332">C-03</text></g>
+          <g class="slot full"><rect x="213" y="316" width="52" height="32" rx="4"/><text x="239" y="332">C-04</text></g>
+          <g class="slot full"><rect x="272" y="316" width="52" height="32" rx="4"/><text x="298" y="332">C-05</text></g>
+          <g class="slot full"><rect x="331" y="316" width="38" height="32" rx="4"/><text x="350" y="332">C-06</text></g>
+          <rect x="36" y="355" width="333" height="18" class="road" rx="2"/>
+          <line x1="36" y1="364" x2="369" y2="364" class="road-line"/>
+          <g class="slot full"><rect x="36" y="379" width="52" height="32" rx="4"/><text x="62" y="395">C-07</text></g>
+          <g class="slot full"><rect x="95" y="379" width="52" height="32" rx="4"/><text x="121" y="395">C-08</text></g>
+          <g class="slot full"><rect x="154" y="379" width="52" height="32" rx="4"/><text x="180" y="395">C-09</text></g>
+          <g class="slot full"><rect x="213" y="379" width="52" height="32" rx="4"/><text x="239" y="395">C-10</text></g>
+          <g class="slot full"><rect x="272" y="379" width="52" height="32" rx="4"/><text x="298" y="395">C-11</text></g>
+          <g class="slot full"><rect x="331" y="379" width="38" height="32" rx="4"/><text x="350" y="395">C-12</text></g>
+          <rect x="36" y="418" width="333" height="18" class="road" rx="2"/>
+          <line x1="36" y1="427" x2="369" y2="427" class="road-line"/>
+          <g class="slot full"><rect x="36" y="442" width="52" height="32" rx="4"/><text x="62" y="458">C-13</text></g>
+          <g class="slot full"><rect x="95" y="442" width="52" height="32" rx="4"/><text x="121" y="458">C-14</text></g>
+          <g class="slot full"><rect x="154" y="442" width="52" height="32" rx="4"/><text x="180" y="458">C-15</text></g>
+          <g class="slot full"><rect x="213" y="442" width="52" height="32" rx="4"/><text x="239" y="458">C-16</text></g>
+          <g class="slot full"><rect x="272" y="442" width="52" height="32" rx="4"/><text x="298" y="458">C-17</text></g>
+          <g class="slot full"><rect x="331" y="442" width="38" height="32" rx="4"/><text x="350" y="458">C-18</text></g>
+
+          <!-- ── ZONE D ── -->
+          <rect x="440" y="285" width="360" height="230" fill="#eff6ff" rx="10" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="620" y="307" class="zone-label" text-anchor="middle">D구역 (지상 1층)</text>
+
+          <g class="slot free"><rect x="456" y="316" width="52" height="32" rx="4"/><text x="482" y="332">D-01</text></g>
+          <g class="slot free"><rect x="515" y="316" width="52" height="32" rx="4"/><text x="541" y="332">D-02</text></g>
+          <g class="slot busy"><rect x="574" y="316" width="52" height="32" rx="4"/><text x="600" y="332">D-03</text></g>
+          <g class="slot free"><rect x="633" y="316" width="52" height="32" rx="4"/><text x="659" y="332">D-04</text></g>
+          <g class="slot full"><rect x="692" y="316" width="48" height="32" rx="4"/><text x="716" y="332">D-05</text></g>
+          <rect x="456" y="355" width="284" height="18" class="road" rx="2"/>
+          <line x1="456" y1="364" x2="740" y2="364" class="road-line"/>
+          <g class="slot free"><rect x="456" y="379" width="52" height="32" rx="4"/><text x="482" y="395">D-06</text></g>
+          <g class="slot full"><rect x="515" y="379" width="52" height="32" rx="4"/><text x="541" y="395">D-07</text></g>
+          <g class="slot free"><rect x="574" y="379" width="52" height="32" rx="4"/><text x="600" y="395">D-08</text></g>
+          <g class="slot busy"><rect x="633" y="379" width="52" height="32" rx="4"/><text x="659" y="395">D-09</text></g>
+          <g class="slot free"><rect x="692" y="379" width="48" height="32" rx="4"/><text x="716" y="395">D-10</text></g>
+          <rect x="456" y="418" width="284" height="18" class="road" rx="2"/>
+          <line x1="456" y1="427" x2="740" y2="427" class="road-line"/>
+          <g class="slot free"><rect x="456" y="442" width="52" height="32" rx="4"/><text x="482" y="458">D-11</text></g>
+          <g class="slot free"><rect x="515" y="442" width="52" height="32" rx="4"/><text x="541" y="458">D-12</text></g>
+          <g class="slot full"><rect x="574" y="442" width="52" height="32" rx="4"/><text x="600" y="458">D-13</text></g>
+          <g class="slot free"><rect x="633" y="442" width="52" height="32" rx="4"/><text x="659" y="458">D-14</text></g>
+          <g class="slot dis"><rect x="692" y="442" width="48" height="32" rx="4"/><text x="716" y="458">♿</text></g>
+
+          <!-- CENTER CORRIDOR -->
+          <rect x="400" y="20" width="40" height="500" fill="#b0c4de" rx="0"/>
+          <text x="420" y="275" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" transform="rotate(-90 420 275)">중앙 통로</text>
+        </svg>
+      </div>
+
+      <!-- LEGEND -->
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#d1fae5; border-color:#198754;"></div> 여유</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fef9c3; border-color:#ffc107;"></div> 혼잡</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fee2e2; border-color:#dc3545;"></div> 만차</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f1f5f9; border-color:#cbd5e1;"></div> 장애인/불가</div>
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="map-controls">
+        <div class="map-btn" title="새로 고침" id="btn-refresh"><i class="bi bi-arrow-clockwise"></i></div>
+        <div class="map-btn" title="전체 화면"><i class="bi bi-fullscreen"></i></div>
+      </div>
+
+      <!-- SLOT TOOLTIP -->
+      <div class="slot-tooltip" id="slot-tooltip">
+        <div class="tt-title" id="tt-title">—</div>
+        <div class="tt-row"><span>상태</span><span id="tt-status">—</span></div>
+        <div class="tt-row"><span>층</span><span>지하 1층</span></div>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div class="side-panel">
+      <div class="side-panel-header">
+        <h6><i class="bi bi-info-circle me-2 text-primary"></i>구역별 현황</h6>
+      </div>
+      <div class="side-panel-body">
+
+        <!-- RECOMMENDED ROUTE -->
+        <div class="route-card">
+          <h6><i class="bi bi-signpost-split me-2"></i>추천 경로</h6>
+          <div class="route-step"><i class="bi bi-1-circle-fill"></i> 입구 진입 후 중앙 통로 직진</div>
+          <div class="route-step"><i class="bi bi-2-circle-fill"></i> A구역 또는 D구역으로 이동</div>
+          <div class="route-step"><i class="bi bi-3-circle-fill"></i> 빈 슬롯에 주차 후 정산</div>
+        </div>
+
+        <!-- ZONE CARDS -->
+        <p style="font-size:0.78rem; font-weight:700; color:#6c757d; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">구역 혼잡도</p>
+
+        <div class="zone-card green">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="zone-name">A구역</div>
+            <span class="badge bg-success rounded-pill" style="font-size:0.7rem;">여유</span>
+          </div>
+          <div class="zone-detail">잔여 10면 / 전체 18면</div>
+          <div class="zone-bar-wrap">
+            <div class="zone-mini-bar"><div class="zone-mini-fill" style="width:44%; background:#22c55e;"></div></div>
+          </div>
+        </div>
+
+        <div class="zone-card yellow">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="zone-name">B구역</div>
+            <span class="badge bg-warning text-dark rounded-pill" style="font-size:0.7rem;">혼잡</span>
+          </div>
+          <div class="zone-detail">잔여 2면 / 전체 15면</div>
+          <div class="zone-bar-wrap">
+            <div class="zone-mini-bar"><div class="zone-mini-fill" style="width:87%; background:#facc15;"></div></div>
+          </div>
+        </div>
+
+        <div class="zone-card red">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="zone-name">C구역</div>
+            <span class="badge bg-danger rounded-pill" style="font-size:0.7rem;">만차</span>
+          </div>
+          <div class="zone-detail">잔여 0면 / 전체 18면</div>
+          <div class="zone-bar-wrap">
+            <div class="zone-mini-bar"><div class="zone-mini-fill" style="width:100%; background:#ef4444;"></div></div>
+          </div>
+        </div>
+
+        <div class="zone-card blue">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="zone-name">D구역</div>
+            <span class="badge bg-primary rounded-pill" style="font-size:0.7rem;">여유</span>
+          </div>
+          <div class="zone-detail">잔여 8면 / 전체 15면</div>
+          <div class="zone-bar-wrap">
+            <div class="zone-mini-bar"><div class="zone-mini-fill" style="width:47%; background:#3b82f6;"></div></div>
+          </div>
+        </div>
+
+        <hr style="border-color:#f0f2f5; margin:16px 0;" />
+
+        <!-- SUMMARY -->
+        <div style="background:#f8f9fc; border-radius:12px; padding:14px;">
+          <p style="font-size:0.78rem; font-weight:700; color:#6c757d; margin-bottom:10px;">전체 요약</p>
+          <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+            <span>전체 주차면</span><strong>66면</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+            <span>이용 중</span><strong class="text-danger">46대</strong>
+          </div>
+          <div class="d-flex justify-content-between" style="font-size:0.82rem;">
+            <span>잔여 공간</span><strong class="text-success">20면</strong>
+          </div>
+        </div>
+
+        <a href="reservation.html" class="btn btn-primary w-100 rounded-3 mt-3" style="padding:12px; font-weight:700; font-size:0.9rem;">
+          <i class="bi bi-calendar2-plus me-2"></i>이 구역 예약하기
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // 인증 가드
+  (function(){
+    if (!sessionStorage.getItem('ez_logged_in')) window.location.replace('../auth/login.html');
+    const u = sessionStorage.getItem('ez_user') || '관리자';
+    document.getElementById('user-d').textContent = u;
+    document.getElementById('avatar-i').textContent = u.charAt(0).toUpperCase();
+  })();
+
+  // 로그아웃
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    sessionStorage.clear(); window.location.href = '../../index.html';
+  });
+
+  // 슬롯 툴팁
+  const tooltip = document.getElementById('slot-tooltip');
+  const ttTitle  = document.getElementById('tt-title');
+  const ttStatus = document.getElementById('tt-status');
+  const statusMap = { free:'여유 (주차 가능)', busy:'혼잡 (곧 만차)', full:'만차 (주차 불가)', dis:'장애인 전용 / 사용 불가' };
+  const panel = document.getElementById('map-panel');
+
+  document.querySelectorAll('.slot[data-id]').forEach(el => {
+    el.addEventListener('mouseenter', (e) => {
+      ttTitle.textContent  = el.dataset.id + ' 주차면';
+      ttStatus.textContent = statusMap[el.dataset.status] || '—';
+      tooltip.classList.add('show');
+    });
+    el.addEventListener('mousemove', (e) => {
+      const rect = panel.getBoundingClientRect();
+      let x = e.clientX - rect.left + 14;
+      let y = e.clientY - rect.top  + 14;
+      if (x + 170 > rect.width)  x -= 175;
+      if (y + 80  > rect.height) y -= 85;
+      tooltip.style.left = x + 'px';
+      tooltip.style.top  = y + 'px';
+    });
+    el.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+  });
+
+  // 새로고침 버튼 애니메이션
+  document.getElementById('btn-refresh').addEventListener('click', function() {
+    this.style.transform = 'rotate(360deg)';
+    this.style.transition = 'transform 0.5s';
+    setTimeout(() => { this.style.transform = ''; this.style.transition = ''; }, 500);
+  });
+</script>
+</body>
+</html>

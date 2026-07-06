@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 영상 모니터링 - ezpark</title>
+  <meta name="description" content="ezpark AI 이동체 인지 영상 모니터링 - 실시간 CCTV 분석 대시보드" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <style>
+    :root { --sidebar-w:260px; --primary:#0d6efd; --success:#198754; --danger:#dc3545; --bg:#0a0e1a; --sidebar-bg:#060a14; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Pretendard Variable','Noto Sans KR',sans-serif; background:var(--bg); color:#e2e8f0; }
+
+    /* SIDEBAR */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); background:var(--sidebar-bg); display:flex; flex-direction:column; z-index:100; border-right:1px solid rgba(255,255,255,0.05); }
+    .sidebar-header { padding:26px 22px 18px; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .sidebar-brand { font-size:1.4rem; font-weight:900; color:#fff; text-decoration:none; }
+    .sidebar-brand span { color:#6ea8fe; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:14px 0; }
+    .nav-section { padding:10px 18px 4px; font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.2); letter-spacing:1.5px; text-transform:uppercase; }
+    .nav-item-link { display:flex; align-items:center; gap:10px; padding:10px 18px; color:rgba(255,255,255,0.45); text-decoration:none; font-size:0.88rem; font-weight:500; border-left:3px solid transparent; transition:all 0.2s; }
+    .nav-item-link i { font-size:0.95rem; width:18px; text-align:center; }
+    .nav-item-link:hover { color:#fff; background:rgba(255,255,255,0.04); }
+    .nav-item-link.active { color:#fff; border-left-color:var(--primary); background:rgba(13,110,253,0.1); }
+    .sidebar-footer { padding:14px 18px; border-top:1px solid rgba(255,255,255,0.05); }
+    .user-info { display:flex; align-items:center; gap:10px; }
+    .avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--primary),#0dcaf0); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.8rem; flex-shrink:0; }
+    .user-name { font-size:0.82rem; font-weight:600; color:#fff; }
+    .user-role { font-size:0.68rem; color:rgba(255,255,255,0.35); }
+    .btn-logout { background:none; border:none; color:rgba(255,255,255,0.35); font-size:0.95rem; cursor:pointer; }
+    .btn-logout:hover { color:#dc3545; }
+
+    /* MAIN */
+    .main-wrap { margin-left:var(--sidebar-w); display:flex; flex-direction:column; min-height:100vh; }
+    .topbar { background:#0d1220; padding:13px 26px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); position:sticky; top:0; z-index:50; }
+    .topbar-title { font-size:1rem; font-weight:700; color:#fff; }
+    .icon-btn { width:36px; height:36px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; color:#94a3b8; transition:all 0.2s; cursor:pointer; position:relative; }
+    .icon-btn:hover { border-color:var(--primary); color:#6ea8fe; }
+    .notif-dot { position:absolute; top:5px; right:5px; width:7px; height:7px; background:var(--danger); border-radius:50%; border:1.5px solid #0d1220; }
+    .live-badge { display:inline-flex; align-items:center; gap:5px; font-size:0.72rem; color:#22c55e; font-weight:600; }
+    .live-dot { width:7px; height:7px; border-radius:50%; background:#22c55e; animation:blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    .content { padding:24px; }
+
+    /* STAT CARDS */
+    .ai-stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:18px 20px; }
+    .ai-stat .num { font-size:1.9rem; font-weight:900; line-height:1; }
+    .ai-stat .lbl { font-size:0.75rem; color:#64748b; margin-top:4px; }
+    .ai-stat .chg { font-size:0.75rem; margin-top:8px; }
+
+    /* CCTV GRID */
+    .cctv-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
+    .cctv-cell {
+      background:#0d1220; border:1px solid rgba(255,255,255,0.07); border-radius:14px;
+      overflow:hidden; cursor:pointer; transition:border-color 0.2s, transform 0.2s;
+      position:relative;
+    }
+    .cctv-cell:hover { border-color:var(--primary); transform:scale(1.01); }
+    .cctv-cell.active-cam { border-color:#22c55e; border-width:2px; }
+    .cctv-header { padding:10px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .cctv-name { font-size:0.8rem; font-weight:700; color:#fff; }
+    .cctv-badge { font-size:0.65rem; font-weight:700; padding:2px 8px; border-radius:20px; }
+    .badge-live    { background:rgba(34,197,94,0.2); color:#22c55e; }
+    .badge-alert   { background:rgba(239,68,68,0.25); color:#f87171; animation:pulse-badge 1.5s infinite; }
+    .badge-offline { background:rgba(100,116,139,0.2); color:#64748b; }
+    @keyframes pulse-badge { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    /* Video placeholder */
+    .cctv-video {
+      position:relative; background:#080d18;
+      aspect-ratio:16/10; display:flex; align-items:center; justify-content:center; overflow:hidden;
+    }
+    .cctv-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+    .noise { position:absolute; inset:0; opacity:0.04; background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    .scan-line { position:absolute; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(34,197,94,0.4),transparent); animation:scan 3s linear infinite; top:0; }
+    @keyframes scan { 0%{top:0} 100%{top:100%} }
+
+    /* Detection boxes */
+    .det-box { position:absolute; border:2px solid; border-radius:3px; font-size:8px; font-weight:700; padding:1px 4px; top:0; left:0; }
+    .det-box.vehicle  { border-color:#22c55e; color:#22c55e; background:rgba(34,197,94,0.08); }
+    .det-box.person   { border-color:#fb923c; color:#fb923c; background:rgba(251,146,60,0.08); }
+    .det-box.alert    { border-color:#f87171; color:#f87171; background:rgba(248,113,113,0.08); animation:blink 0.8s infinite; }
+
+    .cctv-footer { padding:8px 14px; display:flex; justify-content:space-between; align-items:center; }
+    .cam-meta { font-size:0.7rem; color:#475569; }
+    .det-count { font-size:0.7rem; font-weight:700; color:#94a3b8; }
+
+    /* PANEL RIGHT */
+    .monitor-layout { display:flex; gap:16px; }
+    .cctv-wrap { flex:1; }
+    .info-panel { width:280px; flex-shrink:0; display:flex; flex-direction:column; gap:12px; }
+
+    /* LOG LIST */
+    .log-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; }
+    .log-card-head { padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.82rem; font-weight:700; color:#e2e8f0; }
+    .log-list { max-height:320px; overflow-y:auto; }
+    .log-item { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; align-items:flex-start; gap:10px; }
+    .log-item:last-child { border-bottom:none; }
+    .log-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+    .log-title { font-size:0.8rem; font-weight:600; color:#e2e8f0; }
+    .log-sub { font-size:0.7rem; color:#475569; margin-top:2px; }
+
+    /* ACCURACY RING */
+    .acc-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:18px; text-align:center; }
+    .ring-wrap { position:relative; display:inline-flex; align-items:center; justify-content:center; }
+    .ring-label { position:absolute; text-align:center; }
+    .ring-label .pct { font-size:1.5rem; font-weight:900; color:#22c55e; }
+    .ring-label .sub { font-size:0.65rem; color:#475569; }
+    svg.ring circle { fill:none; stroke-width:10; stroke-linecap:round; }
+
+    @media(max-width:900px) { .cctv-grid{ grid-template-columns:repeat(2,1fr); } .info-panel{ display:none; } }
+    @media(max-width:600px) { .cctv-grid{ grid-template-columns:1fr; } }
+    @media(max-width:768px) { .sidebar{ transform:translateX(-100%); } .sidebar.open{ transform:translateX(0); } .main-wrap{ margin-left:0; } }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="../../index.html">ez<span>park</span></a>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">메인</div>
+    <a href="../admin/dashboard.html" class="nav-item-link"><i class="bi bi-speedometer2"></i> 대시보드</a>
+    <div class="nav-section">서비스</div>
+    <a href="../service/map.html"         class="nav-item-link"><i class="bi bi-map"></i> 실시간 주차 지도</a>
+    <a href="../service/reservation.html" class="nav-item-link"><i class="bi bi-calendar2-check"></i> 예약 시스템</a>
+    <a href="../service/payment.html"     class="nav-item-link"><i class="bi bi-credit-card"></i> 결제 및 정산</a>
+    <a href="../service/history.html"     class="nav-item-link"><i class="bi bi-clock-history"></i> 이용 내역</a>
+    <a href="../service/vehicle.html"     class="nav-item-link"><i class="bi bi-car-front"></i> 차량 관리</a>
+    <div class="nav-section">AI & 데이터</div>
+    <a href="monitoring.html" class="nav-item-link active"><i class="bi bi-camera-video"></i> AI 모니터링</a>
+    <a href="forecast.html"   class="nav-item-link"><i class="bi bi-graph-up-arrow"></i> 수요 예측</a>
+    <a href="logs.html"       class="nav-item-link"><i class="bi bi-list-ul"></i> 인지 로그</a>
+    <a href="stats.html"      class="nav-item-link"><i class="bi bi-bar-chart-line"></i> K-AI 통계</a>
+    <a href="rpa.html"        class="nav-item-link"><i class="bi bi-robot"></i> RPA 현황</a>
+    <div class="nav-section">설정</div>
+    <a href="../admin/faq.html"     class="nav-item-link"><i class="bi bi-question-circle"></i> FAQ & 지원</a>
+    <a href="../auth/settings.html" class="nav-item-link"><i class="bi bi-gear"></i> 시스템 설정</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="avatar" id="avatar-i">D</div>
+      <div style="flex:1;"><div class="user-name" id="user-d">관리자</div><div class="user-role">Admin</div></div>
+      <button class="btn-logout" id="btn-logout"><i class="bi bi-box-arrow-right"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-3">
+      <span class="topbar-title"><i class="bi bi-camera-video me-2" style="color:#6ea8fe;"></i>AI 영상 모니터링</span>
+      <span class="live-badge"><span class="live-dot"></span> 6채널 실시간 분석 중</span>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      <span style="font-size:0.75rem; color:#475569;" id="clock">--:--:--</span>
+      <div class="icon-btn"><i class="bi bi-bell"></i><span class="notif-dot"></span></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STAT ROW -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="ai-stat">
+          <div class="num" style="color:#22c55e;">98.2%</div>
+          <div class="lbl">AI 인지 정확도</div>
+          <div class="chg" style="color:#22c55e;"><i class="bi bi-arrow-up-short"></i>+0.4% 이번 주</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ai-stat">
+          <div class="num" style="color:#6ea8fe;">1,240</div>
+          <div class="lbl">오늘 인지 건수</div>
+          <div class="chg" style="color:#6ea8fe;"><i class="bi bi-activity"></i> 오늘 누적</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ai-stat">
+          <div class="num" style="color:#fb923c;">3</div>
+          <div class="lbl">미인식 / 이상 감지</div>
+          <div class="chg" style="color:#f87171;"><i class="bi bi-exclamation-triangle"></i> 확인 필요</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ai-stat">
+          <div class="num" style="color:#a78bfa;">0.3s</div>
+          <div class="lbl">평균 감지 속도</div>
+          <div class="chg" style="color:#64748b;"><i class="bi bi-clock"></i> 평균값</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MONITOR LAYOUT -->
+    <div class="monitor-layout">
+
+      <!-- CCTV GRID -->
+      <div class="cctv-wrap">
+        <div class="cctv-grid">
+
+          <!-- CAM 1 : NORMAL -->
+          <div class="cctv-cell active-cam">
+            <div class="cctv-header">
+              <span class="cctv-name"><i class="bi bi-camera-video-fill me-1" style="color:#22c55e;"></i>CAM-01 · A구역 입구</span>
+              <span class="cctv-badge badge-live">LIVE</span>
+            </div>
+            <div class="cctv-video">
+              <div class="noise"></div>
+              <div class="scan-line"></div>
+              <div style="position:relative; width:100%; height:100%;">
+                <div class="det-box vehicle" style="top:35%; left:20%; width:80px; height:50px;">차량 · 95%</div>
+                <div class="det-box vehicle" style="top:30%; left:55%; width:70px; height:48px;">차량 · 91%</div>
+                <div style="position:absolute; bottom:8px; right:10px; font-size:0.65rem; color:rgba(255,255,255,0.25);" id="ts-1">00:00:00</div>
+              </div>
+            </div>
+            <div class="cctv-footer">
+              <span class="cam-meta">지하 1층 · 남측</span>
+              <span class="det-count"><i class="bi bi-car-front me-1"></i>2대 감지</span>
+            </div>
+          </div>
+
+          <!-- CAM 2 : ALERT -->
+          <div class="cctv-cell">
+            <div class="cctv-header">
+              <span class="cctv-name"><i class="bi bi-camera-video-fill me-1" style="color:#f87171;"></i>CAM-02 · B구역 2층</span>
+              <span class="cctv-badge badge-alert">⚠ ALERT</span>
+            </div>
+            <div class="cctv-video">
+              <div class="noise"></div>
+              <div class="scan-line" style="animation-duration:2s;"></div>
+              <div style="position:relative; width:100%; height:100%;">
+                <div class="det-box alert" style="top:25%; left:30%; width:90px; height:56px;">비인가차량 · 88%</div>
+                <div class="det-box person"  style="top:50%; left:10%; width:40px; height:60px;">보행자 · 79%</div>
+                <div style="position:absolute; bottom:8px; right:10px; font-size:0.65rem; color:rgba(255,255,255,0.25);" id="ts-2">00:00:00</div>
+              </div>
+            </div>
+            <div class="cctv-footer">
+              <span class="cam-meta">지하 2층 · 북측</span>
+              <span class="det-count" style="color:#f87171;"><i class="bi bi-exclamation-triangle me-1"></i>이상 감지!</span>
+            </div>
+          </div>
+
+          <!-- CAM 3 : NORMAL -->
+          <div class="cctv-cell">
+            <div class="cctv-header">
+              <span class="cctv-name"><i class="bi bi-camera-video-fill me-1" style="color:#22c55e;"></i>CAM-03 · C구역 만차</span>
+              <span class="cctv-badge badge-live">LIVE</span>
+            </div>
+            <div class="cctv-video">
+              <div class="noise"></div>
+              <div class="scan-line" style="animation-duration:4s;"></div>
+              <div style="position:relative; width:100%; height:100%;">
+                <div class="det-box vehicle" style="top:20%; left:5%;  width:75px; height:48px;">차량 · 97%</div>
+                <div class="det-box vehicle" style="top:20%; left:35%; width:72px; height:48px;">차량 · 93%</div>
+                <div class="det-box vehicle" style="top:20%; left:62%; width:70px; height:48px;">차량 · 90%</div>
+                <div class="det-box vehicle" style="top:55%; left:15%; width:75px; height:48px;">차량 · 96%</div>
+                <div style="position:absolute; bottom:8px; right:10px; font-size:0.65rem; color:rgba(255,255,255,0.25);" id="ts-3">00:00:00</div>
+              </div>
+            </div>
+            <div class="cctv-footer">
+              <span class="cam-meta">지하 1층 · 동측</span>
+              <span class="det-count"><i class="bi bi-car-front me-1"></i>4대 감지</span>
+            </div>
+          </div>
+
+          <!-- CAM 4 -->
+          <div class="cctv-cell">
+            <div class="cctv-header">
+              <span class="cctv-name"><i class="bi bi-camera-video-fill me-1" style="color:#22c55e;"></i>CAM-04 · D구역 출구</span>
+              <span class="cctv-badge badge-live">LIVE</span>
+            </div>
+            <div class="cctv-video">
+              <div class="noise"></div>
+              <div class="scan-line" style="animation-duration:3.5s;"></div>
+              <div style="position:relative; width:100%; height:100%;">
+                <div class="det-box vehicle" style="top:40%; left:40%; width:80px; height:52px;">차량(출차) · 94%</div>
+                <div style="position:absolute; bottom:8px; right:10px; font-size:0.65rem; color:rgba(255,255,255,0.25);" id="ts-4">00:00:00</div>
+              </div>
+            </div>
+            <div class="cctv-footer">
+              <span class="cam-meta">지상 1층 · 서측</span>
+              <span class="det-count"><i class="bi bi-car-front me-1"></i>1대 감지</span>
+            </div>
+          </div>
+
+          <!-- CAM 5 : PERSON -->
+          <div class="cctv-cell">
+            <div class="cctv-header">
+              <span class="cctv-name"><i class="bi bi-camera-video-fill me-1" style="color:#22c55e;"></i>CAM-05 · 정산소</span>
+              <span class="cctv-badge badge-live">LIVE</span>
+            </div>
+            <div class="cctv-video">
+              <div class="noise"></div>
+              <div class="scan-line" style="animation-duration:2.8s;"></div>
+              <div style="position:relative; width:100%; height:100%;">
+                <div class="det-box person"  style="top:25%; left:30%; width:38px; height:58px;">보행자 · 87%</div>
+                <div class="det-box person"  style="top:20%; left:55%; width:36px; height:55px;">보행자 · 84%</div>
+                <div style="position:absolute; bottom:8px; right:10px; font-size:0.65rem; color:rgba(255,255,255,0.25);" id="ts-5">00:00:00</div>
+              </div>
+            </div>
+            <div class="cctv-footer">
+              <span class="cam-meta">지하 1층 · 정산기 앞</span>
+              <span class="det-count"><i class="bi bi-person me-1"></i>2명 감지</span>
+            </div>
+          </div>
+
+          <!-- CAM 6 : OFFLINE -->
+          <div class="cctv-cell">
+            <div class="cctv-header">
+              <span class="cctv-name"><i class="bi bi-camera-video-off me-1" style="color:#475569;"></i>CAM-06 · E구역</span>
+              <span class="cctv-badge badge-offline">OFFLINE</span>
+            </div>
+            <div class="cctv-video" style="background:#06090f;">
+              <div style="text-align:center; color:#475569;">
+                <i class="bi bi-wifi-off" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
+                <span style="font-size:0.78rem;">연결 끊김 — 재연결 중...</span>
+              </div>
+            </div>
+            <div class="cctv-footer">
+              <span class="cam-meta">지상 2층 · 북측</span>
+              <span class="det-count" style="color:#475569;">신호 없음</span>
+            </div>
+          </div>
+
+        </div><!-- /cctv-grid -->
+      </div><!-- /cctv-wrap -->
+
+      <!-- INFO PANEL -->
+      <div class="info-panel">
+
+        <!-- ACCURACY RING -->
+        <div class="acc-card">
+          <p style="font-size:0.78rem; font-weight:700; color:#64748b; margin-bottom:14px;">AI 인지 정확도</p>
+          <div class="ring-wrap" style="margin:0 auto;">
+            <svg width="110" height="110" class="ring">
+              <circle cx="55" cy="55" r="44" stroke="#1e293b"/>
+              <circle cx="55" cy="55" r="44" stroke="#22c55e" stroke-dasharray="276.5" stroke-dashoffset="49.5" transform="rotate(-90 55 55)"/>
+            </svg>
+            <div class="ring-label">
+              <div class="pct">98.2%</div>
+              <div class="sub">정확도</div>
+            </div>
+          </div>
+          <div style="margin-top:14px; display:flex; justify-content:space-between; font-size:0.73rem; color:#475569;">
+            <span>차량 99.1%</span><span>보행자 96.8%</span>
+          </div>
+        </div>
+
+        <!-- LOG -->
+        <div class="log-card">
+          <div class="log-card-head"><i class="bi bi-list-ul me-2"></i>최근 이벤트 로그</div>
+          <div class="log-list">
+            <div class="log-item">
+              <div class="log-dot" style="background:#f87171;"></div>
+              <div>
+                <div class="log-title">비인가 차량 감지</div>
+                <div class="log-sub">CAM-02 B구역 2층 · 방금 전</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-dot" style="background:#22c55e;"></div>
+              <div>
+                <div class="log-title">번호판 인식 완료</div>
+                <div class="log-sub">CAM-01 · 12가3456 · 2분 전</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-dot" style="background:#22c55e;"></div>
+              <div>
+                <div class="log-title">출차 처리 완료</div>
+                <div class="log-sub">CAM-04 D구역 · 78나5678 · 4분 전</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-dot" style="background:#fb923c;"></div>
+              <div>
+                <div class="log-title">번호판 미인식</div>
+                <div class="log-sub">CAM-03 C구역 · 10분 전</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-dot" style="background:#64748b;"></div>
+              <div>
+                <div class="log-title">CAM-06 연결 끊김</div>
+                <div class="log-sub">E구역 북측 · 15분 전</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-dot" style="background:#22c55e;"></div>
+              <div>
+                <div class="log-title">AI 모델 v2.1 업데이트</div>
+                <div class="log-sub">시스템 · 1시간 전</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="logs.html" class="btn btn-outline-secondary w-100 rounded-3" style="font-size:0.83rem; padding:10px; border-color:rgba(255,255,255,0.1); color:#94a3b8;">
+          <i class="bi bi-list-ul me-1"></i>전체 로그 보기
+        </a>
+
+      </div><!-- /info-panel -->
+    </div><!-- /monitor-layout -->
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // 인증 가드
+  (function(){
+    if (!sessionStorage.getItem('ez_logged_in')) window.location.replace('../auth/login.html');
+    const u = sessionStorage.getItem('ez_user') || '관리자';
+    document.getElementById('user-d').textContent = u;
+    document.getElementById('avatar-i').textContent = u.charAt(0).toUpperCase();
+  })();
+
+  // 로그아웃
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    sessionStorage.clear(); window.location.href = '../../index.html';
+  });
+
+  // 실시간 시계
+  function updateClock() {
+    const now = new Date();
+    const t = now.toLocaleTimeString('ko-KR', {hour12:false});
+    document.getElementById('clock').textContent = t;
+    ['ts-1','ts-2','ts-3','ts-4','ts-5'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = t;
+    });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+</script>
+</body>
+</html>

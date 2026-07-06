@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회원가입 - ezpark</title>
+  <meta name="description" content="ezpark 스마트 주차관제 플랫폼 회원가입" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Pretendard Variable', 'Noto Sans KR', sans-serif; min-height: 100vh; background: #f0f2f8; display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
+
+    .register-wrap { width: 100%; max-width: 880px; background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.1); display: flex; min-height: 700px; }
+
+    /* LEFT BANNER */
+    .reg-left {
+      width: 40%; background: linear-gradient(155deg, #0d1b35 0%, #0a0e1a 100%);
+      padding: 48px 36px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;
+    }
+    .reg-left::before {
+      content: ''; position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      background: rgba(13,110,253,0.15); top: -80px; right: -80px;
+    }
+    .reg-left::after {
+      content: ''; position: absolute; width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(25,135,84,0.1); bottom: 40px; left: -60px;
+    }
+    .reg-brand { font-size: 1.6rem; font-weight: 900; color: #fff; z-index: 1; }
+    .reg-brand span { color: #6ea8fe; }
+    .reg-center { z-index: 1; }
+    .reg-center h2 { font-size: 1.8rem; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 14px; }
+    .reg-center p { color: rgba(255,255,255,0.5); font-size: 0.9rem; line-height: 1.7; }
+    .step-indicator { display: flex; flex-direction: column; gap: 12px; z-index: 1; }
+    .step-ind-item { display: flex; align-items: center; gap: 12px; }
+    .step-circle { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.5); flex-shrink: 0; transition: all 0.3s; }
+    .step-circle.active { background: var(--primary, #0d6efd); border-color: #0d6efd; color: #fff; box-shadow: 0 0 16px rgba(13,110,253,0.5); }
+    .step-circle.done { background: #198754; border-color: #198754; color: #fff; }
+    .step-ind-item span { font-size: 0.82rem; color: rgba(255,255,255,0.5); }
+    .step-ind-item.active span { color: #fff; font-weight: 600; }
+
+    /* RIGHT FORM */
+    .reg-right { flex: 1; padding: 48px 44px; overflow-y: auto; }
+    .reg-right h3 { font-size: 1.5rem; font-weight: 800; color: #0f1923; margin-bottom: 6px; }
+    .reg-right .sub { font-size: 0.88rem; color: #6c757d; margin-bottom: 32px; }
+
+    .form-label { font-weight: 600; font-size: 0.85rem; color: #0f1923; margin-bottom: 5px; }
+    .form-control { border-radius: 10px; padding: 11px 14px; border: 1.5px solid #e9ecef; font-size: 0.92rem; transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 4px rgba(13,110,253,0.08); }
+    .form-control.is-valid   { border-color: #198754; background-image: none; }
+    .form-control.is-invalid { border-color: #dc3545; background-image: none; }
+    .valid-feedback   { font-size: 0.78rem; color: #198754; }
+    .invalid-feedback { font-size: 0.78rem; color: #dc3545; }
+
+    .pw-strength { height: 4px; border-radius: 2px; background: #e9ecef; margin-top: 8px; overflow: hidden; }
+    .pw-strength-bar { height: 100%; border-radius: 2px; transition: width 0.4s, background 0.4s; width: 0; }
+
+    .role-cards { display: flex; gap: 10px; }
+    .role-card { flex: 1; border: 2px solid #e9ecef; border-radius: 12px; padding: 14px 12px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .role-card:hover { border-color: #0d6efd; background: rgba(13,110,253,0.03); }
+    .role-card.selected { border-color: #0d6efd; background: rgba(13,110,253,0.06); }
+    .role-card i { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+    .role-card .rc-label { font-size: 0.8rem; font-weight: 600; color: #0f1923; }
+    .role-card .rc-sub { font-size: 0.72rem; color: #6c757d; margin-top: 2px; }
+
+    .btn-register { width: 100%; padding: 13px; background: linear-gradient(135deg, #0d6efd, #0dcaf0); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 0.97rem; box-shadow: 0 4px 16px rgba(13,110,253,0.3); transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-register:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(13,110,253,0.4); }
+    .terms-txt { font-size: 0.78rem; color: #6c757d; line-height: 1.6; }
+    .terms-txt a { color: #0d6efd; text-decoration: none; }
+
+    /* SUCCESS OVERLAY */
+    .success-overlay { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 40px; }
+    .success-overlay.show { display: flex; }
+    .success-icon { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #198754, #20c997); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #fff; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(25,135,84,0.35); animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    @keyframes pop { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+
+    @media (max-width: 680px) { .reg-left { display: none; } .reg-right { padding: 36px 24px; } .register-wrap { max-width: 440px; } }
+  </style>
+</head>
+<body>
+<div class="register-wrap">
+
+  <!-- LEFT BANNER -->
+  <div class="reg-left">
+    <div class="reg-brand">ez<span>park</span></div>
+    <div class="reg-center">
+      <h2>스마트 주차의<br>시작</h2>
+      <p>30초만에 가입하고 AI 기반 주차관제 서비스를 무료로 경험해 보세요.</p>
+    </div>
+    <div class="step-indicator">
+      <div class="step-ind-item active" id="si-1">
+        <div class="step-circle active" id="sc-1">1</div>
+        <span>기본 정보 입력</span>
+      </div>
+      <div class="step-ind-item" id="si-2">
+        <div class="step-circle" id="sc-2">2</div>
+        <span>역할 및 약관 동의</span>
+      </div>
+      <div class="step-ind-item" id="si-3">
+        <div class="step-circle" id="sc-3">3</div>
+        <span>가입 완료</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT FORM -->
+  <div class="reg-right">
+
+    <!-- STEP 1 -->
+    <div id="step1">
+      <h3>계정 만들기</h3>
+      <p class="sub">기본 정보를 입력해 주세요.</p>
+      <div class="mb-3">
+        <label class="form-label">이름</label>
+        <input type="text" class="form-control" id="reg-name" placeholder="홍길동" />
+        <div class="invalid-feedback" id="err-name">이름을 입력해 주세요.</div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">이메일</label>
+        <div class="input-group">
+          <input type="email" class="form-control" id="reg-email" placeholder="example@ezpark.kr" />
+          <button class="btn btn-outline-secondary" type="button" id="btn-check-email" style="border-radius:0 10px 10px 0; font-size:0.82rem; white-space:nowrap;">중복 확인</button>
+        </div>
+        <div class="invalid-feedback d-block" id="err-email" style="display:none!important;"></div>
+        <div class="valid-feedback d-block" id="ok-email" style="display:none!important;"></div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">비밀번호</label>
+        <input type="password" class="form-control" id="reg-pw" placeholder="8자 이상 영문+숫자+특수문자" />
+        <div class="pw-strength mt-2"><div class="pw-strength-bar" id="pw-bar"></div></div>
+        <div style="font-size:0.75rem; color:#6c757d; margin-top:4px;" id="pw-hint">비밀번호 강도: —</div>
+        <div class="invalid-feedback" id="err-pw">8자 이상 영문, 숫자, 특수문자를 포함해 주세요.</div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">비밀번호 확인</label>
+        <input type="password" class="form-control" id="reg-pw2" placeholder="비밀번호 재입력" />
+        <div class="invalid-feedback" id="err-pw2">비밀번호가 일치하지 않습니다.</div>
+      </div>
+      <button class="btn-register btn mb-3" id="btn-step1">다음 단계 <i class="bi bi-arrow-right ms-1"></i></button>
+      <p class="text-center" style="font-size:0.85rem; color:#6c757d;">이미 계정이 있으신가요? <a href="login.html" class="text-primary fw-semibold">로그인</a></p>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" style="display:none;">
+      <h3>역할 선택 및 약관 동의</h3>
+      <p class="sub">사용 목적에 맞는 역할을 선택해 주세요.</p>
+      <div class="role-cards mb-4" id="role-cards">
+        <div class="role-card selected" data-role="user">
+          <i class="bi bi-person-fill" style="color:#0d6efd;"></i>
+          <div class="rc-label">일반 사용자</div>
+          <div class="rc-sub">주차 예약 및 결제</div>
+        </div>
+        <div class="role-card" data-role="manager">
+          <i class="bi bi-building" style="color:#198754;"></i>
+          <div class="rc-label">주차장 관리자</div>
+          <div class="rc-sub">운영 현황 관리</div>
+        </div>
+        <div class="role-card" data-role="admin">
+          <i class="bi bi-shield-fill" style="color:#6f42c1;"></i>
+          <div class="rc-label">시스템 관리자</div>
+          <div class="rc-sub">플랫폼 전체 관리</div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="agree-all" />
+          <label class="form-check-label fw-bold" for="agree-all" style="font-size:0.88rem;">전체 동의</label>
+        </div>
+        <div style="border-top:1px solid #f0f2f5; padding-top:10px;">
+          <div class="form-check mb-1">
+            <input class="form-check-input" type="checkbox" id="agree1" />
+            <label class="form-check-label terms-txt" for="agree1">[필수] <a href="#">이용약관</a>에 동의합니다.</label>
+          </div>
+          <div class="form-check mb-1">
+            <input class="form-check-input" type="checkbox" id="agree2" />
+            <label class="form-check-label terms-txt" for="agree2">[필수] <a href="#">개인정보 처리방침</a>에 동의합니다.</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="agree3" />
+            <label class="form-check-label terms-txt" for="agree3">[선택] 마케팅 정보 수신에 동의합니다.</label>
+          </div>
+        </div>
+        <div class="invalid-feedback d-block" id="err-agree" style="display:none!important;"></div>
+      </div>
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-outline-secondary flex-shrink-0 rounded-3" id="btn-back" style="padding:12px 20px;">← 이전</button>
+        <button class="btn-register btn flex-grow-1" id="btn-step2">가입 완료 <i class="bi bi-check-lg ms-1"></i></button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-overlay" id="success-view">
+      <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+      <h3 style="font-weight:800; color:#0f1923; margin-bottom:8px;">가입 완료! 🎉</h3>
+      <p style="color:#6c757d; font-size:0.92rem; margin-bottom:32px; line-height:1.7;">ezpark 회원이 되신 것을 환영합니다.<br>로그인 후 대시보드에서 스마트 주차를 경험해 보세요.</p>
+      <a href="login.html" class="btn btn-primary rounded-pill px-5 py-3 fw-bold">로그인하러 가기 <i class="bi bi-arrow-right ms-1"></i></a>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // 역할 선택
+  document.querySelectorAll('.role-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+
+  // 전체 동의
+  document.getElementById('agree-all').addEventListener('change', e => {
+    ['agree1','agree2','agree3'].forEach(id => document.getElementById(id).checked = e.target.checked);
+  });
+
+  // 비밀번호 강도
+  document.getElementById('reg-pw').addEventListener('input', () => {
+    const pw = document.getElementById('reg-pw').value;
+    const bar = document.getElementById('pw-bar');
+    const hint = document.getElementById('pw-hint');
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Za-z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const levels = [
+      {w:'0%',   c:'#e9ecef', t:'— 입력하세요'},
+      {w:'25%',  c:'#dc3545', t:'약함'},
+      {w:'50%',  c:'#ffc107', t:'보통'},
+      {w:'75%',  c:'#0dcaf0', t:'강함'},
+      {w:'100%', c:'#198754', t:'매우 강함'}
+    ];
+    const l = levels[score];
+    bar.style.width = l.w; bar.style.background = l.c;
+    hint.textContent = '비밀번호 강도: ' + l.t;
+  });
+
+  // 이메일 중복 확인 (더미)
+  document.getElementById('btn-check-email').addEventListener('click', () => {
+    const email = document.getElementById('reg-email').value;
+    const errEl = document.getElementById('err-email');
+    const okEl  = document.getElementById('ok-email');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = '올바른 이메일을 입력해 주세요.';
+      errEl.style.display = 'block'; okEl.style.display = 'none';
+    } else {
+      okEl.textContent = '사용 가능한 이메일입니다.';
+      okEl.style.display = 'block'; errEl.style.display = 'none';
+    }
+  });
+
+  // STEP 1 → STEP 2
+  document.getElementById('btn-step1').addEventListener('click', () => {
+    const name  = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pw    = document.getElementById('reg-pw').value;
+    const pw2   = document.getElementById('reg-pw2').value;
+    let ok = true;
+    const show = (id, flag) => { document.getElementById(id).style.display = flag ? 'block' : 'none'; };
+    show('err-name', !name);  if (!name)  ok = false;
+    const emailOk = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!emailOk) { document.getElementById('err-email').textContent = '올바른 이메일을 입력해 주세요.'; show('err-email', true); ok = false; }
+    const pwOk = pw.length >= 8 && /[A-Za-z]/.test(pw) && /[0-9]/.test(pw);
+    show('err-pw', !pwOk);  if (!pwOk) ok = false;
+    show('err-pw2', pw !== pw2); if (pw !== pw2) ok = false;
+    if (!ok) return;
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    document.getElementById('sc-1').className = 'step-circle done'; document.getElementById('si-1').classList.remove('active');
+    document.getElementById('sc-2').className = 'step-circle active'; document.getElementById('si-2').classList.add('active');
+  });
+
+  // 이전
+  document.getElementById('btn-back').addEventListener('click', () => {
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('sc-2').className = 'step-circle'; document.getElementById('si-2').classList.remove('active');
+    document.getElementById('sc-1').className = 'step-circle active'; document.getElementById('si-1').classList.add('active');
+  });
+
+  // STEP 2 → SUCCESS
+  document.getElementById('btn-step2').addEventListener('click', () => {
+    const a1 = document.getElementById('agree1').checked;
+    const a2 = document.getElementById('agree2').checked;
+    const errA = document.getElementById('err-agree');
+    if (!a1 || !a2) {
+      errA.textContent = '필수 약관에 동의해 주세요.';
+      errA.style.display = 'block'; return;
+    }
+    errA.style.display = 'none';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('success-view').classList.add('show');
+    document.getElementById('sc-2').className = 'step-circle done'; document.getElementById('si-2').classList.remove('active');
+    document.getElementById('sc-3').className = 'step-circle done'; document.getElementById('si-3').classList.add('active');
+  });
+</script>
+</body>
+</html>

@@ -79,14 +79,67 @@
 
 ---
 
+### 1단계-7. 회원가입 페이지 구현 `pages/auth/register.html`
+- **구조:** 멀티스텝(2단계) 레이아웃 + 좌측 브랜드 배너
+  - **Step 1:** 이름 / 이메일(중복 확인) / 비밀번호 / 비밀번호 확인
+  - **Step 2:** 역할 선택(일반 사용자 / 주차장 관리자 / 시스템 관리자) + 약관 동의
+  - **Step 3:** 가입 완료 애니메이션 → 로그인 페이지 이동
+- **기능:**
+  - 비밀번호 강도 측정 바 (weak → very strong 5단계)
+  - 이메일 중복 확인 (더미 처리)
+  - 전체 동의 체크박스 연동
+  - 좌측 진행 단계 인디케이터 애니메이션
+
+### 1단계-8. 실시간 주차 지도 구현 `pages/service/map.html`
+- **구조:** 사이드바 + 탑바 + SVG 맵 + 우측 정보 패널
+  - **SVG 주차 맵:** A/B/C/D 4개 구역 × 각 15~18면 슬롯을 직접 SVG로 렌더링
+  - **슬롯 상태:** 여유(초록) / 혼잡(노랑) / 만차(빨강) / 장애인(회색) 색상 구분
+  - **마우스오버 툴팁:** 슬롯 ID, 상태, 층 정보 팝업
+  - **우측 패널:** 추천 경로 카드, 구역별 혼잡도 미니 바, 전체 요약, 예약 바로가기 버튼
+  - **층 선택기:** 지하 1층 / 지하 2층 / 지상 1층 드롭다운
+  - **실시간 LIVE 뱃지** + 지도 새로고침 컨트롤 버튼
+
+### 1단계-9. AI 영상 모니터링 구현 `pages/ai/monitoring.html`
+- **구조:** 다크테마 사이드바 + 6채널 CCTV 그리드 + 우측 정보 패널
+  - **6채널 CCTV 뷰어:** SVG 노이즈 + 스캔라인 + AI 감지 박스 애니메이션
+    - CAM-01: 정상(차량 2대 감지)
+    - CAM-02: 경고(비인가 차량 + 보행자 감지, 알림 점멸)
+    - CAM-03: C구역 만차(차량 4대)
+    - CAM-04: 출차 처리 중
+    - CAM-05: 정산소 보행자
+    - CAM-06: 오프라인(연결 끊김)
+  - **AI 인지 정확도 링 차트:** SVG 도넛 형태로 98.2% 시각화
+  - **실시간 이벤트 로그:** 최근 6건 알림 표시
+  - **실시간 시계:** 모든 카메라 타임스탬프 동기화
+  - **AI 스탯 카드 4종:** 인지 정확도, 인지 건수, 이상 감지 수, 평균 감지 속도
+
+---
+
+## 🔗 GitHub Pages 확인 링크
+| 페이지 | URL |
+|--------|-----|
+| 🏠 홈 (랜딩) | https://fsclass-n.github.io/ezpark/src/main/resources/static/index.html |
+| 🔐 로그인 | https://fsclass-n.github.io/ezpark/src/main/resources/static/pages/auth/login.html |
+| 📝 회원가입 | https://fsclass-n.github.io/ezpark/src/main/resources/static/pages/auth/register.html |
+| 📊 대시보드 | https://fsclass-n.github.io/ezpark/src/main/resources/static/pages/admin/dashboard.html |
+| 🗺️ 주차 지도 | https://fsclass-n.github.io/ezpark/src/main/resources/static/pages/service/map.html |
+| 📹 AI 모니터링 | https://fsclass-n.github.io/ezpark/src/main/resources/static/pages/ai/monitoring.html |
+
+> **데모 계정:** `demo@ezpark.kr` / `1234`
+
+---
+
 ## 📋 다음 예정 작업
-- [ ] 회원가입 페이지 (`register.html`) UI 구현
-- [ ] 실시간 주차 지도 (`map.html`) UI 구현
-- [ ] AI 모니터링 (`monitoring.html`) 더미 영상 뷰어 UI 구현
-- [ ] Netlify 배포 연동 (Publish Dir: `src/main/resources/static`)
-- [ ] `netlify.toml` 설정 파일 작성
+- [ ] 예약 시스템 (`reservation.html`) UI 구현
+- [ ] 결제 및 정산 (`payment.html`) UI 구현
+- [ ] 이용 내역 (`history.html`) UI 구현
+- [ ] 차량 관리 (`vehicle.html`) UI 구현
+- [ ] FAQ & 고객 지원 (`faq.html`) UI 구현
+- [ ] 수요 예측 리포트 (`forecast.html`) 차트 UI 구현
+- [ ] Netlify 배포 연동 (`netlify.toml` 설정)
 
 ---
 
 *최종 수정일: 2026년 7월 7일*
 *팀원: 김도윤 (프론트엔드), 이서진 (백엔드), 박민재 (AI/데이터)*
+
