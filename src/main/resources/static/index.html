@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ezpark - 스마트 주차관제 및 유도 시스템</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Pretendard -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3 class="logo-text">🚗 ezpark</h3>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link active" href="index.html">메인 대시보드</a></li>
+            <li class="nav-item"><a class="nav-link" href="pages/service/map.html">실시간 주차 지도</a></li>
+            <li class="nav-item"><a class="nav-link" href="pages/ai/monitoring.html">AI 영상 모니터링</a></li>
+            <li class="nav-item"><a class="nav-link" href="pages/admin/dashboard.html">관리자 설정</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <!-- Top Navbar -->
+        <header class="top-navbar d-flex justify-content-between align-items-center mb-4">
+            <button class="btn btn-outline-secondary d-md-none" id="menu-toggle">☰</button>
+            <h4 class="mb-0 fw-bold">메인 대시보드</h4>
+            <div class="user-profile">
+                <a href="pages/auth/login.html" class="btn btn-primary rounded-pill px-4">로그인</a>
+            </div>
+        </header>
+
+        <!-- Dashboard Widgets -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h6 class="text-muted">전체 주차면 수</h6>
+                    <h2 class="fw-bold text-dark">1,200 <span class="fs-6 fw-normal">면</span></h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: var(--primary-color);">
+                    <h6 class="text-muted">현재 이용 중</h6>
+                    <h2 class="fw-bold text-primary">845 <span class="fs-6 fw-normal">대</span></h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: var(--secondary-color);">
+                    <h6 class="text-muted">잔여 주차 공간</h6>
+                    <h2 class="fw-bold text-success">355 <span class="fs-6 fw-normal">면</span></h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: var(--accent-color);">
+                    <h6 class="text-muted">혼잡도</h6>
+                    <h2 class="fw-bold text-danger">70% <span class="fs-6 fw-normal text-muted">여유로움</span></h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Main Chart Area -->
+            <div class="col-lg-8">
+                <div class="glass-card h-100 p-4">
+                    <h5 class="fw-bold mb-3">시간대별 주차 수요 예측</h5>
+                    <div class="chart-placeholder d-flex align-items-center justify-content-center text-muted rounded" style="height: 300px; background-color: #f1f3f5;">
+                        [ 차트 영역 ] - Plotly 또는 Chart.js 연동 예정
+                    </div>
+                </div>
+            </div>
+            <!-- Notifications / Logs -->
+            <div class="col-lg-4">
+                <div class="glass-card h-100 p-4">
+                    <h5 class="fw-bold mb-3">실시간 알림</h5>
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent px-0 border-light border-bottom">
+                            <span class="badge bg-danger rounded-pill me-2">경고</span> B구역 2층 비인가 차량 감지
+                            <div class="text-muted small mt-1">방금 전</div>
+                        </li>
+                        <li class="list-group-item bg-transparent px-0 border-light border-bottom">
+                            <span class="badge bg-success rounded-pill me-2">안내</span> A구역 만차 해제
+                            <div class="text-muted small mt-1">10분 전</div>
+                        </li>
+                        <li class="list-group-item bg-transparent px-0 border-light">
+                            <span class="badge bg-primary rounded-pill me-2">시스템</span> AI 영상 분석 모듈 업데이트 완료
+                            <div class="text-muted small mt-1">1시간 전</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & Custom JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
