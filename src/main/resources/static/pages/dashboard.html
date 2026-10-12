@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>관제 대시보드 | EzPark 관제센터</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link href="../css/style.css" rel="stylesheet">
+  <link href="../css/console.css" rel="stylesheet">
+</head>
+<body class="ez-console" data-root="../" data-page="dashboard" data-layout="console" data-title="관제 대시보드">
+  <div class="console-wrap">
+    <aside class="console-sidebar" id="ez-sidebar"></aside>
+    <div class="console-main">
+      <header class="console-topbar" id="ez-topbar"></header>
+
+      <main class="console-content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+          <div>
+            <h2 class="h4 fw-800 text-navy mb-1">통합 주차 관제 현황</h2>
+            <div class="small text-muted-2">전체 <b id="lotCount">10</b>개 주차장 · CCTV <b>6</b>대 · AI 영상 인지 기반 실시간 집계</div>
+          </div>
+          <div class="d-flex gap-2">
+            <select class="form-select form-select-sm w-auto" id="lotFilter" aria-label="주차장 선택"><option value="">전체 주차장</option></select>
+            <button class="btn btn-sm btn-primary" id="btnExport"><i class="fa-solid fa-file-arrow-down me-1"></i>리포트</button>
+          </div>
+        </div>
+
+        <!-- KPI -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-4 col-xl"><div class="panel kpi"><div class="icon-box sm blue"><span class="material-symbols-rounded">local_parking</span></div><div><div class="kpi-label">전체 주차면</div><div class="kpi-value" id="kTotal">0</div><div class="trend up"><i class="fa-solid fa-plus"></i> 760 신규 연동</div></div></div></div>
+          <div class="col-6 col-md-4 col-xl"><div class="panel kpi"><div class="icon-box sm navy"><span class="material-symbols-rounded">directions_car</span></div><div><div class="kpi-label">현재 주차 차량</div><div class="kpi-value" id="kParked">0</div><div class="trend up" id="kParkedTrend"><i class="fa-solid fa-arrow-up"></i> 0</div></div></div></div>
+          <div class="col-6 col-md-4 col-xl"><div class="panel kpi"><div class="icon-box sm yellow"><span class="material-symbols-rounded">donut_large</span></div><div><div class="kpi-label">평균 점유율</div><div class="kpi-value" id="kRate">0<small>%</small></div><div class="trend down"><i class="fa-solid fa-arrow-up"></i> 전일 대비 +3.2%p</div></div></div></div>
+          <div class="col-6 col-md-6 col-xl"><div class="panel kpi"><div class="icon-box sm mint"><span class="material-symbols-rounded">swap_vert</span></div><div><div class="kpi-label">금일 입차 / 출차</div><div class="kpi-value"><span id="kIn">0</span><small> / </small><span id="kOut">0</span></div><div class="trend up"><i class="fa-solid fa-arrow-up"></i> 회전율 2.4회</div></div></div></div>
+          <div class="col-12 col-md-6 col-xl"><div class="panel kpi"><div class="icon-box sm purple"><span class="material-symbols-rounded">center_focus_strong</span></div><div><div class="kpi-label">AI 인지 정확도</div><div class="kpi-value" id="kAcc">97.8<small>%</small></div><div class="trend up"><i class="fa-solid fa-bolt"></i> 평균 추론 <span id="kLat">28</span>ms</div></div></div></div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-xl-8">
+            <div class="panel">
+              <div class="panel-head">
+                <h6><span class="material-symbols-rounded">show_chart</span><span id="chartTitle">시간대별 점유율</span></h6>
+                <div class="seg" id="chartSeg"><button class="active" data-mode="occ">점유율</button><button data-mode="flow">입·출차</button></div>
+              </div>
+              <div class="panel-body">
+                <div class="chart-legend mb-2" id="chartLegend"></div>
+                <div id="mainChart"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-4">
+            <div class="panel">
+              <div class="panel-head"><h6><span class="material-symbols-rounded">layers</span>층별 점유 현황</h6><span class="panel-sub" id="floorLotName">강남역 공영주차장</span></div>
+              <div class="panel-body">
+                <div id="floorBars"></div>
+                <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+                  <b class="small text-navy">B1 실시간 주차면</b>
+                  <span class="small text-muted-2"><i class="fa-solid fa-square text-mint"></i> 빈자리 <i class="fa-solid fa-square ms-2" style="color:#5b8cff"></i> EV</span>
+                </div>
+                <div class="mini-map" id="miniMap"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-xl-8">
+            <div class="panel">
+              <div class="panel-head"><h6><span class="material-symbols-rounded">videocam</span>CCTV 영상 인지 미리보기</h6><a href="cctv.html" class="btn btn-sm btn-soft">전체 화면 <i class="fa-solid fa-arrow-right ms-1"></i></a></div>
+              <div class="panel-body"><div class="cam-grid" id="camPreview"></div></div>
+            </div>
+          </div>
+          <div class="col-xl-4">
+            <div class="panel">
+              <div class="panel-head">
+                <h6><span class="material-symbols-rounded">notifications_active</span>실시간 이벤트</h6>
+                <div class="d-flex gap-2 align-items-center">
+                  <select class="form-select form-select-sm w-auto py-1" id="evFilter" aria-label="이벤트 필터"><option value="">전체</option><option value="alert">경보만</option><option value="flow">입·출차</option></select>
+                  <button class="btn btn-sm btn-light" id="evPause" aria-label="일시정지"><i class="fa-solid fa-pause"></i></button>
+                </div>
+              </div>
+              <div class="panel-body pt-0"><ul class="event-log" id="eventLog"></ul></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-xl-8">
+            <div class="panel">
+              <div class="panel-head"><h6><span class="material-symbols-rounded">table_view</span>주차장별 운영 현황</h6><span class="panel-sub">5초마다 자동 갱신</span></div>
+              <div class="table-responsive">
+                <table class="table table-ez table-hover">
+                  <thead><tr><th>주차장</th><th>유형</th><th class="text-end">전체</th><th class="text-end">잔여</th><th style="min-width:160px">점유율</th><th>상태</th><th></th></tr></thead>
+                  <tbody id="lotTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-4">
+            <div class="panel">
+              <div class="panel-head"><h6><span class="material-symbols-rounded">pie_chart</span>인지 차종 분포</h6><span class="panel-sub">금일 누적</span></div>
+              <div class="panel-body"><div id="typeDonut"></div></div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="console-footer">© 2026 EzPark 관제센터 · 프론트엔드 데모 (목업 데이터)</footer>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/mini-chart.js"></script>
+  <script src="../js/pages/dashboard.js"></script>
+</body>
+</html>

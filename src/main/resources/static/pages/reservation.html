@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>예약·결제 | EzPark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link href="../css/style.css" rel="stylesheet">
+</head>
+<body data-root="../" data-page="reservation">
+  <div id="ez-header"></div>
+
+  <section class="page-hero" data-bg="garageExit">
+    <div class="container">
+      <div class="breadcrumb-ez"><a href="../index.html">홈</a><span>/</span><span>주차 서비스</span><span>/</span><span class="text-white">예약·결제</span></div>
+      <h1>주차 예약·결제</h1>
+      <p class="mb-0">4단계로 간편하게 주차면을 예약하세요. 입차 30분 전까지 무료 취소할 수 있습니다.</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="ez-card p-3 p-md-4 p-lg-5">
+            <div class="stepper" id="stepper">
+              <div class="bar" id="stepBar" style="width:0"></div>
+              <div class="step active" data-step="1"><div class="dot">1</div><span>주차장</span></div>
+              <div class="step" data-step="2"><div class="dot">2</div><span>일시</span></div>
+              <div class="step" data-step="3"><div class="dot">3</div><span>차량 정보</span></div>
+              <div class="step" data-step="4"><div class="dot">4</div><span>결제</span></div>
+            </div>
+
+            <form id="rsvForm" novalidate>
+              <!-- STEP 1 -->
+              <div class="step-pane active" data-pane="1">
+                <h5 class="fw-800 text-navy mb-1">주차장을 선택하세요</h5>
+                <p class="text-muted-2 small mb-4">예약 가능한 주차장만 표시됩니다. 실시간 잔여면 기준</p>
+                <div class="row g-3" id="lotOptions"></div>
+              </div>
+
+              <!-- STEP 2 -->
+              <div class="step-pane" data-pane="2">
+                <h5 class="fw-800 text-navy mb-4">입차 일시와 이용 시간을 선택하세요</h5>
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label class="form-label" for="date">입차 날짜</label>
+                    <input type="date" class="form-control" id="date" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="duration">이용 시간</label>
+                    <select class="form-select" id="duration">
+                      <option value="60">1시간</option>
+                      <option value="120" selected>2시간</option>
+                      <option value="180">3시간</option>
+                      <option value="240">4시간</option>
+                      <option value="360">6시간</option>
+                      <option value="480">8시간</option>
+                      <option value="720">12시간</option>
+                      <option value="1440">종일 (24시간)</option>
+                    </select>
+                  </div>
+                </div>
+                <label class="form-label">입차 예정 시간</label>
+                <div class="time-grid" id="timeGrid"></div>
+                <div class="invalid-feedback d-block" id="timeErr" hidden>입차 시간을 선택해 주세요.</div>
+              </div>
+
+              <!-- STEP 3 -->
+              <div class="step-pane" data-pane="3">
+                <h5 class="fw-800 text-navy mb-4">차량 정보를 입력하세요</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="plate">차량번호</label>
+                    <input type="text" class="form-control" id="plate" placeholder="예) 12가3456" required pattern="^\d{2,3}[가-힣]\d{4}$">
+                    <div class="invalid-feedback">올바른 차량번호 형식이 아닙니다. (예: 12가3456, 123가4567)</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="phone">연락처</label>
+                    <input type="tel" class="form-control" id="phone" placeholder="010-0000-0000" required pattern="^01[016789]-?\d{3,4}-?\d{4}$">
+                    <div class="invalid-feedback">휴대폰 번호를 확인해 주세요.</div>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">차종</label>
+                    <div class="row g-2" id="carTypes">
+                      <div class="col-6 col-md-3"><label class="select-card"><input type="radio" name="carType" value="소형" checked><div class="inner text-center"><i class="fa-solid fa-car-side fs-4 text-blue"></i><div class="small fw-bold mt-1">소형/경차</div></div></label></div>
+                      <div class="col-6 col-md-3"><label class="select-card"><input type="radio" name="carType" value="중형"><div class="inner text-center"><i class="fa-solid fa-car fs-4 text-blue"></i><div class="small fw-bold mt-1">중형</div></div></label></div>
+                      <div class="col-6 col-md-3"><label class="select-card"><input type="radio" name="carType" value="대형"><div class="inner text-center"><i class="fa-solid fa-truck-pickup fs-4 text-blue"></i><div class="small fw-bold mt-1">대형/SUV</div></div></label></div>
+                      <div class="col-6 col-md-3"><label class="select-card"><input type="radio" name="carType" value="전기차"><div class="inner text-center"><i class="fa-solid fa-charging-station fs-4 text-mint"></i><div class="small fw-bold mt-1">전기차</div></div></label></div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="memo">요청사항 <span class="text-muted-2 fw-normal">(선택)</span></label>
+                    <textarea class="form-control" id="memo" rows="3" maxlength="200" placeholder="예) 엘리베이터 근처 자리 희망"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- STEP 4 -->
+              <div class="step-pane" data-pane="4">
+                <h5 class="fw-800 text-navy mb-4">결제 수단을 선택하세요</h5>
+                <div class="row g-2 mb-4">
+                  <div class="col-6 col-md-3"><label class="select-card"><input type="radio" name="pay" value="신용카드" checked><div class="inner text-center"><i class="fa-regular fa-credit-card fs-4 text-navy"></i><div class="small fw-bold mt-1">신용/체크카드</div></div></label></div>
+                  <div class="col-6 col-md-3"><label class="select-card"><input type="radio" name="pay" value="카카오페이"><div class="inner text-center"><i class="fa-solid fa-comment fs-4" style="color:#e0c400"></i><div class="small fw-bold mt-1">카카오페이</div></div></label></div>
+                  <div class="col-6 col-md-3"><label class="select-card"><input type="radio" name="pay" value="네이버페이"><div class="inner text-center"><span class="fw-800 fs-4" style="color:#03c75a">N</span><div class="small fw-bold mt-1">네이버페이</div></div></label></div>
+                  <div class="col-6 col-md-3"><label class="select-card"><input type="radio" name="pay" value="토스페이"><div class="inner text-center"><i class="fa-solid fa-wallet fs-4 text-blue"></i><div class="small fw-bold mt-1">토스페이</div></div></label></div>
+                </div>
+                <label class="form-label" for="coupon">쿠폰</label>
+                <select class="form-select mb-4" id="coupon">
+                  <option value="0">쿠폰 선택 안 함</option>
+                  <option value="30" selected>[이벤트] 첫 예약 30% 할인 (최대 1만원)</option>
+                  <option value="10">[회원] 10% 할인 쿠폰</option>
+                </select>
+                <div class="bg-soft rounded-4 p-3 small">
+                  <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="agreeAll"><label class="form-check-label fw-bold" for="agreeAll">전체 동의</label></div>
+                  <div class="form-check mb-1 ms-3"><input class="form-check-input agree" type="checkbox" id="agree1" required><label class="form-check-label" for="agree1">[필수] 예약 및 취소·환불 규정 동의</label></div>
+                  <div class="form-check ms-3"><input class="form-check-input agree" type="checkbox" id="agree2" required><label class="form-check-label" for="agree2">[필수] 차량번호 영상 인식 및 개인정보 처리 동의</label></div>
+                  <div class="invalid-feedback d-block" id="agreeErr" hidden>필수 약관에 동의해 주세요.</div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between mt-5">
+                <button type="button" class="btn btn-outline-secondary" id="prevBtn" disabled><i class="fa-solid fa-arrow-left me-1"></i>이전</button>
+                <button type="button" class="btn btn-primary px-4" id="nextBtn">다음<i class="fa-solid fa-arrow-right ms-1"></i></button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="ez-card p-4 summary-box">
+            <h5 class="fw-800 text-navy mb-3"><i class="fa-solid fa-receipt text-blue me-2"></i>예약 요약</h5>
+            <img id="sumImg" class="w-100 rounded-4 mb-3" style="height:140px;object-fit:cover" alt="선택한 주차장">
+            <div class="summary-row"><span>주차장</span><b id="sumLot">-</b></div>
+            <div class="summary-row"><span>주차면</span><b id="sumSlot">입차 시 AI 자동 배정</b></div>
+            <div class="summary-row"><span>입차 일시</span><b id="sumDate">-</b></div>
+            <div class="summary-row"><span>이용 시간</span><b id="sumDur">-</b></div>
+            <div class="summary-row"><span>차량</span><b id="sumCar">-</b></div>
+            <hr class="my-2">
+            <div class="summary-row"><span>기본 요금</span><b id="sumBase">0원</b></div>
+            <div class="summary-row"><span>감면 (전기차·공영)</span><b class="text-mint" id="sumEv">-0원</b></div>
+            <div class="summary-row"><span>쿠폰 할인</span><b class="text-mint" id="sumCoupon">-0원</b></div>
+            <div class="summary-row total-row align-items-end"><span class="fw-bold text-navy">결제 예정 금액</span><b id="sumTotal">0원</b></div>
+            <p class="small text-muted-2 mt-3 mb-0"><i class="fa-solid fa-circle-info me-1"></i>실제 주차 시간이 초과되면 출차 시 추가 요금이 정산됩니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Complete Modal -->
+  <div class="modal fade" id="doneModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-2">
+        <div class="modal-body text-center p-4">
+          <div class="icon-box mint mb-3" style="width:72px;height:72px;border-radius:50%;font-size:2rem"><i class="fa-solid fa-check"></i></div>
+          <h4 class="fw-800 text-navy mb-1">예약이 완료되었습니다</h4>
+          <p class="text-muted-2 small mb-4">입차 시 아래 QR 또는 차량번호 인식으로 자동 입차됩니다.</p>
+          <div class="qr mb-3" id="qr"></div>
+          <div class="font-en fw-bold text-blue mb-3" id="rsvNo"></div>
+          <div class="bg-soft rounded-4 p-3 text-start small" id="doneInfo"></div>
+        </div>
+        <div class="modal-footer border-0 pt-0 justify-content-center">
+          <a href="mypage.html" class="btn btn-soft">예약 내역 보기</a>
+          <a href="guide.html" class="btn btn-primary" id="doneGuide">주차 유도 시작</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ez-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/pages/reservation.js"></script>
+</body>
+</html>

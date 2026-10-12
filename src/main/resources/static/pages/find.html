@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>주차장 찾기 | EzPark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link href="../css/style.css" rel="stylesheet">
+</head>
+<body data-root="../" data-page="find">
+  <div id="ez-header"></div>
+
+  <section class="page-hero" data-bg="aerialLines">
+    <div class="container">
+      <div class="breadcrumb-ez"><a href="../index.html">홈</a><span>/</span><span>주차 서비스</span><span>/</span><span class="text-white">주차장 찾기</span></div>
+      <h1>실시간 주차장 찾기</h1>
+      <p class="mb-0">AI 영상 인지로 3초마다 갱신되는 잔여 주차면을 확인하고, 원하는 주차장을 바로 예약하거나 유도를 시작하세요.</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="container">
+      <!-- Toolbar -->
+      <div class="ez-card p-3 p-lg-4 mb-4">
+        <div class="row g-3 align-items-center">
+          <div class="col-lg-4">
+            <div class="input-icon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="search" class="form-control" id="q" placeholder="주차장명, 주소, 지역 검색" aria-label="검색">
+            </div>
+          </div>
+          <div class="col-6 col-lg-2">
+            <select class="form-select" id="area" aria-label="지역">
+              <option value="">전체 지역</option>
+            </select>
+          </div>
+          <div class="col-6 col-lg-2">
+            <select class="form-select" id="sort" aria-label="정렬">
+              <option value="dist">거리순</option>
+              <option value="avail">잔여면 많은순</option>
+              <option value="fee">요금 낮은순</option>
+              <option value="rating">평점순</option>
+            </select>
+          </div>
+          <div class="col-lg-4">
+            <div class="chip-group" id="chips">
+              <input type="checkbox" id="fPublic" value="공영"><label for="fPublic">공영</label>
+              <input type="checkbox" id="fPrivate" value="민영"><label for="fPrivate">민영</label>
+              <input type="checkbox" id="fEv"><label for="fEv"><i class="fa-solid fa-charging-station me-1"></i>전기차</label>
+              <input type="checkbox" id="fDis"><label for="fDis"><i class="fa-solid fa-wheelchair me-1"></i>장애인</label>
+              <input type="checkbox" id="fAvail"><label for="fAvail">여유만</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-5 order-2 order-lg-1">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="fw-bold text-navy">검색 결과 <span class="text-blue" id="count">0</span>곳</div>
+            <span class="small text-muted-2"><span class="live-dot text-danger me-1">LIVE</span> <span id="updated"></span></span>
+          </div>
+          <div id="lotList" class="d-flex flex-column gap-3" style="max-height:640px;overflow-y:auto;padding:2px"></div>
+        </div>
+        <div class="col-lg-7 order-1 order-lg-2">
+          <div class="map-box ez-card" id="mapBox">
+            <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+              <rect width="1000" height="1000" fill="#eaf0f7"/>
+              <g stroke="#dde5f0" stroke-width="2">
+                <path d="M0 100H1000M0 200H1000M0 300H1000M0 400H1000M0 650H1000M0 750H1000M0 850H1000M100 0V1000M200 0V1000M300 0V1000M450 0V1000M600 0V1000M750 0V1000M900 0V1000"/>
+              </g>
+              <ellipse cx="470" cy="150" rx="140" ry="90" fill="#d7ecd9"/>
+              <ellipse cx="760" cy="760" rx="90" ry="60" fill="#d7ecd9"/>
+              <ellipse cx="180" cy="820" rx="110" ry="70" fill="#d7ecd9"/>
+              <path d="M0 560 C150 540 230 600 330 590 S480 560 560 540 S720 560 820 500 S940 470 1000 470" fill="none" stroke="#b9d3f3" stroke-width="58" stroke-linecap="round"/>
+              <g fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round">
+                <path d="M0 360 L1000 330"/>
+                <path d="M0 700 C300 690 600 720 1000 650"/>
+                <path d="M420 0 L440 1000"/>
+                <path d="M600 0 C580 400 560 700 660 1000"/>
+                <path d="M120 0 L280 1000"/>
+                <path d="M860 0 L800 1000"/>
+              </g>
+              <g fill="none" stroke="#ffd36b" stroke-width="7" stroke-linecap="round" opacity=".8">
+                <path d="M0 640 C300 630 600 600 1000 560"/>
+                <path d="M0 480 C300 500 600 470 1000 420"/>
+              </g>
+            </svg>
+            <span class="position-absolute small fw-bold text-muted-2" style="left:44%;top:12%">종로·중구</span>
+            <span class="position-absolute small fw-bold text-muted-2" style="left:14%;top:30%">마포</span>
+            <span class="position-absolute small fw-bold text-muted-2" style="left:20%;top:62%">영등포</span>
+            <span class="position-absolute small fw-bold text-muted-2" style="left:60%;top:78%">강남·서초</span>
+            <span class="position-absolute small fw-bold text-muted-2" style="left:82%;top:68%">송파</span>
+            <span class="position-absolute small fw-bold text-muted-2" style="left:68%;top:36%">성동</span>
+            <span class="position-absolute small fw-bold" style="left:46%;top:58%;color:#7da7dc">한강</span>
+            <div class="me-dot" style="left:55%;top:73%" title="내 위치"></div>
+            <div id="markers"></div>
+            <div class="map-ctrl">
+              <button type="button" id="btnLocate" aria-label="내 위치"><i class="fa-solid fa-location-crosshairs"></i></button>
+              <button type="button" id="btnRefresh" aria-label="새로고침"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+            <div class="map-legend">
+              <span><i class="fa-solid fa-circle text-mint"></i>여유</span>
+              <span><i class="fa-solid fa-circle text-yellow"></i>보통</span>
+              <span><i class="fa-solid fa-circle text-red"></i>혼잡</span>
+            </div>
+          </div>
+          <p class="small text-muted-2 mt-2 mb-0"><i class="fa-solid fa-circle-info me-1"></i>프론트엔드 단계에서는 SVG 모형 지도를 사용하며, 백엔드 단계에서 공공데이터 좌표 + 지도 API로 교체됩니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detail Modal -->
+  <div class="modal fade" id="lotModal" tabindex="-1" aria-labelledby="lotModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content overflow-hidden" id="lotModalBody"></div>
+    </div>
+  </div>
+
+  <div id="ez-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/pages/find.js"></script>
+</body>
+</html>
