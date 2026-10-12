@@ -197,7 +197,7 @@ const EZ = (() => {
         </div>
         <hr>
         <div class="d-flex flex-column flex-md-row justify-content-between gap-2 small">
-          <span>© 2026 EzPark Team (김길동 · 홍길동 · 박미금 · 이오리). All rights reserved.</span>
+          <span>© 2026 EzPark Team (김길동 · 홍기흥 · 박미금 · 이오리). All rights reserved.</span>
           <span><a href="#">이용약관</a> · <a href="#" class="text-white fw-bold">개인정보처리방침</a> · <a href="#">영상정보처리방침</a></span>
         </div>
       </div>
@@ -250,7 +250,7 @@ const EZ = (() => {
           <div class="dropdown-menu dropdown-menu-end p-0 shadow border-0" style="width:300px;border-radius:14px">
             <div class="p-3 border-bottom fw-bold">알림 <span class="ez-badge red ms-1">3</span></div>
             <a class="dropdown-item py-2 px-3 small" href="${url('pages/cctv.html')}"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>CAM-04 불법주차 의심 차량 감지</a>
-            <a class="dropdown-item py-2 px-3 small" href="${url('pages/dashboard.html')}"><i class="fa-solid fa-square-parking text-warning me-2"></i>홍대입구 공영주차장 만차 임박 (96%)</a>
+            <a class="dropdown-item py-2 px-3 small" href="${url('pages/dashboard.html')}"><i class="fa-solid fa-square-parking text-warning me-2"></i>자갈치시장 공영주차장 만차 임박 (93%)</a>
             <a class="dropdown-item py-2 px-3 small" href="${url('pages/admin.html')}"><i class="fa-solid fa-building text-primary me-2"></i>신규 기업 도입 문의 2건</a>
           </div>
         </div>

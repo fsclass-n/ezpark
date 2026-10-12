@@ -68,8 +68,8 @@
     const q = $('#lSearch').value.trim().toLowerCase();
     $('#lBody').innerHTML = lots.filter(l => !q || `${l.name} ${l.addr}`.toLowerCase().includes(q)).map(l => `
       <tr><td class="font-en small">${l.id}</td><td class="fw-bold text-navy text-nowrap">${esc(l.name)}</td>
-      <td><span class="ez-badge ${l.type === '공영' ? 'blue' : 'gray'}">${l.type}</span></td><td class="small text-nowrap">${esc(l.addr)}</td>
-      <td class="text-end font-en">${fmt(l.total)}</td><td class="text-end font-en">${fmt(l.fee10)}</td>
+      <td><span class="ez-badge blue">${esc(l.region)}</span> <span class="ez-badge gray">${l.type}</span></td><td class="small text-nowrap">${esc(l.addr)}</td>
+      <td class="text-end font-en">${fmt(l.total)}</td><td class="text-end text-nowrap small">${esc(l.feeShort)}</td>
       <td>${l.ev ? '<i class="fa-solid fa-bolt text-mint"></i>' : '<span class="text-muted-2">-</span>'}</td>
       <td class="text-end text-nowrap"><button class="btn btn-sm btn-light" data-edit="${l.id}" aria-label="수정"><i class="fa-solid fa-pen"></i></button>
       <button class="btn btn-sm btn-light text-danger" data-del="${l.id}" aria-label="삭제"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
@@ -81,8 +81,8 @@
     $('#lotModalTitle').textContent = l ? '주차장 수정' : '주차장 등록';
     $('#fId').value = l ? l.id : '';
     if (l) {
-      $('#fName').value = l.name; $('#fAddr').value = l.addr; $('#fType').value = l.type; $('#fArea').value = l.area;
-      $('#fTotal').value = l.total; $('#fFee').value = l.fee10; $('#fEv').checked = l.ev;
+      $('#fName').value = l.name; $('#fAddr').value = l.addr; $('#fType').value = l.type; $('#fArea').value = l.region;
+      $('#fTotal').value = l.total; $('#fFee').value = l.fee10; $('#fEv').checked = l.ev === true;
     }
     lotModal.show();
   }
@@ -102,10 +102,12 @@
     const f = e.target;
     f.classList.add('was-validated');
     if (!f.checkValidity()) return;
-    const data = { name: $('#fName').value.trim(), addr: $('#fAddr').value.trim(), type: $('#fType').value, area: $('#fArea').value.trim(), total: +$('#fTotal').value, fee10: +$('#fFee').value, ev: $('#fEv').checked };
+    const data = { name: $('#fName').value.trim(), addr: $('#fAddr').value.trim(), type: $('#fType').value, region: $('#fArea').value.trim(), total: +$('#fTotal').value, fee10: +$('#fFee').value, ev: $('#fEv').checked || null };
+    data.feeShort = data.fee10 ? `10분 ${fmt(data.fee10)}원` : '무료';
+    data.feeText = data.feeShort;
     const id = +$('#fId').value;
     if (id) Object.assign(lots.find(l => l.id === id), data);
-    else lots.push({ id: Math.max(...lots.map(l => l.id)) + 1, available: data.total, dayMax: data.fee10 * 36, disabled: true, x: 50, y: 50, dist: 0, rating: 0, photo: 'garageExit', floors: ['B1'], tags: [], ...data });
+    else lots.push({ id: Math.max(...lots.map(l => l.id)) + 1, area: '', available: data.total, dayMax: 0, hours: '현장 확인', manager: '', tel: '', disabled: null, lat: EZ_DATA.HOME.lat, lng: EZ_DATA.HOME.lng, dist: 0, photo: 'garageExit', floors: ['B1'], tags: [], ...data });
     lotModal.hide();
     renderLots(); renderKpi();
     toast(id ? '주차장 정보가 수정되었습니다.' : '주차장이 등록되었습니다.');

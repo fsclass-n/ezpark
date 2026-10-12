@@ -266,7 +266,7 @@ mark { background: var(--ez-yellow-soft); padding: 0 .1em; border-radius: 3px; }
 .ez-footer .social a:hover { background: var(--ez-blue); }
 .ez-footer hr { border-color: rgba(255, 255, 255, .12); opacity: 1; margin: 2.5rem 0 1.5rem; }
 
-/* ---------- Find (홍길동) ---------- */
+/* ---------- Find (홍기흥) ---------- */
 .filter-panel { padding: 1.5rem; position: sticky; top: calc(var(--ez-header-h) + 1rem); }
 .filter-panel h6 { font-weight: 800; color: var(--ez-navy); font-size: .9rem; margin-bottom: .75rem; }
 .chip-group { display: flex; flex-wrap: wrap; gap: .4rem; }
@@ -278,24 +278,31 @@ mark { background: var(--ez-yellow-soft); padding: 0 .1em; border-radius: 3px; }
 .lot-card .thumb { width: 92px; height: 92px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
 .lot-card h6 { font-weight: 800; color: var(--ez-navy); margin-bottom: .2rem; }
 .lot-card .avail-num { font-family: var(--ez-font-en); font-weight: 800; font-size: 1.5rem; line-height: 1; }
-.map-box { position: relative; height: 640px; border-radius: var(--ez-radius); overflow: hidden; background: #e8eef7; }
-.map-box svg { width: 100%; height: 100%; display: block; }
-.map-marker { position: absolute; transform: translate(-50%, -100%); cursor: pointer; z-index: 2; transition: transform .2s; }
-.map-marker:hover, .map-marker.active { transform: translate(-50%, -100%) scale(1.15); z-index: 3; }
-.map-marker .pin { background: var(--ez-blue); color: #fff; font: 800 .8rem/1 var(--ez-font-en); padding: .45rem .6rem; border-radius: 10px; box-shadow: 0 6px 14px rgba(11, 31, 58, .25); position: relative; white-space: nowrap; }
-.map-marker .pin::after { content: ''; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); border: 6px solid transparent; border-bottom: 0; border-top-color: inherit; }
-.map-marker .pin.low { background: var(--ez-mint); border-top-color: var(--ez-mint); }
-.map-marker .pin.mid { background: #f0a800; border-top-color: #f0a800; }
-.map-marker .pin.high { background: var(--ez-red); border-top-color: var(--ez-red); }
-.map-marker.active .pin { outline: 3px solid #fff; }
+.map-box { position: relative; height: 640px; border-radius: var(--ez-radius); overflow: hidden; background: #dbe8f6; }
+.map-geo { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); aspect-ratio: 600 / 1000; max-width: 100%; }
+.map-geo svg { width: 100%; height: 100%; display: block; }
+.map-geo .geo-land { fill: #f4f7fb; stroke: #b8c8dc; stroke-width: 2; }
+.map-geo .geo-label text { fill: #7b8aa3; font: 700 22px var(--ez-font); }
+.map-marker { position: absolute; transform: translate(-50%, -50%); cursor: pointer; z-index: 2; }
+.map-marker .dot { display: block; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 3px 8px rgba(11, 31, 58, .35); transition: transform .2s; }
+.map-marker .dot.low { background: var(--ez-mint); }
+.map-marker .dot.mid { background: #f0a800; }
+.map-marker .dot.high { background: var(--ez-red); }
+.map-marker .tag { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); background: var(--ez-navy); color: #fff; font-size: .75rem; font-weight: 700; padding: .35rem .6rem; border-radius: 8px; white-space: nowrap; box-shadow: 0 6px 14px rgba(11, 31, 58, .25); opacity: 0; pointer-events: none; transition: opacity .15s; }
+.map-marker .tag b { font-family: var(--ez-font-en); margin-left: .3rem; }
+.map-marker:hover, .map-marker.active { z-index: 5; }
+.map-marker:hover .dot, .map-marker.active .dot { transform: scale(1.35); }
+.map-marker:hover .tag, .map-marker.active .tag { opacity: 1; }
+.map-marker.active .dot { animation: ring 1.6s infinite; }
+@keyframes ring { 0% { box-shadow: 0 0 0 0 rgba(47, 107, 255, .55); } 100% { box-shadow: 0 0 0 14px rgba(47, 107, 255, 0); } }
 .map-legend { position: absolute; left: 1rem; bottom: 1rem; background: #fff; border-radius: 12px; padding: .6rem .9rem; font-size: .8rem; box-shadow: var(--ez-shadow); display: flex; gap: .9rem; z-index: 4; }
 .map-legend i { margin-right: .25rem; }
 .map-ctrl { position: absolute; right: 1rem; top: 1rem; display: flex; flex-direction: column; gap: .4rem; z-index: 4; }
 .map-ctrl button { width: 40px; height: 40px; border-radius: 10px; border: 0; background: #fff; box-shadow: var(--ez-shadow); color: var(--ez-navy); }
-.me-dot { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--ez-blue); border: 3px solid #fff; transform: translate(-50%, -50%); box-shadow: 0 0 0 8px rgba(47, 107, 255, .2); z-index: 2; }
+.me-dot { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--ez-blue); border: 3px solid #fff; transform: translate(-50%, -50%); box-shadow: 0 0 0 6px rgba(47, 107, 255, .2); z-index: 1; }
 @media (max-width: 991.98px) { .map-box { height: 380px; } .filter-panel { position: static; } }
 
-/* ---------- Guide (홍길동) ---------- */
+/* ---------- Guide (홍기흥) ---------- */
 .floor-tabs .btn { min-width: 64px; }
 .floor-tabs .btn.active { background: var(--ez-navy); color: #fff; border-color: var(--ez-navy); }
 .lot-map-wrap { background: #1d2738; border-radius: var(--ez-radius); padding: 1rem; overflow-x: auto; }
@@ -331,7 +338,7 @@ mark { background: var(--ez-yellow-soft); padding: 0 .1em; border-radius: 3px; }
 .route-steps .step-ic { width: 36px; height: 36px; border-radius: 50%; background: var(--ez-blue-soft); color: var(--ez-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .route-steps li:last-child .step-ic { background: var(--ez-mint); color: #fff; }
 
-/* ---------- Reservation (홍길동) ---------- */
+/* ---------- Reservation (홍기흥) ---------- */
 .stepper { display: flex; justify-content: space-between; position: relative; margin-bottom: 2rem; }
 .stepper::before { content: ''; position: absolute; top: 20px; left: 10%; right: 10%; height: 3px; background: var(--ez-gray-200); }
 .stepper .bar { position: absolute; top: 20px; left: 10%; height: 3px; background: var(--ez-blue); transition: width .4s ease; }
@@ -359,7 +366,7 @@ mark { background: var(--ez-yellow-soft); padding: 0 .1em; border-radius: 3px; }
 .qr i { background: transparent; }
 .qr i.on { background: var(--ez-navy); }
 
-/* ---------- Mypage (홍길동) ---------- */
+/* ---------- Mypage (홍기흥) ---------- */
 .profile-card { padding: 2rem 1.5rem; text-align: center; }
 .profile-card .avatar-lg { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 4px solid var(--ez-blue-soft); }
 .nav-pills-ez .nav-link { border-radius: 12px; color: var(--ez-gray-600); font-weight: 600; text-align: left; display: flex; align-items: center; gap: .6rem; padding: .75rem 1rem; }

@@ -6,7 +6,7 @@
   const nowH = new Date().getHours();
   let range = 7;
 
-  [...new Set(lots.map(l => l.area))].forEach(a => $('#areaSel').insertAdjacentHTML('beforeend', `<option>${a}</option>`));
+  [...new Set(lots.map(l => l.region))].forEach(a => $('#areaSel').insertAdjacentHTML('beforeend', `<option>${a}</option>`));
   const seeded = s => () => ((s = (s * 9301 + 49297) % 233280) / 233280);
 
   /* 1. 48시간 수요 예측 */
@@ -49,8 +49,8 @@
   const heat = MiniChart.heatmap($('#heatmap'), { rows: days, cols: hours, data: heatData(), suffix: '%', cellH: 28 });
 
   /* 3. 지역별 수요 vs 공급 */
-  const areas = [...new Set(lots.map(l => l.area))];
-  const supply = areas.map(a => lots.filter(l => l.area === a).reduce((s, l) => s + l.total, 0));
+  const areas = [...new Set(lots.map(l => l.region))];
+  const supply = areas.map(a => lots.filter(l => l.region === a).reduce((s, l) => s + l.total, 0));
   const demand = supply.map((s, i) => Math.round(s * (0.8 + ((i * 37) % 40) / 100)));
   MiniChart.bar($('#areaChart'), { labels: areas, series: [{ name: '피크 수요', data: demand, color: C.blue }, { name: '공급 면수', data: supply, color: C.mint }], suffix: '', height: 250, barMax: 16 });
 
@@ -67,10 +67,10 @@
 
   /* 5. 인사이트 카드 */
   const insights = [
-    { ic: 'warning', c: 'red', t: '홍대입구 주말 만차 지속', d: '토·일 13~18시 점유율 96%↑. 인근 민영 주차장과 제휴 시 유입 분산 효과 예상 (+120면).' },
-    { ic: 'ev_station', c: 'mint', t: 'EV 충전면 부족', d: '코엑스·잠실 EV 면 점유율 98%. 일반면 대비 회전율 0.6배로 충전 완료 차량 이동 알림 필요.' },
-    { ic: 'storefront', c: 'yellow', t: '쇼핑몰 피크 예측', d: '이번 주 금요일 19시 잠실 롯데월드몰 점유율 94% 예측. B4 우선 유도 권장.' },
-    { ic: 'savings', c: 'blue', t: '요금 정책 제안', d: '서울역 환승주차장 07~09시 탄력 요금(+10%) 적용 시 월 매출 +6.8% 추정.' }
+    { ic: 'warning', c: 'red', t: '자갈치시장 주말 만차 지속', d: '121면 소규모 주차장으로 토·일 11~15시 점유율 95%↑ 예측. 인근 보수복개천 공영주차장(149면) 연계 유도 권장.' },
+    { ic: 'ev_station', c: 'mint', t: 'EV 충전구역 수요 집중', d: '화성행궁(전기차 11면)·국채보상운동기념공원(10면) EV 구역 점유율 98%. 충전 완료 차량 이동 알림 필요.' },
+    { ic: 'festival', c: 'yellow', t: '관광지 피크 예측', d: '이번 주말 14시 전주 한옥마을 제1공영주차장 점유율 94% 예측. 제4공영주차장(636면·무료 셔틀) 우회 안내 권장.' },
+    { ic: 'savings', c: 'blue', t: '운영 정책 제안', d: '세종로 공영주차장 평일 12~13시 피크 집중. 광화문 행사일 사전 예약제 운영 시 진입 대기 감소 기대.' }
   ];
   $('#insights').innerHTML = insights.map(i => `
     <div class="col-md-6"><div class="d-flex gap-3 p-3 rounded-4 bg-soft h-100">
@@ -112,7 +112,7 @@
   const answers = [
     [/혼잡|시간대|피크/, () => `[요약] 이번 주 혼잡 시간대 요약\n\n• 평일 피크: 12~13시 (평균 점유율 ${Math.max(...hourlyOcc)}%)\n• 퇴근 피크: 18시 (87%)\n• 주말 피크: 14~17시, 평일보다 2시간 늦게 시작\n\n가장 혼잡한 곳: ${busy.map(l => l.name).join(', ')}\n→ 11시 30분 이전 사전 예약 알림 발송을 권장합니다.`],
     [/쇼핑몰|전략|운영/, () => `[제안] 쇼핑몰 운영 전략 제안\n\n1. 주말 13~18시 층별 유도: 상층(B1) 만차 시 하층 우선 안내로 진입 대기 40% 감소 기대\n2. 구매 금액 연동 무료 주차 → 출차 정산 자동화로 출구 정체 해소\n3. 금요일 저녁 예약 전용면 5% 운영 → 객단가 높은 고객 유치\n\n예상 효과: 회전율 +18%, 관제 인력 -35%`],
-    [/전기차|EV|충전/i, () => `[분석] 전기차 충전면 확충 우선순위\n\n1순위 코엑스 스마트파킹 – EV 점유율 98%, 대기 평균 23분\n2순위 잠실 롯데월드몰 – 주말 EV 수요 전주 대비 +14%\n3순위 강남역 공영주차장 – 공영 감면 효과로 수요 집중\n\n충전 완료 후 30분 이상 점유 차량이 31%로, '충전 완료 이동 알림' 도입을 함께 권장합니다.`],
+    [/전기차|EV|충전/i, () => `[분석] 전기차 충전구역 확충 우선순위\n\n1순위 화성행궁 공영주차장 – 전기차 구역 11면(충전 2면) 대비 주말 수요 초과\n2순위 국채보상운동기념공원 공영주차장 – 전기차 충전구역 10면, 동성로 방문 수요 집중\n3순위 탑동 제1공영주차장 – 급속 충전기 1기, 관광객 전기 렌터카 비중 높음\n\n충전 완료 후 장시간 점유 차량이 많아 '충전 완료 이동 알림' 도입을 함께 권장합니다.`],
     [/예측|리포트|다음/, () => `[리포트] 다음 주 수요 예측 리포트 (요약)\n\n• 전체 평균 점유율: 74.2% (전주 대비 +2.1%p)\n• 만차 위험(95%↑) 예상: ${busy.map(l => l.name).join(', ')}\n• 여유 예상: ${top.slice(0, 2).map(l => l.name).join(', ')}\n• 모델: RandomForest (R² 0.93, MAE 3.1%p)\n\n주요 변수: 요일, 시간대, 강수 확률, 인근 행사, 공휴일`],
     [/./, q => `"${q}"에 대한 분석 결과입니다.\n\n현재 프론트엔드 데모 단계로 사전 정의된 응답을 제공합니다. 백엔드 연동 후에는 실시간 주차 데이터와 함께 Gemini API에 질의하여 맞춤형 답변을 생성합니다.\n\n추천 질문: 혼잡 시간대, 쇼핑몰 전략, 전기차 충전면, 수요 예측 리포트`]
   ];

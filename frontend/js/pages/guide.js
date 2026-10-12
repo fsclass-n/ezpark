@@ -1,4 +1,4 @@
-/* 주차 유도 (담당: 홍길동) */
+/* 주차 유도 (담당: 홍기흥) */
 (() => {
   const { $, $$, fmt, timeStr, url, toast, esc } = EZ;
   const lots = EZ_DATA.lots;

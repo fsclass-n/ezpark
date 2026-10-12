@@ -144,7 +144,7 @@
       const r = occRate(l), c = occClass(r);
       return `<tr class="${sel === l.id ? 'table-primary' : ''}">
         <td class="fw-bold text-navy text-nowrap">${esc(l.name)}</td>
-        <td><span class="ez-badge ${l.type === '공영' ? 'blue' : 'gray'}">${l.type}</span></td>
+        <td><span class="ez-badge blue">${l.region}</span></td>
         <td class="text-end font-en">${fmt(l.total)}</td>
         <td class="text-end font-en fw-bold text-${c === 'low' ? 'mint' : c === 'mid' ? 'yellow' : 'red'}">${fmt(l.available)}</td>
         <td><div class="d-flex align-items-center gap-2"><div class="occ-bar flex-grow-1"><span class="occ-${c}" style="width:${r}%"></span></div><span class="small font-en" style="width:34px">${r}%</span></div></td>
@@ -171,7 +171,7 @@
   renderEvents();
 
   setInterval(() => {
-    lots.forEach(l => { l.available = Math.max(0, Math.min(l.total, l.available + rand(-4, 4))); });
+    lots.forEach(l => { const step = Math.max(1, Math.round(l.total / 150)); l.available = Math.max(0, Math.min(l.total, l.available + rand(-step, step))); });
     renderKpi();
   }, 3000);
   setInterval(pushEvent, 2500);

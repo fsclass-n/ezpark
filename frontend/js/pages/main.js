@@ -28,7 +28,7 @@
   });
 
   /* 실시간 주차장 현황 */
-  const lots = EZ_DATA.lots.slice(0, 6);
+  const lots = [1, 4, 7, 8, 9, 10].map(id => EZ_DATA.lots.find(l => l.id === id));
   const renderLots = () => {
     $('#liveLots').innerHTML = lots.map(l => {
       const r = occRate(l), c = occClass(r);
@@ -37,10 +37,10 @@
         <div class="flex-grow-1 min-w-0">
           <div class="d-flex align-items-center gap-2 mb-1">
             <b class="text-navy text-truncate">${esc(l.name)}</b>
-            <span class="ez-badge ${l.type === '공영' ? 'blue' : 'gray'}">${l.type}</span>
+            <span class="ez-badge blue">${l.region}</span>
           </div>
           <div class="occ-bar"><span class="occ-${c}" style="width:${r}%"></span></div>
-          <div class="small text-muted-2 mt-1">점유율 ${r}% · ${occText(r)} · 10분 ${fmt(l.fee10)}원</div>
+          <div class="small text-muted-2 mt-1">${occText(r)} · 점유율 ${r}% · ${l.feeShort}</div>
         </div>
         <div class="avail text-${c === 'low' ? 'mint' : c === 'mid' ? 'yellow' : 'red'}">${fmt(l.available)}<div class="small text-muted-2 fw-normal" style="font-size:.7rem">잔여면</div></div>
       </a>`;
@@ -49,13 +49,13 @@
   };
   renderLots();
   setInterval(() => {
-    lots.forEach(l => { l.available = Math.max(0, Math.min(l.total, l.available + Math.round((Math.random() - 0.5) * 6))); });
+    lots.forEach(l => { const step = Math.max(1, Math.round(l.total / 150)); l.available = Math.max(0, Math.min(l.total, l.available + Math.round((Math.random() - 0.5) * 2 * step))); });
     renderLots();
   }, 4000);
 
   /* 리뷰 */
   const reviews = [
-    { img: 'p1', name: '이서연', role: '직장인 · 강남 출퇴근', text: '퇴근길 코엑스 주차장 들어가기 전에 빈자리를 미리 보고, 경로 안내까지 받으니 주차가 정말 편해졌어요.' },
+    { img: 'p1', name: '이서연', role: '직장인 · 광화문 출퇴근', text: '세종로 공영주차장 들어가기 전에 빈자리를 미리 보고, 경로 안내까지 받으니 주차가 정말 편해졌어요.' },
     { img: 'p3', name: '박정훈', role: '쇼핑몰 시설팀장', text: '주말마다 진입 대기열이 길었는데 층별 유도 이후 대기 시간이 확 줄었습니다. 관제 인력 운영도 효율적이에요.' },
     { img: 'p2', name: '최민호', role: '병원 총무팀', text: '외래 예약과 주차 배정을 연동한 뒤 환자 민원이 크게 줄었습니다. Gemini 리포트로 회의 자료 만들기도 쉬워요.' }
   ];

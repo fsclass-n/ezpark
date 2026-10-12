@@ -67,7 +67,7 @@
               </div>
               <div class="table-responsive">
                 <table class="table table-ez table-hover">
-                  <thead><tr><th>ID</th><th>주차장명</th><th>유형</th><th>주소</th><th class="text-end">면수</th><th class="text-end">10분 요금</th><th>EV</th><th class="text-end">관리</th></tr></thead>
+                  <thead><tr><th>ID</th><th>주차장명</th><th>지역·유형</th><th>주소</th><th class="text-end">면수</th><th class="text-end">기본 요금</th><th>EV</th><th class="text-end">관리</th></tr></thead>
                   <tbody id="lBody"></tbody>
                 </table>
               </div>
@@ -116,10 +116,10 @@
           <input type="hidden" id="fId">
           <div class="col-12"><label class="form-label" for="fName">주차장명</label><input class="form-control" id="fName" required><div class="invalid-feedback">주차장명을 입력해 주세요.</div></div>
           <div class="col-12"><label class="form-label" for="fAddr">주소</label><input class="form-control" id="fAddr" required><div class="invalid-feedback">주소를 입력해 주세요.</div></div>
-          <div class="col-6"><label class="form-label" for="fType">유형</label><select class="form-select" id="fType"><option>공영</option><option>민영</option></select></div>
-          <div class="col-6"><label class="form-label" for="fArea">지역</label><input class="form-control" id="fArea" required><div class="invalid-feedback">지역을 입력해 주세요.</div></div>
+          <div class="col-6"><label class="form-label" for="fType">유형 (공영)</label><select class="form-select" id="fType"><option>노외</option><option>노상</option><option>부설</option></select></div>
+          <div class="col-6"><label class="form-label" for="fArea">시·도</label><input class="form-control" id="fArea" required><div class="invalid-feedback">시·도를 입력해 주세요.</div></div>
           <div class="col-6"><label class="form-label" for="fTotal">전체 면수</label><input type="number" class="form-control" id="fTotal" min="1" required><div class="invalid-feedback">1 이상 입력</div></div>
-          <div class="col-6"><label class="form-label" for="fFee">10분 요금(원)</label><input type="number" class="form-control" id="fFee" min="0" step="100" required><div class="invalid-feedback">요금을 입력해 주세요.</div></div>
+          <div class="col-6"><label class="form-label" for="fFee">10분 환산 요금(원, 무료 0)</label><input type="number" class="form-control" id="fFee" min="0" step="100" required><div class="invalid-feedback">요금을 입력해 주세요.</div></div>
           <div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="fEv"><label class="form-check-label" for="fEv">전기차 충전 가능</label></div></div>
         </div>
         <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button><button class="btn btn-primary">저장</button></div>

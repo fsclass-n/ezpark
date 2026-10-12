@@ -24,7 +24,7 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
           <div>
             <h2 class="h4 fw-800 text-navy mb-1">통합 주차 관제 현황</h2>
-            <div class="small text-muted-2">전체 <b id="lotCount">10</b>개 주차장 · CCTV <b>6</b>대 · AI 영상 인지 기반 실시간 집계</div>
+            <div class="small text-muted-2">전국 공영주차장 <b id="lotCount">10</b>곳 · CCTV <b>6</b>대 · AI 영상 인지 기반 실시간 집계</div>
           </div>
           <div class="d-flex gap-2">
             <select class="form-select form-select-sm w-auto" id="lotFilter" aria-label="주차장 선택"><option value="">전체 주차장</option></select>
@@ -34,7 +34,7 @@
 
         <!-- KPI -->
         <div class="row g-3 mb-4">
-          <div class="col-6 col-md-4 col-xl"><div class="panel kpi"><div class="icon-box sm blue"><span class="material-symbols-rounded">local_parking</span></div><div><div class="kpi-label">전체 주차면</div><div class="kpi-value" id="kTotal">0</div><div class="trend up"><i class="fa-solid fa-plus"></i> 760 신규 연동</div></div></div></div>
+          <div class="col-6 col-md-4 col-xl"><div class="panel kpi"><div class="icon-box sm blue"><span class="material-symbols-rounded">local_parking</span></div><div><div class="kpi-label">전체 주차면</div><div class="kpi-value" id="kTotal">0</div><div class="trend up"><i class="fa-solid fa-map-location-dot"></i> 9개 시·도</div></div></div></div>
           <div class="col-6 col-md-4 col-xl"><div class="panel kpi"><div class="icon-box sm navy"><span class="material-symbols-rounded">directions_car</span></div><div><div class="kpi-label">현재 주차 차량</div><div class="kpi-value" id="kParked">0</div><div class="trend up" id="kParkedTrend"><i class="fa-solid fa-arrow-up"></i> 0</div></div></div></div>
           <div class="col-6 col-md-4 col-xl"><div class="panel kpi"><div class="icon-box sm yellow"><span class="material-symbols-rounded">donut_large</span></div><div><div class="kpi-label">평균 점유율</div><div class="kpi-value" id="kRate">0<small>%</small></div><div class="trend down"><i class="fa-solid fa-arrow-up"></i> 전일 대비 +3.2%p</div></div></div></div>
           <div class="col-6 col-md-6 col-xl"><div class="panel kpi"><div class="icon-box sm mint"><span class="material-symbols-rounded">swap_vert</span></div><div><div class="kpi-label">금일 입차 / 출차</div><div class="kpi-value"><span id="kIn">0</span><small> / </small><span id="kOut">0</span></div><div class="trend up"><i class="fa-solid fa-arrow-up"></i> 회전율 2.4회</div></div></div></div>
@@ -56,7 +56,7 @@
           </div>
           <div class="col-xl-4">
             <div class="panel">
-              <div class="panel-head"><h6><span class="material-symbols-rounded">layers</span>층별 점유 현황</h6><span class="panel-sub" id="floorLotName">강남역 공영주차장</span></div>
+              <div class="panel-head"><h6><span class="material-symbols-rounded">layers</span>층별 점유 현황</h6><span class="panel-sub" id="floorLotName">세종로 공영주차장</span></div>
               <div class="panel-body">
                 <div id="floorBars"></div>
                 <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
@@ -96,7 +96,7 @@
               <div class="panel-head"><h6><span class="material-symbols-rounded">table_view</span>주차장별 운영 현황</h6><span class="panel-sub">5초마다 자동 갱신</span></div>
               <div class="table-responsive">
                 <table class="table table-ez table-hover">
-                  <thead><tr><th>주차장</th><th>유형</th><th class="text-end">전체</th><th class="text-end">잔여</th><th style="min-width:160px">점유율</th><th>상태</th><th></th></tr></thead>
+                  <thead><tr><th>주차장</th><th>지역</th><th class="text-end">전체</th><th class="text-end">잔여</th><th style="min-width:160px">점유율</th><th>상태</th><th></th></tr></thead>
                   <tbody id="lotTable"></tbody>
                 </table>
               </div>

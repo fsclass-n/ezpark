@@ -1,7 +1,7 @@
-/* 마이페이지 (담당: 홍길동) */
+/* 마이페이지 (담당: 홍기흥) */
 (() => {
   const { $, $$, fmt, won, esc, toast, auth, url, occRate, occClass } = EZ;
-  const user = auth.get() || { name: '홍길동', email: 'demo@ezpark.kr', role: 'USER', plate: '12가3456', phone: '010-1234-5678', demo: true };
+  const user = auth.get() || { name: '홍기흥', email: 'demo@ezpark.kr', role: 'USER', plate: '12가3456', phone: '010-1234-5678', demo: true };
   $('#guestAlert').hidden = !user.demo;
 
   /* 프로필 */

@@ -19,8 +19,8 @@
   <section class="page-hero" data-bg="aerialLines">
     <div class="container">
       <div class="breadcrumb-ez"><a href="../index.html">홈</a><span>/</span><span>주차 서비스</span><span>/</span><span class="text-white">주차장 찾기</span></div>
-      <h1>실시간 주차장 찾기</h1>
-      <p class="mb-0">AI 영상 인지로 3초마다 갱신되는 잔여 주차면을 확인하고, 원하는 주차장을 바로 예약하거나 유도를 시작하세요.</p>
+      <h1>전국 공영주차장 찾기</h1>
+      <p class="mb-0">서울부터 제주까지 전국 공영주차장의 위치·주차면수·요금을 확인하고, 원하는 주차장을 바로 예약하거나 유도를 시작하세요.</p>
     </div>
   </section>
 
@@ -32,12 +32,12 @@
           <div class="col-lg-4">
             <div class="input-icon">
               <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="search" class="form-control" id="q" placeholder="주차장명, 주소, 지역 검색" aria-label="검색">
+              <input type="search" class="form-control" id="q" placeholder="주차장명, 주소, 지역 검색 (예: 부산, 세종로)" aria-label="검색">
             </div>
           </div>
           <div class="col-6 col-lg-2">
-            <select class="form-select" id="area" aria-label="지역">
-              <option value="">전체 지역</option>
+            <select class="form-select" id="area" aria-label="시·도">
+              <option value="">전국</option>
             </select>
           </div>
           <div class="col-6 col-lg-2">
@@ -45,13 +45,13 @@
               <option value="dist">거리순</option>
               <option value="avail">잔여면 많은순</option>
               <option value="fee">요금 낮은순</option>
-              <option value="rating">평점순</option>
+              <option value="total">주차면수 많은순</option>
             </select>
           </div>
           <div class="col-lg-4">
             <div class="chip-group" id="chips">
-              <input type="checkbox" id="fPublic" value="공영"><label for="fPublic">공영</label>
-              <input type="checkbox" id="fPrivate" value="민영"><label for="fPrivate">민영</label>
+              <input type="checkbox" id="fPaid" value="paid"><label for="fPaid">유료</label>
+              <input type="checkbox" id="fFree" value="free"><label for="fFree">무료</label>
               <input type="checkbox" id="fEv"><label for="fEv"><i class="fa-solid fa-charging-station me-1"></i>전기차</label>
               <input type="checkbox" id="fDis"><label for="fDis"><i class="fa-solid fa-wheelchair me-1"></i>장애인</label>
               <input type="checkbox" id="fAvail"><label for="fAvail">여유만</label>
@@ -70,40 +70,21 @@
         </div>
         <div class="col-lg-7 order-1 order-lg-2">
           <div class="map-box ez-card" id="mapBox">
-            <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
-              <rect width="1000" height="1000" fill="#eaf0f7"/>
-              <g stroke="#dde5f0" stroke-width="2">
-                <path d="M0 100H1000M0 200H1000M0 300H1000M0 400H1000M0 650H1000M0 750H1000M0 850H1000M100 0V1000M200 0V1000M300 0V1000M450 0V1000M600 0V1000M750 0V1000M900 0V1000"/>
-              </g>
-              <ellipse cx="470" cy="150" rx="140" ry="90" fill="#d7ecd9"/>
-              <ellipse cx="760" cy="760" rx="90" ry="60" fill="#d7ecd9"/>
-              <ellipse cx="180" cy="820" rx="110" ry="70" fill="#d7ecd9"/>
-              <path d="M0 560 C150 540 230 600 330 590 S480 560 560 540 S720 560 820 500 S940 470 1000 470" fill="none" stroke="#b9d3f3" stroke-width="58" stroke-linecap="round"/>
-              <g fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round">
-                <path d="M0 360 L1000 330"/>
-                <path d="M0 700 C300 690 600 720 1000 650"/>
-                <path d="M420 0 L440 1000"/>
-                <path d="M600 0 C580 400 560 700 660 1000"/>
-                <path d="M120 0 L280 1000"/>
-                <path d="M860 0 L800 1000"/>
-              </g>
-              <g fill="none" stroke="#ffd36b" stroke-width="7" stroke-linecap="round" opacity=".8">
-                <path d="M0 640 C300 630 600 600 1000 560"/>
-                <path d="M0 480 C300 500 600 470 1000 420"/>
-              </g>
-            </svg>
-            <span class="position-absolute small fw-bold text-muted-2" style="left:44%;top:12%">종로·중구</span>
-            <span class="position-absolute small fw-bold text-muted-2" style="left:14%;top:30%">마포</span>
-            <span class="position-absolute small fw-bold text-muted-2" style="left:20%;top:62%">영등포</span>
-            <span class="position-absolute small fw-bold text-muted-2" style="left:60%;top:78%">강남·서초</span>
-            <span class="position-absolute small fw-bold text-muted-2" style="left:82%;top:68%">송파</span>
-            <span class="position-absolute small fw-bold text-muted-2" style="left:68%;top:36%">성동</span>
-            <span class="position-absolute small fw-bold" style="left:46%;top:58%;color:#7da7dc">한강</span>
-            <div class="me-dot" style="left:55%;top:73%" title="내 위치"></div>
-            <div id="markers"></div>
+            <div class="map-geo" id="mapGeo">
+              <svg viewBox="0 0 600 1000" preserveAspectRatio="none" aria-hidden="true">
+                <g class="geo-grid" stroke="#dce4ef" stroke-width="1.5">
+                  <path d="M0 200H600M0 400H600M0 600H600M0 800H600M150 0V1000M300 0V1000M450 0V1000"/>
+                </g>
+                <path class="geo-land" d="M68.2,179.1 L109.1,165.2 L147.3,165.2 L190.9,130.4 L231.8,78.3 L300.0,73.0 L340.9,78.3 L376.4,22.6 L402.3,87.0 L450.0,165.2 L478.6,213.9 L486.8,227.8 L512.7,295.7 L518.2,373.9 L520.9,426.1 L541.4,466.1 L525.0,504.3 L520.9,565.2 L504.5,600.0 L484.1,626.1 L463.6,643.5 L429.5,652.2 L415.9,695.7 L381.8,678.3 L334.1,687.0 L293.2,687.0 L279.5,713.0 L238.6,730.4 L211.4,747.8 L177.3,747.8 L129.5,773.9 L95.5,747.8 L88.6,704.3 L109.1,660.9 L102.3,626.1 L115.9,582.6 L122.7,547.8 L147.3,513.0 L147.3,478.3 L129.5,434.8 L122.7,400.0 L95.5,373.9 L75.0,339.1 L102.3,313.0 L136.4,304.3 L156.8,287.0 L143.2,252.2 L136.4,226.1 L129.5,200.0 L109.1,182.6 Z"/>
+                <ellipse class="geo-land" cx="129.5" cy="933.9" rx="54.5" ry="29.6"/>
+                <g class="geo-label"><text x="170.2" y="212.2" text-anchor="end">서울</text><text x="132.0" y="231.3" text-anchor="end">인천</text><text x="210.3" y="266.1" text-anchor="start">수원</text><text x="429.3" y="180.9" text-anchor="end">강릉</text><text x="260.7" y="424.4" text-anchor="start">대전</text><text x="229.4" y="516.6" text-anchor="start">전주</text><text x="427.1" y="507.9" text-anchor="start">대구</text><text x="455.2" y="627.9" text-anchor="end">부산</text><text x="144.8" y="920.0" text-anchor="start">제주</text></g>
+              </svg>
+              <div class="me-dot" id="meDot" title="기준 위치: 서울시청"></div>
+              <div id="markers"></div>
+            </div>
             <div class="map-ctrl">
-              <button type="button" id="btnLocate" aria-label="내 위치"><i class="fa-solid fa-location-crosshairs"></i></button>
-              <button type="button" id="btnRefresh" aria-label="새로고침"><i class="fa-solid fa-rotate"></i></button>
+              <button type="button" id="btnLocate" aria-label="기준 위치(서울시청) 거리순 정렬" title="서울시청 기준 거리순"><i class="fa-solid fa-location-crosshairs"></i></button>
+              <button type="button" id="btnRefresh" aria-label="새로고침" title="새로고침"><i class="fa-solid fa-rotate"></i></button>
             </div>
             <div class="map-legend">
               <span><i class="fa-solid fa-circle text-mint"></i>여유</span>
@@ -111,7 +92,7 @@
               <span><i class="fa-solid fa-circle text-red"></i>혼잡</span>
             </div>
           </div>
-          <p class="small text-muted-2 mt-2 mb-0"><i class="fa-solid fa-circle-info me-1"></i>프론트엔드 단계에서는 SVG 모형 지도를 사용하며, 백엔드 단계에서 공공데이터 좌표 + 지도 API로 교체됩니다.</p>
+          <p class="small text-muted-2 mt-2 mb-0"><i class="fa-solid fa-circle-info me-1"></i>주차장명·주소·주차면수·요금은 운영기관 공개자료 및 공공데이터포털 「전국주차장정보표준데이터」 기준(2026.10 확인)이며, <b>잔여면은 데모 시뮬레이션</b>입니다. 지도는 근사 좌표의 모형 지도로, 백엔드 단계에서 공공데이터 좌표 + 지도 API로 교체됩니다.</p>
         </div>
       </div>
     </div>

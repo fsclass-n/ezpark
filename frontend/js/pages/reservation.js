@@ -1,4 +1,4 @@
-/* 예약·결제 (담당: 홍길동) */
+/* 예약·결제 (담당: 홍기흥) */
 (() => {
   const { $, $$, fmt, won, pad, occRate, occClass, esc, toast, auth } = EZ;
   const lots = EZ_DATA.lots;
@@ -15,7 +15,7 @@
         <img src="${ezImg(l.photo, 160, 160)}" alt="" style="width:64px;height:64px;border-radius:12px;object-fit:cover" loading="lazy">
         <div class="flex-grow-1 min-w-0">
           <div class="fw-bold text-navy text-truncate">${esc(l.name)}</div>
-          <div class="small text-muted-2">10분 ${fmt(l.fee10)}원 · ${l.type}${l.ev ? ' · EV' : ''}</div>
+          <div class="small text-muted-2">${l.region} · ${l.feeShort}${l.ev ? ' · EV' : ''}</div>
           <div class="occ-bar mt-2"><span class="occ-${c}" style="width:${r}%"></span></div>
         </div>
         <div class="text-end"><div class="fw-800 font-en text-${c === 'low' ? 'mint' : c === 'mid' ? 'yellow' : 'red'}">${fmt(l.available)}</div><div class="small text-muted-2">잔여</div></div>
@@ -53,9 +53,10 @@
     const lot = lots.find(l => l.id === state.lotId);
     if (!lot) return { base: 0, ev: 0, coupon: 0, total: 0 };
     const min = +$('#duration').value;
-    const base = Math.min(lot.dayMax * Math.ceil(min / 1440), Math.ceil(min / 10) * lot.fee10);
+    const byTime = Math.ceil(min / 10) * lot.fee10;
+    const base = lot.dayMax ? Math.min(lot.dayMax * Math.ceil(min / 1440), byTime) : byTime;
     const carType = $('input[name=carType]:checked').value;
-    const ev = carType === '전기차' && lot.type === '공영' ? Math.round(base * 0.5) : 0;
+    const ev = carType === '전기차' ? Math.round(base * 0.5) : 0; // 공영주차장 저공해(전기)차 50% 감면
     const rate = +$('#coupon').value;
     const coupon = Math.min(rate === 30 ? 10000 : Infinity, Math.round(((base - ev) * rate) / 100));
     return { lot, base, ev, coupon, total: Math.max(0, base - ev - coupon), min, carType };
