@@ -2,12 +2,13 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <!--
   EzPark 공통 레이아웃 조각 (P1 common.js 의 renderHeader / renderFooter / renderConsole 을 서버 렌더링으로 전환)
-  - head(title, console) : 공통 <head>
-  - header(transparent)  : 공개 페이지 상단 메뉴 (로그인 상태는 ${loginUser})
-  - footer               : 공개 페이지 하단
-  - sidebar / topbar     : 관제 콘솔 레이아웃
+  - commonHead(title, console) : 공통 <head>
+  - publicHeader(transparent)  : 공개 페이지 상단 메뉴 (로그인 상태는 ${loginUser})
+  - publicFooter               : 공개 페이지 하단
+  - consoleSidebar / consoleTopbar : 관제 콘솔 레이아웃
+  ※ 조각 이름을 태그명(header, footer 등)과 같게 지으면 :: 선택자가 같은 태그를 모두 가져오므로 주의
 -->
-<head th:fragment="head(title, console)">
+<head th:fragment="commonHead(title, console)">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="EzPark - AI 영상 인지 기반 스마트 주차관제·유도 플랫폼">
@@ -25,7 +26,7 @@
 <body>
 
 <!-- ===================== 공개 페이지 헤더 ===================== -->
-<header th:fragment="header(transparent)" class="ez-header" th:classappend="${transparent} ? 'transparent'" id="ezHeader">
+<header th:fragment="publicHeader(transparent)" class="ez-header" th:classappend="${transparent} ? 'transparent'" id="ezHeader">
   <nav class="navbar navbar-expand-lg">
     <div class="container">
       <a class="navbar-brand brand" th:href="@{/}"><span class="brand-logo">E</span><span class="brand-text">Ez<b>Park</b></span></a>
@@ -74,7 +75,7 @@
 </header>
 
 <!-- ===================== 공개 페이지 푸터 ===================== -->
-<footer th:fragment="footer" class="ez-footer">
+<footer th:fragment="publicFooter" class="ez-footer">
   <div class="container">
     <div class="row g-4">
       <div class="col-lg-4">
@@ -129,7 +130,7 @@
 </footer>
 
 <!-- ===================== 관제 콘솔 사이드바 ===================== -->
-<aside th:fragment="sidebar" class="console-sidebar" id="ez-sidebar">
+<aside th:fragment="consoleSidebar" class="console-sidebar" id="ez-sidebar">
   <div class="side-brand"><a class="brand" th:href="@{/}"><span class="brand-logo">E</span><span class="brand-text">Ez<b>Park</b></span></a></div>
   <nav>
     <div class="side-label">Monitoring</div>
@@ -154,7 +155,7 @@
 </aside>
 
 <!-- ===================== 관제 콘솔 상단바 ===================== -->
-<header th:fragment="topbar" class="console-topbar" id="ez-topbar">
+<header th:fragment="consoleTopbar" class="console-topbar" id="ez-topbar">
   <button class="topbar-btn d-xl-none" id="sideToggle" aria-label="메뉴"><i class="fa-solid fa-bars"></i></button>
   <h1 class="page-title" th:text="${title}">관제센터</h1>
   <div class="search input-icon d-none d-md-block ms-3">

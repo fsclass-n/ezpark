@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head(title='회원가입 | EzPark', console=false)}"></head>
+<head th:replace="~{fragments/layout :: commonHead(title='회원가입 | EzPark', console=false)}"></head>
 <body data-root="../" data-page="register" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
   <div class="auth-wrap">
     <div class="auth-visual" data-bg="aerialLot">

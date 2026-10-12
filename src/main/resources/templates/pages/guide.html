@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head(title='주차 유도 | EzPark', console=false)}"></head>
+<head th:replace="~{fragments/layout :: commonHead(title='주차 유도 | EzPark', console=false)}"></head>
 <body data-root="../" data-page="guide" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
-  <header th:replace="~{fragments/layout :: header(transparent=false)}"></header>
+  <header th:replace="~{fragments/layout :: publicHeader(transparent=false)}"></header>
 
   <section class="page-hero" data-bg="garageArrow">
     <div class="container">
@@ -82,7 +82,7 @@
     </div>
   </section>
 
-  <footer th:replace="~{fragments/layout :: footer}"></footer>
+  <footer th:replace="~{fragments/layout :: publicFooter}"></footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script src="../js/data.js"></script>

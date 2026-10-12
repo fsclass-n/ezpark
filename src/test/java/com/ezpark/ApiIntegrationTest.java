@@ -132,6 +132,13 @@ class ApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("공개 페이지에는 공개 헤더만, 콘솔 상단바·사이드바는 포함되지 않는다")
+    void layoutFragments() throws Exception {
+        String html = mvc.perform(get("/")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        org.assertj.core.api.Assertions.assertThat(html).contains("id=\"ezHeader\"").doesNotContain("id=\"ez-topbar\"").doesNotContain("id=\"ez-sidebar\"");
+    }
+
+    @Test
     @DisplayName("Gemini 키가 없으면 규칙 기반 답변(fallback)")
     void insightFallback() throws Exception {
         MockHttpSession admin = (MockHttpSession) mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)

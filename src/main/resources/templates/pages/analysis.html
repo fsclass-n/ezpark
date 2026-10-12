@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head(title='K-AI 데이터 분석 | EzPark 관제센터', console=true)}"></head>
+<head th:replace="~{fragments/layout :: commonHead(title='K-AI 데이터 분석 | EzPark 관제센터', console=true)}"></head>
 <body class="ez-console" data-root="../" data-page="analysis" data-layout="console" data-title="K-AI 데이터 분석" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
   <div class="console-wrap">
-    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+    <aside th:replace="~{fragments/layout :: consoleSidebar}"></aside>
     <div class="console-main">
-      <header th:replace="~{fragments/layout :: topbar}"></header>
+      <header th:replace="~{fragments/layout :: consoleTopbar}"></header>
 
       <main class="console-content">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">

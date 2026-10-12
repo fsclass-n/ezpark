@@ -17,6 +17,7 @@ EzPark – AI 영상 인지 기반 주차관제·유도 반응형 웹 (훈련생
 ## Conventions
 - 서버: 컨트롤러 DTO 는 record + Bean Validation, 오류는 `ApiException` → `{"message"}`; 권한은 `LoginInterceptor(Level)` + `PageController`
 - SQL 은 MySQL 8 / TiDB / H2(MODE=MySQL) 공용 문법만 사용 (`CREATE INDEX IF NOT EXISTS` 금지 → 인라인 INDEX)
+- Thymeleaf 조각 이름은 태그명과 겹치지 않게 짓는다 (`:: header` 는 모든 `<header>` 태그까지 선택함 → `publicHeader`, `consoleTopbar` 등 사용)
 - generated key 는 `prepareStatement(sql, new String[]{"id"})` (H2 는 RETURN_GENERATED_KEYS 시 모든 기본값 컬럼 반환)
 - 시간은 Asia/Seoul 기준 (`ReservationService.KST`, JVM 기본 시간대 설정)
 - 프런트: Bootstrap 5.3.3 (CDN+SRI), Font Awesome 6.5.2, Material Symbols, Google Fonts, Unsplash(`EZ_PHOTO` 키)
