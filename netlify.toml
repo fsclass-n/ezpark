@@ -1,2 +1,10 @@
+# EzPark 프런트엔드 데모 배포 (Netlify)
+# - frontend/ 폴더만 공개한다. (백엔드 src/, Python 등은 배포되지 않음)
+# - frontend/ 또는 이 파일이 바뀐 커밋에서만 배포한다.
+#   ignore 종료코드: 0 = 배포 건너뜀, 1 = 배포 진행
+#   첫 배포처럼 비교 기준 커밋이 같으면 항상 배포한다.
+
 [build]
-  publish = "src/main/resources/static"
+  publish = "frontend"
+  command = ""
+  ignore = '[ "$CACHED_COMMIT_REF" != "$COMMIT_REF" ] && git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- frontend netlify.toml'

@@ -46,11 +46,25 @@ EzPark
 
 ## 4. 폴더 구조
 
+저장소 구조 (프런트엔드는 `frontend/`에 독립 보관 → Netlify 데모 배포 대상)
+
 ```
-src/main/resources/static/
+ezpark/
+├── frontend/              # P1 프런트엔드 (Netlify publish 폴더, 이 폴더 변경 시에만 자동 배포)
+├── scripts/
+│   └── frontend-to-backend.sh   # P2 시작 시 frontend/ → src/main/resources 복사
+├── docs/                  # 기획서
+├── netlify.toml           # Netlify 배포 설정
+└── (P2) pom.xml / build.gradle, src/main/java, src/main/resources/{static,templates}
+```
+
+`frontend/` 내부
+
+```
+frontend/
 ├── index.html
 ├── favicon.svg
-├── pages/                 # 하위 페이지 (Thymeleaf 전환 시 templates/ 로 이동)
+├── pages/                 # 하위 페이지 (P2에서 templates/pages/ 로 복사 후 Thymeleaf 전환)
 │   ├── find.html  guide.html  reservation.html  mypage.html
 │   ├── dashboard.html  cctv.html  analysis.html  admin.html
 │   └── enterprise.html  support.html  login.html  register.html
@@ -122,6 +136,41 @@ src/main/resources/static/
 
 ## 8. 백엔드 전환 가이드 (P2 대비)
 
+### 8.1 역할 분리 원칙
+| 폴더 | 용도 | 배포 |
+| --- | --- | --- |
+| `frontend/` | P1 결과물(UI 원본·데모). 화면 시안 변경은 여기서 먼저 확인 | Netlify (이 폴더 변경 시에만) |
+| `src/main/resources/static/` | Spring Boot 정적 리소스 (css, js, 이미지) | Render / AWS EC2 |
+| `src/main/resources/templates/` | Thymeleaf 템플릿 (html) | Render / AWS EC2 |
+
+- P2부터는 `src/main/resources/`가 실제 서비스의 기준이다. `frontend/`는 데모 사이트로 유지하고, 화면을 바꿔 데모에도 보여줘야 할 때만 함께 수정한다.
+- 백엔드 커밋(`src/`, `pom.xml` 등)은 Netlify 배포를 일으키지 않는다. (`netlify.toml`의 `ignore` 설정)
+
+### 8.2 P2 시작 절차 (Day 14)
+1. Spring Initializr로 프로젝트 생성 후 **저장소 루트**에 `pom.xml`(또는 `build.gradle`)과 `src/`를 둔다. (JDK 21, Spring Boot 4.x, Spring Web, Thymeleaf, JDBC API, MySQL Driver, Lombok)
+2. 프런트엔드 복사 (Git Bash):
+   ```bash
+   bash scripts/frontend-to-backend.sh
+   ```
+   - `frontend/css, js, favicon.svg` → `src/main/resources/static/`
+   - `frontend/index.html, pages/*.html` → `src/main/resources/templates/`
+   - 대상 폴더에 이미 파일이 있으면 덮어쓰지 않고 중단한다. (`--force`로 강제)
+3. 임시 페이지 컨트롤러를 추가하면 **HTML 수정 없이** 현재 화면이 Spring에서 그대로 열린다. (상대경로 구조 유지)
+   ```java
+   @Controller
+   public class PageController {
+       @GetMapping({"/", "/index.html"})
+       public String index() { return "index"; }
+
+       // 템플릿 이름은 소문자 영문만 허용 (뷰 이름 주입 방지)
+       @GetMapping("/pages/{name:[a-z]+}.html")
+       public String page(@PathVariable String name) { return "pages/" + name; }
+   }
+   ```
+4. 이후 페이지별로 Thymeleaf 전환을 진행한다. (아래 표)
+
+### 8.3 전환 대응표
+
 | 프론트(현재) | 백엔드(P2) |
 | --- | --- |
 | `common.js` `renderHeader()` | `templates/fragments/header.html` (`th:fragment="header"`) |
@@ -134,12 +183,17 @@ src/main/resources/static/
 
 정적 파일이므로 간단한 로컬 서버로 확인한다.
 
-```bash
-# VS Code Live Server 또는
-cd src/main/resources/static
-python -m http.server 5500
-# http://localhost:5500 접속
-```
+- **VS Code Live Server**: `.vscode/settings.json`에 루트가 `/frontend`로 지정되어 있어, 아무 HTML에서 *Open with Live Server* → `http://127.0.0.1:5500/`
+- **Python**
+  ```bash
+  cd frontend
+  python -m http.server 5500
+  # http://localhost:5500 접속
+  ```
+
+### 9.1 Netlify 배포
+- GitHub 저장소 연결 시 `netlify.toml`이 자동 적용된다. (Build command 비움, Publish directory `frontend`)
+- `frontend/` 또는 `netlify.toml`이 바뀐 커밋만 배포되고, 그 외(백엔드·문서) 커밋은 배포를 건너뛴다.
 
 > 데모 계정: `admin@ezpark.kr` / `ezpark1234` (관리자), 그 외 형식에 맞는 이메일/비밀번호는 일반 회원으로 로그인됩니다.
 
