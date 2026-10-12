@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='주차장 찾기 | EzPark', console=false)}"></head>
+<body data-root="../" data-page="find" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
+  <header th:replace="~{fragments/layout :: header(transparent=false)}"></header>
+
+  <section class="page-hero" data-bg="aerialLines">
+    <div class="container">
+      <div class="breadcrumb-ez"><a href="../index.html">홈</a><span>/</span><span>주차 서비스</span><span>/</span><span class="text-white">주차장 찾기</span></div>
+      <h1>전국 공영주차장 찾기</h1>
+      <p class="mb-0">서울부터 제주까지 전국 공영주차장의 위치·주차면수·요금을 확인하고, 원하는 주차장을 바로 예약하거나 유도를 시작하세요.</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="container">
+      <!-- Toolbar -->
+      <div class="ez-card p-3 p-lg-4 mb-4">
+        <div class="row g-3 align-items-center">
+          <div class="col-lg-4">
+            <div class="input-icon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="search" class="form-control" id="q" placeholder="주차장명, 주소, 지역 검색 (예: 부산, 세종로)" aria-label="검색">
+            </div>
+          </div>
+          <div class="col-6 col-lg-2">
+            <select class="form-select" id="area" aria-label="시·도">
+              <option value="">전국</option>
+            </select>
+          </div>
+          <div class="col-6 col-lg-2">
+            <select class="form-select" id="sort" aria-label="정렬">
+              <option value="dist">거리순</option>
+              <option value="avail">잔여면 많은순</option>
+              <option value="fee">요금 낮은순</option>
+              <option value="total">주차면수 많은순</option>
+            </select>
+          </div>
+          <div class="col-lg-4">
+            <div class="chip-group" id="chips">
+              <input type="checkbox" id="fPaid" value="paid"><label for="fPaid">유료</label>
+              <input type="checkbox" id="fFree" value="free"><label for="fFree">무료</label>
+              <input type="checkbox" id="fEv"><label for="fEv"><i class="fa-solid fa-charging-station me-1"></i>전기차</label>
+              <input type="checkbox" id="fDis"><label for="fDis"><i class="fa-solid fa-wheelchair me-1"></i>장애인</label>
+              <input type="checkbox" id="fAvail"><label for="fAvail">여유만</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-5 order-2 order-lg-1">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="fw-bold text-navy">검색 결과 <span class="text-blue" id="count">0</span>곳</div>
+            <span class="small text-muted-2"><span class="live-dot text-danger me-1">LIVE</span> <span id="updated"></span></span>
+          </div>
+          <div id="lotList" class="d-flex flex-column gap-3" style="max-height:640px;overflow-y:auto;padding:2px"></div>
+        </div>
+        <div class="col-lg-7 order-1 order-lg-2">
+          <div class="map-box ez-card" id="mapBox">
+            <div class="map-geo" id="mapGeo">
+              <svg viewBox="0 0 600 1000" preserveAspectRatio="none" aria-hidden="true">
+                <g class="geo-grid" stroke="#dce4ef" stroke-width="1.5">
+                  <path d="M0 200H600M0 400H600M0 600H600M0 800H600M150 0V1000M300 0V1000M450 0V1000"/>
+                </g>
+                <path class="geo-land" d="M68.2,179.1 L109.1,165.2 L147.3,165.2 L190.9,130.4 L231.8,78.3 L300.0,73.0 L340.9,78.3 L376.4,22.6 L402.3,87.0 L450.0,165.2 L478.6,213.9 L486.8,227.8 L512.7,295.7 L518.2,373.9 L520.9,426.1 L541.4,466.1 L525.0,504.3 L520.9,565.2 L504.5,600.0 L484.1,626.1 L463.6,643.5 L429.5,652.2 L415.9,695.7 L381.8,678.3 L334.1,687.0 L293.2,687.0 L279.5,713.0 L238.6,730.4 L211.4,747.8 L177.3,747.8 L129.5,773.9 L95.5,747.8 L88.6,704.3 L109.1,660.9 L102.3,626.1 L115.9,582.6 L122.7,547.8 L147.3,513.0 L147.3,478.3 L129.5,434.8 L122.7,400.0 L95.5,373.9 L75.0,339.1 L102.3,313.0 L136.4,304.3 L156.8,287.0 L143.2,252.2 L136.4,226.1 L129.5,200.0 L109.1,182.6 Z"/>
+                <ellipse class="geo-land" cx="129.5" cy="933.9" rx="54.5" ry="29.6"/>
+                <g class="geo-label"><text x="170.2" y="212.2" text-anchor="end">서울</text><text x="132.0" y="231.3" text-anchor="end">인천</text><text x="210.3" y="266.1" text-anchor="start">수원</text><text x="429.3" y="180.9" text-anchor="end">강릉</text><text x="260.7" y="424.4" text-anchor="start">대전</text><text x="229.4" y="516.6" text-anchor="start">전주</text><text x="427.1" y="507.9" text-anchor="start">대구</text><text x="455.2" y="627.9" text-anchor="end">부산</text><text x="144.8" y="920.0" text-anchor="start">제주</text></g>
+              </svg>
+              <div class="me-dot" id="meDot" title="기준 위치: 서울시청"></div>
+              <div id="markers"></div>
+            </div>
+            <div class="map-ctrl">
+              <button type="button" id="btnLocate" aria-label="기준 위치(서울시청) 거리순 정렬" title="서울시청 기준 거리순"><i class="fa-solid fa-location-crosshairs"></i></button>
+              <button type="button" id="btnRefresh" aria-label="새로고침" title="새로고침"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+            <div class="map-legend">
+              <span><i class="fa-solid fa-circle text-mint"></i>여유</span>
+              <span><i class="fa-solid fa-circle text-yellow"></i>보통</span>
+              <span><i class="fa-solid fa-circle text-red"></i>혼잡</span>
+            </div>
+          </div>
+          <p class="small text-muted-2 mt-2 mb-0"><i class="fa-solid fa-circle-info me-1"></i>주차장명·주소·주차면수·요금은 운영기관 공개자료 및 공공데이터포털 「전국주차장정보표준데이터」 기준(2026.10 확인)이며, <b>잔여면은 데모 시뮬레이션</b>입니다. 지도는 근사 좌표의 모형 지도로, 지도 API 연동은 P4 단계에서 진행합니다. 잔여면은 서버 시뮬레이터가 갱신합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detail Modal -->
+  <div class="modal fade" id="lotModal" tabindex="-1" aria-labelledby="lotModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content overflow-hidden" id="lotModalBody"></div>
+    </div>
+  </div>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/pages/find.js"></script>
+</body>
+</html>

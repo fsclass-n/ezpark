@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:ezpark-test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+
+ezpark:
+  admin:
+    email: admin@ezpark.kr
+    password: test-admin-1!
+  simulator:
+    enabled: false
+  gemini:
+    api-key: ""
+  public-data:
+    service-key: ""

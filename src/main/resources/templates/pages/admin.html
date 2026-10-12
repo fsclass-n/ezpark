@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='관리자 | EzPark 관제센터', console=true)}"></head>
+<body class="ez-console" data-root="../" data-page="admin" data-layout="console" data-title="관리자" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
+  <div class="console-wrap">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+    <div class="console-main">
+      <header th:replace="~{fragments/layout :: topbar}"></header>
+
+      <main class="console-content">
+
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-xl-3"><div class="panel kpi"><div class="icon-box sm blue"><span class="material-symbols-rounded">group</span></div><div><div class="kpi-label">전체 회원</div><div class="kpi-value" id="kUsers">0</div></div></div></div>
+          <div class="col-6 col-xl-3"><div class="panel kpi"><div class="icon-box sm purple"><span class="material-symbols-rounded">apartment</span></div><div><div class="kpi-label">기업 회원</div><div class="kpi-value" id="kBiz">0</div></div></div></div>
+          <div class="col-6 col-xl-3"><div class="panel kpi"><div class="icon-box sm yellow"><span class="material-symbols-rounded">mark_email_unread</span></div><div><div class="kpi-label">미처리 문의</div><div class="kpi-value" id="kInq">0</div></div></div></div>
+          <div class="col-6 col-xl-3"><div class="panel kpi"><div class="icon-box sm mint"><span class="material-symbols-rounded">local_parking</span></div><div><div class="kpi-label">연동 주차장</div><div class="kpi-value" id="kLots">0</div></div></div></div>
+        </div>
+
+        <div class="panel">
+          <ul class="nav admin-tabs px-3" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tUsers" type="button" role="tab"><i class="fa-solid fa-users me-1"></i>회원 관리</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tLots" type="button" role="tab"><i class="fa-solid fa-square-parking me-1"></i>주차장 관리</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tInq" type="button" role="tab"><i class="fa-solid fa-building me-1"></i>기업 문의</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tNotice" type="button" role="tab"><i class="fa-solid fa-bullhorn me-1"></i>공지사항</button></li>
+          </ul>
+          <div class="tab-content">
+            <!-- 회원 -->
+            <div class="tab-pane fade show active" id="tUsers" role="tabpanel">
+              <div class="d-flex flex-wrap gap-2 p-3">
+                <div class="input-icon flex-grow-1" style="max-width:320px"><i class="fa-solid fa-magnifying-glass"></i><input class="form-control form-control-sm" id="uSearch" placeholder="이름, 이메일, 차량번호" aria-label="회원 검색"></div>
+                <select class="form-select form-select-sm w-auto" id="uRole" aria-label="권한"><option value="">전체 권한</option><option value="USER">일반</option><option value="BIZ">기업</option><option value="ADMIN">관리자</option></select>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-ez table-hover">
+                  <thead><tr><th>회원</th><th>이메일</th><th>대표 차량</th><th>권한</th><th>가입일</th><th>상태</th><th class="text-end">관리</th></tr></thead>
+                  <tbody id="uBody"></tbody>
+                </table>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-3">
+                <span class="small text-muted-2" id="uInfo"></span>
+                <ul class="pagination pagination-sm pager m-0" id="uPager"></ul>
+              </div>
+            </div>
+
+            <!-- 주차장 -->
+            <div class="tab-pane fade" id="tLots" role="tabpanel">
+              <div class="d-flex justify-content-between gap-2 p-3">
+                <div class="input-icon" style="max-width:320px;flex:1"><i class="fa-solid fa-magnifying-glass"></i><input class="form-control form-control-sm" id="lSearch" placeholder="주차장명, 주소" aria-label="주차장 검색"></div>
+                <div class="d-flex gap-2"><button class="btn btn-sm btn-soft" id="lSync" title="공공데이터포털 전국주차장정보표준데이터"><i class="fa-solid fa-cloud-arrow-down me-1"></i>공공데이터 동기화</button><button class="btn btn-sm btn-primary" id="lAdd"><i class="fa-solid fa-plus me-1"></i>주차장 등록</button></div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-ez table-hover">
+                  <thead><tr><th>ID</th><th>주차장명</th><th>지역·유형</th><th>주소</th><th class="text-end">면수</th><th class="text-end">기본 요금</th><th>EV</th><th class="text-end">관리</th></tr></thead>
+                  <tbody id="lBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 기업 문의 -->
+            <div class="tab-pane fade" id="tInq" role="tabpanel">
+              <div class="d-flex flex-wrap gap-2 p-3" id="inqFilter">
+                <button class="btn btn-sm btn-primary" data-s="">전체</button>
+                <button class="btn btn-sm btn-light" data-s="접수">접수</button>
+                <button class="btn btn-sm btn-light" data-s="상담중">상담중</button>
+                <button class="btn btn-sm btn-light" data-s="견적발송">견적발송</button>
+                <button class="btn btn-sm btn-light" data-s="계약완료">계약완료</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-ez table-hover">
+                  <thead><tr><th>접수일</th><th>기업명</th><th>업종</th><th>담당자</th><th class="text-end">규모(면)</th><th>희망 요금제</th><th>상태</th></tr></thead>
+                  <tbody id="iBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 공지 -->
+            <div class="tab-pane fade" id="tNotice" role="tabpanel">
+              <div class="d-flex justify-content-end p-3"><button class="btn btn-sm btn-primary" id="nAdd"><i class="fa-solid fa-pen me-1"></i>공지 작성</button></div>
+              <div class="table-responsive">
+                <table class="table table-ez table-hover">
+                  <thead><tr><th>번호</th><th>분류</th><th>제목</th><th>작성일</th><th class="text-end">조회</th><th class="text-end">관리</th></tr></thead>
+                  <tbody id="nBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="console-footer">© 2026 EzPark 관제센터 · 관리자 API 는 서버에서 ADMIN 권한을 검증합니다.</footer>
+    </div>
+  </div>
+
+  <!-- 주차장 등록/수정 모달 -->
+  <div class="modal fade" id="lotModal" tabindex="-1" aria-labelledby="lotModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form class="modal-content" id="lotForm" novalidate>
+        <div class="modal-header"><h5 class="modal-title fw-800" id="lotModalTitle">주차장 등록</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button></div>
+        <div class="modal-body row g-3">
+          <input type="hidden" id="fId">
+          <div class="col-12"><label class="form-label" for="fName">주차장명</label><input class="form-control" id="fName" required><div class="invalid-feedback">주차장명을 입력해 주세요.</div></div>
+          <div class="col-12"><label class="form-label" for="fAddr">주소</label><input class="form-control" id="fAddr" required><div class="invalid-feedback">주소를 입력해 주세요.</div></div>
+          <div class="col-6"><label class="form-label" for="fType">유형 (공영)</label><select class="form-select" id="fType"><option>노외</option><option>노상</option><option>부설</option></select></div>
+          <div class="col-6"><label class="form-label" for="fArea">시·도</label><input class="form-control" id="fArea" required><div class="invalid-feedback">시·도를 입력해 주세요.</div></div>
+          <div class="col-6"><label class="form-label" for="fTotal">전체 면수</label><input type="number" class="form-control" id="fTotal" min="1" required><div class="invalid-feedback">1 이상 입력</div></div>
+          <div class="col-6"><label class="form-label" for="fFee">10분 환산 요금(원, 무료 0)</label><input type="number" class="form-control" id="fFee" min="0" step="100" required><div class="invalid-feedback">요금을 입력해 주세요.</div></div>
+          <div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="fEv"><label class="form-check-label" for="fEv">전기차 충전 가능</label></div></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button><button class="btn btn-primary">저장</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 공지 작성 모달 -->
+  <div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="noticeModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <form class="modal-content" id="noticeForm" novalidate>
+        <div class="modal-header"><h5 class="modal-title fw-800" id="noticeModalTitle">공지 작성</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button></div>
+        <div class="modal-body row g-3">
+          <div class="col-md-3"><label class="form-label" for="nCat">분류</label><select class="form-select" id="nCat"><option>공지</option><option>점검</option><option>이벤트</option></select></div>
+          <div class="col-md-9"><label class="form-label" for="nTitle">제목</label><input class="form-control" id="nTitle" required maxlength="80"><div class="invalid-feedback">제목을 입력해 주세요.</div></div>
+          <div class="col-12"><label class="form-label" for="nBodyTxt">내용</label><textarea class="form-control" id="nBodyTxt" rows="6" required></textarea><div class="invalid-feedback">내용을 입력해 주세요.</div></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button><button class="btn btn-primary">등록</button></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/pages/admin.js"></script>
+</body>
+</html>

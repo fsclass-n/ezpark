@@ -1,0 +1,62 @@
+# =========================================================
+# EzPark 기본 설정 (배포·TiDB Cloud)
+# 비밀값(DB 접속 정보, API 키, 관리자 비밀번호)은 환경변수 또는 프로젝트 루트의 .env 파일로 주입한다.
+# .env 는 .gitignore 대상 – 형식은 .env.example 참고
+# =========================================================
+spring:
+  application:
+    name: ezpark
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${DB_URL:}
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      # TiDB Serverless 는 유휴 연결을 정리하므로 연결 수명을 짧게 유지
+      max-lifetime: 300000
+      idle-timeout: 120000
+  sql:
+    init:
+      mode: never   # DbInitializer 가 db/schema.sql · db/seed.sql 을 직접 실행
+  thymeleaf:
+    cache: true
+  web:
+    resources:
+      cache:
+        period: 1h
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+    session:
+      timeout: 60m
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${SESSION_COOKIE_SECURE:false}
+  error:
+    include-stacktrace: never
+
+ezpark:
+  admin:
+    email: ${EZPARK_ADMIN_EMAIL:admin@ezpark.kr}
+    password: ${EZPARK_ADMIN_PASSWORD:}
+  simulator:
+    enabled: ${EZPARK_SIMULATOR_ENABLED:true}
+    interval-ms: ${EZPARK_SIMULATOR_INTERVAL_MS:5000}
+    event-retention: 500
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-3.8-flash}
+  public-data:
+    service-key: ${PUBLIC_DATA_SERVICE_KEY:}
+
+logging:
+  level:
+    com.ezpark: INFO

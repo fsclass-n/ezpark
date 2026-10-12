@@ -145,6 +145,8 @@ gantt
 > 상세 WBS는 [`02-frontend-plan.md`](./02-frontend-plan.md) 참고
 
 #### P2. 백엔드 (Day 14–26, 104h)
+> 상세 WBS·ERD·API 명세는 [`03-backend-plan.md`](./03-backend-plan.md) 참고
+
 | 기간 | 김길동 | 홍기흥 | 박미금 | 이오리 |
 | --- | --- | --- | --- | --- |
 | Day 14–16 | Spring Boot 4 프로젝트 셋업, 공통 설정, 회원가입/로그인(BCrypt) | MySQL/TiDB 스키마·DDL | 공통 응답·예외 구조 | Thymeleaf 레이아웃(fragment) 전환 |

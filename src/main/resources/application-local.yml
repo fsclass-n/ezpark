@@ -1,0 +1,21 @@
+# =========================================================
+# local 프로필 – DB 설치 없이 바로 실행 (H2 인메모리, MySQL 호환 모드)
+#   ./gradlew bootRun --args='--spring.profiles.active=local'
+# 재시작하면 데이터가 초기화된다. H2 는 bootRun 전용(developmentOnly)이라 배포 jar 에는 없다.
+# =========================================================
+spring:
+  datasource:
+    url: jdbc:h2:mem:ezpark;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        period: 0
+
+ezpark:
+  admin:
+    # 로컬 개발 전용 기본 관리자 비밀번호 (배포 환경에서는 EZPARK_ADMIN_PASSWORD 로 반드시 별도 지정)
+    password: ${EZPARK_ADMIN_PASSWORD:ezpark1234}

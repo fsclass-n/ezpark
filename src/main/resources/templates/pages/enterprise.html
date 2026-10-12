@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='기업 솔루션 | EzPark', console=false)}"></head>
+<body data-root="../" data-page="enterprise" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
+  <header th:replace="~{fragments/layout :: header(transparent=false)}"></header>
+
+  <section class="page-hero" data-bg="towers" style="padding-bottom:5rem">
+    <div class="container">
+      <div class="breadcrumb-ez"><a href="../index.html">홈</a><span>/</span><span class="text-white">기업 솔루션</span></div>
+      <span class="ez-badge yellow mb-3"><i class="fa-solid fa-building"></i> EzPark for Business</span>
+      <h1>기업 수요를 반영한<br>AI 주차 운영 솔루션</h1>
+      <p class="mb-4">기존 CCTV에 AI를 더해 인력은 줄이고 회전율은 높이세요. 업종별 데이터 분석으로 운영 전략까지 제안합니다.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="#contact" class="btn btn-yellow btn-lg">무료 도입 상담</a>
+        <a href="#pricing" class="btn btn-ghost btn-lg">요금제 보기</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 도입 효과 -->
+  <section class="section-sm bg-soft">
+    <div class="container">
+      <div class="row g-3" style="margin-top:-6rem;position:relative;z-index:2">
+        <div class="col-6 col-lg-3 reveal"><div class="ez-card effect-card"><div class="num"><span data-count="35">0</span>%</div><div class="fw-bold text-navy">관제 인력 비용 절감</div><div class="small text-muted-2">24시간 무인 관제</div></div></div>
+        <div class="col-6 col-lg-3 reveal"><div class="ez-card effect-card"><div class="num"><span data-count="18">0</span>%</div><div class="fw-bold text-navy">주차 회전율 향상</div><div class="small text-muted-2">빈자리 실시간 유도</div></div></div>
+        <div class="col-6 col-lg-3 reveal"><div class="ez-card effect-card"><div class="num"><span data-count="62">0</span>%</div><div class="fw-bold text-navy">탐색 시간 단축</div><div class="small text-muted-2">고객 만족도 상승</div></div></div>
+        <div class="col-6 col-lg-3 reveal"><div class="ez-card effect-card"><div class="num"><span data-count="80">0</span>%</div><div class="fw-bold text-navy">센서 대비 구축비 절감</div><div class="small text-muted-2">기존 CCTV 활용</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 문제 & 솔루션 -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <div class="section-eyebrow">Problem &amp; Solution</div>
+        <h2 class="section-title">기업 고객이 겪는 주차 운영 문제,<br>EzPark가 해결합니다</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4 reveal">
+          <div class="ez-card p-4 h-100">
+            <div class="d-flex align-items-center gap-2 mb-3"><span class="ez-badge red">Problem</span><b class="text-navy">진입 대기·민원</b></div>
+            <p class="small text-muted-2">주말·피크 시간 만차 정보가 늦게 반영되어 진입로 정체와 고객 민원이 반복됩니다.</p>
+            <hr>
+            <div class="d-flex align-items-center gap-2 mb-2"><span class="ez-badge mint">Solution</span><b class="text-navy">실시간 면 단위 유도</b></div>
+            <p class="small text-muted-2 mb-0">3초 단위 점유 갱신과 층별 유도로 진입 대기열을 분산합니다.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="ez-card p-4 h-100">
+            <div class="d-flex align-items-center gap-2 mb-3"><span class="ez-badge red">Problem</span><b class="text-navy">높은 관제 비용</b></div>
+            <p class="small text-muted-2">CCTV를 사람이 직접 모니터링해야 해 야간·주말 인력 운영 부담이 큽니다.</p>
+            <hr>
+            <div class="d-flex align-items-center gap-2 mb-2"><span class="ez-badge mint">Solution</span><b class="text-navy">AI 이벤트 자동 감지</b></div>
+            <p class="small text-muted-2 mb-0">불법·이중 주차, 장기 주차, 보행자 위험을 AI가 감지해 알림만 확인하면 됩니다.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="ez-card p-4 h-100">
+            <div class="d-flex align-items-center gap-2 mb-3"><span class="ez-badge red">Problem</span><b class="text-navy">데이터 부재</b></div>
+            <p class="small text-muted-2">언제, 어디가, 왜 혼잡한지 데이터가 없어 요금·운영 정책을 감으로 결정합니다.</p>
+            <hr>
+            <div class="d-flex align-items-center gap-2 mb-2"><span class="ez-badge mint">Solution</span><b class="text-navy">K-AI 수요 분석 리포트</b></div>
+            <p class="small text-muted-2 mb-0">수요 예측과 Gemini 인사이트로 탄력 요금·제휴 전략을 제안합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 업종별 -->
+  <section class="section bg-soft">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-5 reveal">
+        <div><div class="section-eyebrow">Use Cases</div><h2 class="section-title mb-0">업종별 맞춤 활용 사례</h2></div>
+        <p class="section-desc mb-0" style="max-width:420px">기업 도입 문의 데이터를 분석해 업종별로 가장 많이 요청된 기능을 패키지로 제공합니다.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3 reveal"><div class="usecase-card"><img data-img="mall" data-w="700" alt="쇼핑몰"><div class="body"><span class="ez-badge yellow mb-2">쇼핑몰</span><h5>주말 피크 분산</h5><p>층별 유도 · 구매 연동 무료 주차 · 출차 자동 정산</p></div></div></div>
+        <div class="col-md-6 col-lg-3 reveal"><div class="usecase-card"><img data-img="hospital" data-w="700" alt="병원"><div class="body"><span class="ez-badge mint mb-2">병원</span><h5>외래 예약 연동</h5><p>진료 시간 기반 사전 배정 · 장애인 전용면 우선 안내</p></div></div></div>
+        <div class="col-md-6 col-lg-3 reveal"><div class="usecase-card"><img data-img="officeFloor" data-w="700" alt="오피스"><div class="body"><span class="ez-badge blue mb-2">오피스</span><h5>정기권·방문객</h5><p>입주사별 할당 · 방문 차량 사전 등록 · 월 정산</p></div></div></div>
+        <div class="col-md-6 col-lg-3 reveal"><div class="usecase-card"><img data-img="city" data-w="700" alt="공공기관"><div class="body"><span class="ez-badge purple mb-2">공공기관</span><h5>공영주차장 통합관제</h5><p>다중 사이트 관제 · 공공데이터 연계 · 수요 예측</p></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 요금제 -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <div class="section-eyebrow">Pricing</div>
+        <h2 class="section-title mb-4">규모에 맞는 요금제를 선택하세요</h2>
+        <div class="price-toggle" id="priceToggle">
+          <button class="active" data-cycle="month">월간 결제</button>
+          <button data-cycle="year">연간 결제 <span class="ez-badge mint ms-1">-20%</span></button>
+        </div>
+      </div>
+      <div class="row g-4 align-items-stretch" id="priceCards"></div>
+      <p class="text-center small text-muted-2 mt-4">* 부가세 별도 · 면당 월 요금 기준 · 카메라 하드웨어 및 설치비 별도 (현장 실사 후 견적)</p>
+    </div>
+  </section>
+
+  <!-- 도입 프로세스 -->
+  <section class="section bg-soft">
+    <div class="container">
+      <div class="text-center mb-5 reveal"><div class="section-eyebrow">Process</div><h2 class="section-title">평균 2주, 빠른 도입 프로세스</h2></div>
+      <div class="row g-4 process justify-content-center">
+        <div class="col-6 col-lg process-item reveal"><div class="num"><i class="fa-solid fa-headset"></i></div><h6>상담 신청</h6><p>요구사항·규모 파악</p></div>
+        <div class="col-6 col-lg process-item reveal"><div class="num"><i class="fa-solid fa-person-digging"></i></div><h6>현장 실사</h6><p>CCTV 화각·네트워크 점검</p></div>
+        <div class="col-6 col-lg process-item reveal"><div class="num"><i class="fa-solid fa-draw-polygon"></i></div><h6>ROI 설정</h6><p>주차면 영역 매핑·학습</p></div>
+        <div class="col-6 col-lg process-item reveal"><div class="num"><i class="fa-solid fa-vial-circle-check"></i></div><h6>시범 운영</h6><p>정확도 검증·튜닝</p></div>
+        <div class="col-6 col-lg process-item reveal"><div class="num"><i class="fa-solid fa-rocket"></i></div><h6>정식 오픈</h6><p>관제·유도·리포트 제공</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 문의 -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-5 reveal">
+          <div class="section-eyebrow">Contact</div>
+          <h2 class="section-title mb-3">도입 효과를 먼저<br>계산해 보세요</h2>
+          <p class="section-desc mb-4">주차면 수와 현재 운영 인력을 입력하면 예상 절감 효과를 보여드립니다.</p>
+          <div class="ez-card p-4">
+            <label class="form-label d-flex justify-content-between" for="roiSlots"><span>주차면 수</span><b class="text-blue font-en" id="roiSlotsVal">500</b></label>
+            <input type="range" class="form-range mb-3" id="roiSlots" min="50" max="5000" step="50" value="500">
+            <label class="form-label d-flex justify-content-between" for="roiStaff"><span>현재 관제 인력 (명)</span><b class="text-blue font-en" id="roiStaffVal">4</b></label>
+            <input type="range" class="form-range mb-4" id="roiStaff" min="1" max="30" value="4">
+            <div class="row g-2 text-center">
+              <div class="col-6"><div class="bg-soft rounded-4 p-3"><div class="small text-muted-2">월 인건비 절감</div><div class="fw-800 font-en fs-5 text-mint" id="roiSave">0</div></div></div>
+              <div class="col-6"><div class="bg-soft rounded-4 p-3"><div class="small text-muted-2">월 추가 매출(회전율)</div><div class="fw-800 font-en fs-5 text-blue" id="roiRev">0</div></div></div>
+              <div class="col-12"><div class="bg-navy text-white rounded-4 p-3"><div class="small opacity-75">추천 요금제</div><div class="fw-800 fs-5" id="roiPlan">Business</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-7 reveal">
+          <form class="ez-card p-4 p-lg-5" id="contactForm" novalidate>
+            <h4 class="fw-800 text-navy mb-4">도입 문의</h4>
+            <div class="row g-3">
+              <div class="col-md-6"><label class="form-label" for="iCompany">기업/기관명 *</label><input class="form-control" id="iCompany" required><div class="invalid-feedback">기업명을 입력해 주세요.</div></div>
+              <div class="col-md-6"><label class="form-label" for="iIndustry">업종 *</label><select class="form-select" id="iIndustry" required><option value="">선택</option><option>쇼핑몰</option><option>병원</option><option>오피스</option><option>공공기관</option><option>상가</option><option>전시장</option><option>기타</option></select><div class="invalid-feedback">업종을 선택해 주세요.</div></div>
+              <div class="col-md-6"><label class="form-label" for="iName">담당자명 *</label><input class="form-control" id="iName" required minlength="2"><div class="invalid-feedback">담당자명을 입력해 주세요.</div></div>
+              <div class="col-md-6"><label class="form-label" for="iPhone">연락처 *</label><input type="tel" class="form-control" id="iPhone" required pattern="^0\d{1,2}-?\d{3,4}-?\d{4}$" placeholder="010-0000-0000"><div class="invalid-feedback">연락처 형식을 확인해 주세요.</div></div>
+              <div class="col-md-6"><label class="form-label" for="iEmail">이메일 *</label><input type="email" class="form-control" id="iEmail" required><div class="invalid-feedback">올바른 이메일을 입력해 주세요.</div></div>
+              <div class="col-md-3"><label class="form-label" for="iSlots">주차면 수</label><input type="number" class="form-control" id="iSlots" min="1" value="500"></div>
+              <div class="col-md-3"><label class="form-label" for="iPlan">요금제</label><select class="form-select" id="iPlan"><option>Starter</option><option selected>Business</option><option>Enterprise</option></select></div>
+              <div class="col-12"><label class="form-label" for="iMsg">문의 내용</label><textarea class="form-control" id="iMsg" rows="4" maxlength="1000" placeholder="현재 운영 현황, 도입 희망 시기 등을 알려주세요."></textarea><div class="small text-muted-2 text-end mt-1"><span id="iMsgCnt">0</span>/1000</div></div>
+              <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="iAgree" required><label class="form-check-label small" for="iAgree">[필수] 상담을 위한 개인정보 수집·이용에 동의합니다.</label><div class="invalid-feedback">개인정보 수집에 동의해 주세요.</div></div></div>
+              <div class="col-12"><button class="btn btn-primary btn-lg w-100"><i class="fa-solid fa-paper-plane me-2"></i>문의 접수</button></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/pages/enterprise.js"></script>
+</body>
+</html>

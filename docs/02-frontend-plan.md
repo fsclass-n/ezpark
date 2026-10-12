@@ -167,7 +167,7 @@ frontend/
 - P2부터는 `src/main/resources/`가 실제 서비스의 기준이다. `frontend/`는 데모 사이트로 유지하고, 화면을 바꿔 데모에도 보여줘야 할 때만 함께 수정한다.
 - 백엔드 커밋(`src/`, `pom.xml` 등)은 Netlify 배포를 일으키지 않는다. (`netlify.toml`의 `ignore` 설정)
 
-### 8.2 P2 시작 절차 (Day 14)
+### 8.2 P2 시작 절차 (Day 14) – ✅ 2026.10 적용 완료 (상세: [`03-backend-plan.md`](./03-backend-plan.md))
 1. Spring Initializr로 프로젝트 생성 후 **저장소 루트**에 `pom.xml`(또는 `build.gradle`)과 `src/`를 둔다. (JDK 21, Spring Boot 4.x, Spring Web, Thymeleaf, JDBC API, MySQL Driver, Lombok)
 2. 프런트엔드 복사 (Git Bash):
    ```bash

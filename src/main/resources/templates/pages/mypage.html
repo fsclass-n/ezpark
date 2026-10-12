@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='마이페이지 | EzPark', console=false)}"></head>
+<body data-root="../" data-page="mypage" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
+  <header th:replace="~{fragments/layout :: header(transparent=false)}"></header>
+
+  <section class="page-hero" data-bg="driver">
+    <div class="container">
+      <div class="breadcrumb-ez"><a href="../index.html">홈</a><span>/</span><span class="text-white">마이페이지</span></div>
+      <h1>마이페이지</h1>
+      <p class="mb-0">내 차량, 예약·이용 내역, 즐겨찾는 주차장을 한곳에서 관리하세요.</p>
+    </div>
+  </section>
+
+  <section class="page-body">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Side -->
+        <div class="col-lg-3">
+          <div class="ez-card profile-card mb-3">
+            <img class="avatar-lg mb-3" data-img="p2" data-w="200" data-h="200" alt="프로필">
+            <h5 class="fw-800 text-navy mb-0" id="pName">-</h5>
+            <div class="small text-muted-2 mb-3" id="pEmail">-</div>
+            <span class="ez-badge blue" id="pRole"><i class="fa-solid fa-crown"></i> 일반 회원</span>
+            <div class="row g-2 mt-3 text-center">
+              <div class="col-6"><div class="bg-soft rounded-3 p-2"><div class="fw-800 font-en text-navy">3,200</div><div class="small text-muted-2">포인트</div></div></div>
+              <div class="col-6"><div class="bg-soft rounded-3 p-2"><div class="fw-800 font-en text-navy">2</div><div class="small text-muted-2">쿠폰</div></div></div>
+            </div>
+          </div>
+          <div class="ez-card p-2">
+            <div class="nav flex-column nav-pills nav-pills-ez" role="tablist">
+              <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tabHome" type="button" role="tab"><i class="fa-solid fa-house"></i>요약</button>
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabCar" type="button" role="tab"><i class="fa-solid fa-car"></i>내 차량</button>
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabHistory" type="button" role="tab"><i class="fa-solid fa-clock-rotate-left"></i>이용 내역</button>
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabFav" type="button" role="tab"><i class="fa-solid fa-star"></i>즐겨찾기</button>
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabSetting" type="button" role="tab"><i class="fa-solid fa-gear"></i>계정 설정</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="col-lg-9">
+          <div class="tab-content">
+            <!-- 요약 -->
+            <div class="tab-pane fade show active" id="tabHome" role="tabpanel">
+              <div class="row g-3 mb-4">
+                <div class="col-6 col-xl-3"><div class="ez-card p-3"><div class="icon-box sm blue mb-2"><i class="fa-solid fa-square-parking"></i></div><div class="small text-muted-2">이번 달 이용</div><div class="fw-800 font-en fs-4 text-navy" id="stUse">0<small class="fs-6">회</small></div></div></div>
+                <div class="col-6 col-xl-3"><div class="ez-card p-3"><div class="icon-box sm mint mb-2"><i class="fa-solid fa-won-sign"></i></div><div class="small text-muted-2">이번 달 결제</div><div class="fw-800 font-en fs-4 text-navy" id="stPay">0</div></div></div>
+                <div class="col-6 col-xl-3"><div class="ez-card p-3"><div class="icon-box sm yellow mb-2"><i class="fa-solid fa-stopwatch"></i></div><div class="small text-muted-2">절약한 탐색 시간</div><div class="fw-800 font-en fs-4 text-navy">42<small class="fs-6">분</small></div></div></div>
+                <div class="col-6 col-xl-3"><div class="ez-card p-3"><div class="icon-box sm purple mb-2"><i class="fa-solid fa-leaf"></i></div><div class="small text-muted-2">CO₂ 절감</div><div class="fw-800 font-en fs-4 text-navy">3.1<small class="fs-6">kg</small></div></div></div>
+              </div>
+              <div class="ez-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-800 text-navy m-0">예정된 예약</h5>
+                  <a href="reservation.html" class="btn btn-sm btn-primary"><i class="fa-solid fa-plus me-1"></i>새 예약</a>
+                </div>
+                <div id="upcoming"></div>
+              </div>
+              <div class="ez-card overflow-hidden">
+                <div class="row g-0 align-items-center">
+                  <div class="col-md-5"><img data-img="carDark" data-w="700" alt="정기권" class="w-100 h-100" style="min-height:200px;object-fit:cover"></div>
+                  <div class="col-md-7 p-4">
+                    <span class="ez-badge mint mb-2">정기권 (예시 · 정기권 기능은 P4 예정)</span>
+                    <h5 class="fw-800 text-navy">천호역 공영주차장 월 정기권</h5>
+                    <p class="small text-muted-2 mb-3">2026.10.01 ~ 2026.10.31 · 월 168,000원 (서울시설공단)</p>
+                    <div class="occ-bar mb-2" style="height:10px"><span class="occ-low" style="width:38%"></span></div>
+                    <div class="small text-muted-2 mb-3">잔여 19일</div>
+                    <button class="btn btn-sm btn-soft" onclick="EZ.toast('정기권 연장 신청이 접수되었습니다.')">연장 신청</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 내 차량 -->
+            <div class="tab-pane fade" id="tabCar" role="tabpanel">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-800 text-navy m-0">내 차량 <span class="text-blue" id="carCount">0</span>/5</h5>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#carModal"><i class="fa-solid fa-plus me-1"></i>차량 등록</button>
+              </div>
+              <div class="row g-3" id="carList"></div>
+            </div>
+
+            <!-- 이용 내역 -->
+            <div class="tab-pane fade" id="tabHistory" role="tabpanel">
+              <div class="ez-card overflow-hidden">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 p-4 pb-3">
+                  <h5 class="fw-800 text-navy m-0">이용 내역</h5>
+                  <select class="form-select form-select-sm w-auto" id="histFilter" aria-label="상태 필터">
+                    <option value="">전체</option><option>완료</option><option>할인적용</option><option>취소</option>
+                  </select>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-ez table-hover">
+                    <thead><tr><th>이용일시</th><th>주차장</th><th>주차면</th><th>이용시간</th><th class="text-end">결제금액</th><th>상태</th><th></th></tr></thead>
+                    <tbody id="histBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- 즐겨찾기 -->
+            <div class="tab-pane fade" id="tabFav" role="tabpanel">
+              <h5 class="fw-800 text-navy mb-3">즐겨찾는 주차장</h5>
+              <div class="row g-3" id="favList"></div>
+            </div>
+
+            <!-- 설정 -->
+            <div class="tab-pane fade" id="tabSetting" role="tabpanel">
+              <div class="ez-card p-4 mb-4">
+                <h5 class="fw-800 text-navy mb-4">회원 정보</h5>
+                <form id="profileForm" class="row g-3" novalidate>
+                  <div class="col-md-6"><label class="form-label" for="sName">이름</label><input class="form-control" id="sName" required minlength="2"><div class="invalid-feedback">이름을 2자 이상 입력해 주세요.</div></div>
+                  <div class="col-md-6"><label class="form-label" for="sEmail">이메일</label><input class="form-control" id="sEmail" readonly></div>
+                  <div class="col-md-6"><label class="form-label" for="sPhone">연락처</label><input class="form-control" id="sPhone" pattern="^01[016789]-?\d{3,4}-?\d{4}$" placeholder="010-0000-0000"><div class="invalid-feedback">휴대폰 번호 형식을 확인해 주세요.</div></div>
+                  <div class="col-md-6"><label class="form-label" for="sPw">새 비밀번호 <span class="text-muted-2 fw-normal">(변경 시)</span></label><input type="password" class="form-control" id="sPw" minlength="8" autocomplete="new-password"><div class="invalid-feedback">8자 이상 입력해 주세요.</div></div>
+                  <div class="col-12"><button class="btn btn-primary">저장</button></div>
+                </form>
+              </div>
+              <div class="ez-card p-4">
+                <h5 class="fw-800 text-navy mb-3">알림 설정</h5>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n1" checked><label class="form-check-label" for="n1">예약 입차 30분 전 알림</label></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n2" checked><label class="form-check-label" for="n2">즐겨찾기 주차장 빈자리 알림</label></div>
+                <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="n3"><label class="form-check-label" for="n3">장기 주차 경고 알림</label></div>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="n4"><label class="form-check-label" for="n4">이벤트·혜택 정보 수신 (선택)</label></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 차량 등록 모달 -->
+  <div class="modal fade" id="carModal" tabindex="-1" aria-labelledby="carModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form class="modal-content" id="carForm" novalidate>
+        <div class="modal-header"><h5 class="modal-title fw-800" id="carModalTitle">차량 등록</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button></div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label" for="cPlate">차량번호</label><input class="form-control" id="cPlate" placeholder="12가3456" required pattern="^\d{2,3}[가-힣]\d{4}$"><div class="invalid-feedback">예) 12가3456, 123가4567</div></div>
+          <div class="mb-3"><label class="form-label" for="cModel">차종(모델명)</label><input class="form-control" id="cModel" placeholder="아이오닉 5" required><div class="invalid-feedback">모델명을 입력해 주세요.</div></div>
+          <div><label class="form-label" for="cType">구분</label><select class="form-select" id="cType"><option>소형</option><option selected>중형</option><option>대형</option><option>전기차</option></select></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button><button class="btn btn-primary">등록</button></div>
+      </form>
+    </div>
+  </div>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/pages/mypage.js"></script>
+</body>
+</html>

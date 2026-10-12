@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='회원가입 | EzPark', console=false)}"></head>
+<body data-root="../" data-page="register" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
+  <div class="auth-wrap">
+    <div class="auth-visual" data-bg="aerialLot">
+      <div>
+        <span class="ez-badge mint mb-3"><i class="fa-solid fa-gift"></i> 신규 가입 혜택</span>
+        <h2 class="fw-800 mb-3" style="font-size:2.4rem;line-height:1.3">첫 예약 30% 할인,<br>지금 시작하세요</h2>
+        <ul class="check-list">
+          <li class="text-white-50"><i class="fa-solid fa-circle-check"></i><div><b class="text-white">실시간 빈자리</b> 확인과 AI 추천</div></li>
+          <li class="text-white-50"><i class="fa-solid fa-circle-check"></i><div><b class="text-white">입구→주차면</b> 경로 안내</div></li>
+          <li class="text-white-50"><i class="fa-solid fa-circle-check"></i><div><b class="text-white">차량번호 인식</b>으로 자동 입·출차</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="auth-form" style="max-width:620px">
+      <a class="brand mb-4" href="../index.html"><span class="brand-logo">E</span><span class="brand-text">Ez<b>Park</b></span></a>
+      <h3 class="fw-800 text-navy mb-1">회원가입</h3>
+      <p class="text-muted-2 mb-4">이미 계정이 있으신가요? <a href="login.html" class="fw-bold">로그인</a></p>
+
+      <form id="registerForm" novalidate>
+        <div class="row g-2 mb-3">
+          <div class="col-6"><label class="select-card"><input type="radio" name="mtype" value="USER" checked><div class="inner text-center py-2"><i class="fa-solid fa-user text-blue me-1"></i><b class="small">개인 회원</b></div></label></div>
+          <div class="col-6"><label class="select-card"><input type="radio" name="mtype" value="BIZ"><div class="inner text-center py-2"><i class="fa-solid fa-building text-blue me-1"></i><b class="small">기업 회원</b></div></label></div>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label" for="rName">이름 *</label><input class="form-control" id="rName" required minlength="2" maxlength="20" autocomplete="name"><div class="invalid-feedback">이름을 2자 이상 입력해 주세요.</div></div>
+          <div class="col-md-6" id="companyWrap" hidden><label class="form-label" for="rCompany">회사명 *</label><input class="form-control" id="rCompany"><div class="invalid-feedback">회사명을 입력해 주세요.</div></div>
+          <div class="col-12">
+            <label class="form-label" for="rEmail">이메일 *</label>
+            <div class="input-group has-validation">
+              <input type="email" class="form-control" id="rEmail" required autocomplete="email" style="border-radius:12px 0 0 12px">
+              <button class="btn btn-outline-secondary" type="button" id="dupCheck" style="border-radius:0 12px 12px 0">중복 확인</button>
+              <div class="invalid-feedback" id="emailFeedback">올바른 이메일 주소를 입력해 주세요.</div>
+            </div>
+            <div class="valid-feedback d-block small" id="emailOk" hidden>사용 가능한 이메일입니다.</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="rPw">비밀번호 *</label>
+            <div class="position-relative"><input type="password" class="form-control pe-5" id="rPw" required minlength="8" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$" autocomplete="new-password"><button type="button" class="pw-toggle" data-target="rPw" aria-label="비밀번호 보기"><i class="fa-regular fa-eye"></i></button><div class="invalid-feedback">영문·숫자·특수문자 포함 8자 이상</div></div>
+            <div class="pw-meter"><span id="pwBar"></span></div>
+            <div class="small mt-1 text-muted-2" id="pwText">영문, 숫자, 특수문자 조합 8자 이상</div>
+          </div>
+          <div class="col-md-6"><label class="form-label" for="rPw2">비밀번호 확인 *</label><input type="password" class="form-control" id="rPw2" required autocomplete="new-password"><div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div></div>
+          <div class="col-md-6"><label class="form-label" for="rPhone">휴대폰 *</label><input type="tel" class="form-control" id="rPhone" required pattern="^01[016789]-?\d{3,4}-?\d{4}$" placeholder="010-0000-0000" autocomplete="tel"><div class="invalid-feedback">휴대폰 번호 형식을 확인해 주세요.</div></div>
+          <div class="col-md-6"><label class="form-label" for="rPlate">차량번호 <span class="text-muted-2 fw-normal">(선택)</span></label><input class="form-control" id="rPlate" pattern="^\d{2,3}[가-힣]\d{4}$" placeholder="12가3456"><div class="invalid-feedback">예) 12가3456, 123가4567</div></div>
+        </div>
+
+        <div class="bg-soft rounded-4 p-3 small mt-4">
+          <div class="form-check mb-2 pb-2 border-bottom"><input class="form-check-input" type="checkbox" id="agAll"><label class="form-check-label fw-bold" for="agAll">전체 동의</label></div>
+          <div class="form-check mb-1"><input class="form-check-input ag" type="checkbox" id="ag1" required><label class="form-check-label" for="ag1">[필수] 이용약관 동의</label></div>
+          <div class="form-check mb-1"><input class="form-check-input ag" type="checkbox" id="ag2" required><label class="form-check-label" for="ag2">[필수] 개인정보 수집·이용 동의</label></div>
+          <div class="form-check mb-1"><input class="form-check-input ag" type="checkbox" id="ag3"><label class="form-check-label" for="ag3">[선택] 위치기반 서비스 이용 동의</label></div>
+          <div class="form-check"><input class="form-check-input ag" type="checkbox" id="ag4"><label class="form-check-label" for="ag4">[선택] 마케팅 정보 수신 동의</label></div>
+          <div class="invalid-feedback d-block" id="agErr" hidden>필수 약관에 동의해 주세요.</div>
+        </div>
+
+        <button class="btn btn-primary btn-lg w-100 mt-4" id="regBtn">가입하기</button>
+      </form>
+
+      <div class="divider-text">또는</div>
+      <button class="social-btn" data-social="Google"><i class="fa-brands fa-google" style="color:#4285f4"></i>Google 계정으로 가입</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/pages/auth.js"></script>
+</body>
+</html>

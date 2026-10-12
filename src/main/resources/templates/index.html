@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='EzPark | AI 영상 인지 스마트 주차관제·유도 플랫폼', console=false)}"></head>
+<body data-root="./" data-page="home" data-header="transparent" th:data-user-id="${loginUser?.id}" th:data-user-name="${loginUser?.name}" th:data-user-email="${loginUser?.email}" th:data-user-role="${loginUser?.role}" data-server="true">
+  <header th:replace="~{fragments/layout :: header(transparent=true)}"></header>
+
+  <!-- HERO -->
+  <section class="hero" id="hero" data-bg="garageNeon">
+    <div class="container">
+      <div class="row align-items-center g-4 g-lg-5">
+        <div class="col-lg-6">
+          <span class="ez-badge yellow mb-3"><i class="fa-solid fa-bolt"></i> K-AI 이동체 인지 영상 데이터 기반</span>
+          <h1 class="mb-4">AI가 보는 주차장,<br><span class="hl">기다림 없는 주차</span></h1>
+          <p class="hero-lead mb-4">CCTV 영상을 AI가 실시간으로 분석해 빈자리를 찾고, 입구에서 주차면까지 길을 안내합니다. 운전자는 더 빠르게, 기업은 더 똑똑하게.</p>
+          <form class="hero-search mb-3" id="heroSearch">
+            <div class="input-icon flex-grow-1">
+              <i class="fa-solid fa-location-dot"></i>
+              <input type="text" class="form-control" name="q" placeholder="지역 또는 주차장 이름 (예: 부산, 세종로)" aria-label="주차장 검색">
+            </div>
+            <button class="btn btn-primary px-4" type="submit"><i class="fa-solid fa-magnifying-glass me-1"></i> 검색</button>
+          </form>
+          <div class="hero-chips mb-4">
+            <a href="pages/find.html?q=서울">#서울</a>
+            <a href="pages/find.html?q=부산">#부산</a>
+            <a href="pages/find.html?q=제주">#제주</a>
+            <a href="pages/find.html?ev=1">#전기차 충전</a>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <a href="pages/guide.html" class="btn btn-yellow btn-lg"><i class="fa-solid fa-route me-2"></i>주차 유도 체험</a>
+            <a href="pages/dashboard.html" class="btn btn-ghost btn-lg"><i class="fa-solid fa-display me-2"></i>관제센터 둘러보기</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-panel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <div class="small text-white-50">CAM-01 · 화성행궁 공영주차장 지상 주차장</div>
+                <div class="fw-bold">실시간 이동체 인지</div>
+              </div>
+              <span class="live-dot text-white">LIVE</span>
+            </div>
+            <div class="hero-cam">
+              <img data-img="aerialLot" data-w="900" data-h="600" loading="eager" alt="주차장 항공 CCTV 화면">
+              <div class="det-layer" id="heroDet"></div>
+              <div class="scanline"></div>
+              <div class="cam-hud"><span>REC ● 1080p · 30fps</span><span id="heroClock"></span></div>
+            </div>
+            <div class="row g-2 mt-2">
+              <div class="col-3"><div class="hero-stat"><strong class="text-mint" id="hsFree">6</strong><small>빈자리</small></div></div>
+              <div class="col-3"><div class="hero-stat"><strong id="hsCar">21</strong><small>주차 차량</small></div></div>
+              <div class="col-3"><div class="hero-stat"><strong class="text-yellow" id="hsMove">3</strong><small>이동 차량</small></div></div>
+              <div class="col-3"><div class="hero-stat"><strong id="hsLat">28<small class="ms-1">ms</small></strong><small>추론 속도</small></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="#features" class="scroll-hint" aria-label="아래로 스크롤"><i class="fa-solid fa-chevron-down fa-lg"></i></a>
+  </section>
+
+  <!-- PARTNERS -->
+  <section class="py-4 border-bottom">
+    <div class="container">
+      <div class="partner-logos">
+        <span><i class="fa-solid fa-building-columns"></i>Seoul City</span>
+        <span><i class="fa-solid fa-database"></i>AI-Hub</span>
+        <span><i class="fa-solid fa-cloud"></i>Public Data</span>
+        <span><i class="fa-brands fa-google"></i>Gemini</span>
+        <span><i class="fa-solid fa-fire"></i>Firebase</span>
+        <span><i class="fa-brands fa-aws"></i>AWS</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <div class="section-eyebrow">Core Features</div>
+        <h2 class="section-title">영상 한 대로 시작하는<br class="d-md-none"> 스마트 주차 운영</h2>
+        <p class="section-desc mt-3">센서 설치 없이 기존 CCTV만으로 주차면 단위 관제와 유도를 실현합니다.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-sm-6 col-lg-3 reveal">
+          <div class="ez-card ez-card-hover feature-card">
+            <div class="icon-box blue"><span class="material-symbols-rounded">center_focus_strong</span></div>
+            <h5>이동체 인지</h5>
+            <p>차량·사람·이륜차를 실시간 인지하고 주차면 점유 여부를 판단합니다.</p>
+            <a href="pages/cctv.html" class="more">영상 인지 보기 <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <div class="ez-card ez-card-hover feature-card">
+            <div class="icon-box mint"><span class="material-symbols-rounded">monitoring</span></div>
+            <h5>실시간 관제</h5>
+            <p>층별 점유율, 입·출차, 불법주차 이벤트를 한 화면에서 모니터링합니다.</p>
+            <a href="pages/dashboard.html" class="more">대시보드 보기 <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <div class="ez-card ez-card-hover feature-card">
+            <div class="icon-box yellow"><span class="material-symbols-rounded">alt_route</span></div>
+            <h5>스마트 주차 유도</h5>
+            <p>가장 가까운 빈자리를 추천하고 입구부터 주차면까지 경로를 안내합니다.</p>
+            <a href="pages/guide.html" class="more">유도 체험하기 <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <div class="ez-card ez-card-hover feature-card">
+            <div class="icon-box purple"><span class="material-symbols-rounded">neurology</span></div>
+            <h5>K-AI 수요 분석</h5>
+            <p>공공데이터와 이용 로그로 수요를 예측하고 Gemini가 운영 인사이트를 제안합니다.</p>
+            <a href="pages/analysis.html" class="more">분석 리포트 <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="section bg-soft">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <div class="section-eyebrow">How it works</div>
+        <h2 class="section-title">영상에서 안내까지, 단 4단계</h2>
+      </div>
+      <div class="row g-4 process">
+        <div class="col-6 col-lg-3 process-item reveal">
+          <div class="num"><i class="fa-solid fa-video"></i></div>
+          <h6>01. 영상 수집</h6>
+          <p>기존 CCTV·IP 카메라 영상을 엣지 서버로 실시간 스트리밍</p>
+        </div>
+        <div class="col-6 col-lg-3 process-item reveal">
+          <div class="num"><i class="fa-solid fa-crosshairs"></i></div>
+          <h6>02. AI 객체 인지</h6>
+          <p>K-AI 데이터로 학습한 모델이 차량·사람·이륜차를 인지</p>
+        </div>
+        <div class="col-6 col-lg-3 process-item reveal">
+          <div class="num"><i class="fa-solid fa-square-parking"></i></div>
+          <h6>03. 점유 판단</h6>
+          <p>주차면 ROI와 겹침 비율로 면 단위 점유·이상 상황 판단</p>
+        </div>
+        <div class="col-6 col-lg-3 process-item reveal">
+          <div class="num"><i class="fa-solid fa-diamond-turn-right"></i></div>
+          <h6>04. 유도·알림</h6>
+          <p>운전자 앱·전광판에 빈자리 유도, 관제센터에 이벤트 알림</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI SHOWCASE -->
+  <section class="section">
+    <div class="container">
+      <div class="row align-items-center g-4 g-lg-5">
+        <div class="col-lg-6 reveal">
+          <div class="img-stack">
+            <img class="main" data-img="garageDark" data-w="1000" alt="지하 주차장 전경">
+            <div class="float-card a">
+              <div class="icon-box sm mint"><i class="fa-solid fa-bullseye"></i></div>
+              <div><div class="small text-muted-2">인지 정확도 (mAP@0.5)</div><div class="fw-800 font-en fs-5 text-navy">97.8%</div></div>
+            </div>
+            <div class="float-card b">
+              <div class="icon-box sm blue"><i class="fa-solid fa-gauge-high"></i></div>
+              <div><div class="small text-muted-2">평균 추론 속도</div><div class="fw-800 font-en fs-5 text-navy">28ms</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 reveal">
+          <div class="section-eyebrow">K-AI Data</div>
+          <h2 class="section-title mb-3">주차 관련 이동체 인지 영상으로<br>학습한 AI 모델</h2>
+          <p class="section-desc mb-4">AI-Hub 공개 데이터셋의 주차장 이동체 영상과 라벨 데이터를 정제·학습하여 실내·실외·야간 환경에서도 안정적인 인지 성능을 확보했습니다.</p>
+          <ul class="check-list mb-4">
+            <li><i class="fa-solid fa-circle-check"></i><div><b>다중 클래스 인지</b> – 승용차, 승합차, 이륜차, 보행자 등 이동체 분류</div></li>
+            <li><i class="fa-solid fa-circle-check"></i><div><b>면 단위 점유 판단</b> – 주차면 ROI 기반 점유/공석/불법 주차 판별</div></li>
+            <li><i class="fa-solid fa-circle-check"></i><div><b>개인정보 비식별화</b> – 번호판·얼굴 엣지 단 블러 처리 후 메타데이터만 저장</div></li>
+          </ul>
+          <a href="pages/cctv.html" class="btn btn-primary">영상 인지 모니터링 <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE LOTS -->
+  <section class="section bg-soft" id="live">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4 reveal">
+        <div>
+          <div class="section-eyebrow">Live Status</div>
+          <h2 class="section-title mb-0">지금, 전국 공영주차장 현황</h2>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span class="small text-muted-2"><i class="fa-solid fa-rotate me-1"></i>잔여면 데모 · 갱신 <span id="liveTime">--:--:--</span></span>
+          <a href="pages/find.html" class="btn btn-outline-primary btn-sm">전체 보기</a>
+        </div>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-7 reveal">
+          <div class="ez-card overflow-hidden" id="liveLots"></div>
+        </div>
+        <div class="col-lg-5 reveal">
+          <div class="ez-card h-100 overflow-hidden d-flex flex-column">
+            <img data-img="garageArrow" data-w="800" alt="주차 유도 화살표가 있는 주차장" style="height:240px;object-fit:cover;width:100%">
+            <div class="p-4 d-flex flex-column flex-grow-1">
+              <span class="ez-badge blue mb-2 align-self-start"><i class="fa-solid fa-wand-magic-sparkles"></i> AI 추천</span>
+              <h5 class="fw-800 text-navy">빈자리 찾아 돌지 마세요</h5>
+              <p class="text-muted-2 small mb-4">층별 주차면 지도에서 가장 가까운 빈자리를 추천하고, 입구에서부터 경로를 그려 드립니다. 평균 주차 탐색 시간이 <b class="text-blue">62% 단축</b>됩니다.</p>
+              <a href="pages/guide.html" class="btn btn-primary mt-auto">주차 유도 시작 <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="section-sm">
+    <div class="container">
+      <div class="stats-band reveal">
+        <div class="row g-4 text-center position-relative" style="z-index:1">
+          <div class="col-6 col-lg-3"><div class="stat-num"><span data-count="12480">0</span>+</div><div class="stat-label">관제 중인 주차면</div></div>
+          <div class="col-6 col-lg-3"><div class="stat-num"><span data-count="97.8">0</span>%</div><div class="stat-label">이동체 인지 정확도</div></div>
+          <div class="col-6 col-lg-3"><div class="stat-num"><span data-count="62">0</span>%</div><div class="stat-label">주차 탐색 시간 단축</div></div>
+          <div class="col-6 col-lg-3"><div class="stat-num"><span data-count="48">0</span>곳</div><div class="stat-label">도입 기업·기관</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B2B -->
+  <section class="section">
+    <div class="container">
+      <div class="row g-4 g-lg-5 align-items-center">
+        <div class="col-lg-5 reveal">
+          <div class="section-eyebrow">For Business</div>
+          <h2 class="section-title mb-3">기업 수요를 반영한<br>맞춤형 주차 비즈니스</h2>
+          <p class="section-desc mb-4">쇼핑몰, 병원, 오피스, 공공기관의 운영 데이터를 분석해 업종별 혼잡 패턴과 수익 개선 포인트를 제시합니다.</p>
+          <div class="d-flex gap-3 mb-4">
+            <div><div class="fw-800 font-en fs-3 text-blue">-35%</div><div class="small text-muted-2">관제 인력 비용</div></div>
+            <div class="vr"></div>
+            <div><div class="fw-800 font-en fs-3 text-mint">+18%</div><div class="small text-muted-2">주차 회전율</div></div>
+            <div class="vr"></div>
+            <div><div class="fw-800 font-en fs-3 text-navy">2주</div><div class="small text-muted-2">평균 도입 기간</div></div>
+          </div>
+          <a href="pages/enterprise.html" class="btn btn-primary me-2">기업 솔루션 보기</a>
+          <a href="pages/enterprise.html#contact" class="btn btn-soft">도입 문의</a>
+        </div>
+        <div class="col-lg-7">
+          <div class="row g-3">
+            <div class="col-sm-6 reveal">
+              <div class="usecase-card" style="min-height:260px">
+                <img data-img="mall" data-w="700" alt="쇼핑몰 내부">
+                <div class="body"><span class="ez-badge yellow mb-2">쇼핑몰</span><h5>주말 피크 분산</h5><p>층별 유도로 진입 대기열 40% 감소</p></div>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="usecase-card" style="min-height:260px">
+                <img data-img="hospital" data-w="700" alt="병원 로비">
+                <div class="body"><span class="ez-badge mint mb-2">병원</span><h5>외래 예약 연동</h5><p>진료 예약 시간 기반 주차면 사전 배정</p></div>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="usecase-card" style="min-height:260px">
+                <img data-img="towers" data-w="700" alt="오피스 빌딩">
+                <div class="body"><span class="ez-badge blue mb-2">오피스</span><h5>정기권·방문객 관리</h5><p>입주사별 할당량과 방문 차량 자동 정산</p></div>
+              </div>
+            </div>
+            <div class="col-sm-6 reveal">
+              <div class="usecase-card" style="min-height:260px">
+                <img data-img="skyline" data-w="700" alt="도시 전경">
+                <div class="body"><span class="ez-badge purple mb-2">공공기관</span><h5>공영주차장 통합관제</h5><p>공공데이터 연계로 지역 주차 수요 예측</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section bg-soft">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <div class="section-eyebrow">Reviews</div>
+        <h2 class="section-title">이용자와 운영자가 말하는 EzPark</h2>
+      </div>
+      <div class="row g-4" id="reviews"></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="cta text-center reveal" data-bg="aerialLines">
+        <h2 class="fw-800 mb-3">지금 바로 스마트 주차를 경험하세요</h2>
+        <p class="mb-4 opacity-75">회원가입 후 첫 예약 시 주차요금 30% 할인 (10월 한정)</p>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+          <a href="pages/register.html" class="btn btn-light btn-lg text-primary fw-bold">무료 회원가입</a>
+          <a href="pages/enterprise.html#contact" class="btn btn-ghost btn-lg">기업 도입 상담</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/pages/main.js"></script>
+</body>
+</html>

@@ -2,28 +2,34 @@
 
 ## Project
 EzPark – AI 영상 인지 기반 주차관제·유도 반응형 웹 (훈련생 4인 300시간 프로젝트).
-- 기획/일정: `docs/01-project-plan.md`, 프론트엔드 WBS·백엔드 전환 가이드: `docs/02-frontend-plan.md`
-- 현재 단계: P1 프론트엔드 완료 (정적 파일, `frontend/`)
+- 기획/일정: `docs/01-project-plan.md`
+- P1 프론트엔드: `docs/02-frontend-plan.md` (완료, `frontend/`)
+- P2 백엔드: `docs/03-backend-plan.md` (Spring Boot 4.1.1 · Gradle · Thymeleaf · JdbcTemplate · TiDB)
 
 ## Repository layout
-- `frontend/` – 프런트엔드 원본 / Netlify 데모 배포 폴더 (`netlify.toml`: publish=`frontend`, `frontend/`·`netlify.toml` 변경 커밋에서만 배포)
-- `scripts/frontend-to-backend.sh` – P2 시작 시 `frontend/` → `src/main/resources/{static,templates}` 복사 (대상에 파일 있으면 중단, `--force`로 덮어쓰기)
-- P2 백엔드(Spring Boot)는 저장소 루트에 `pom.xml`/`build.gradle` + `src/` 로 추가한다. 백엔드 변경은 Netlify 배포를 일으키지 않는다.
-- `frontend/`에는 API 키 등 비밀정보를 절대 두지 않는다 (그대로 공개됨).
+- `frontend/` – P1 목업 프런트엔드 / Netlify 데모 (`netlify.toml`: `frontend/`·`netlify.toml` 변경 커밋에서만 배포)
+- `src/main/java/com/ezpark/**` – 백엔드 (패키지: config, common, web, user, lot, reservation, member, monitor, board, admin, ai, publicdata)
+- `src/main/resources/templates` – Thymeleaf (공통 조각 `fragments/layout.html`), `static/` – API 연동 버전 CSS/JS
+- `src/main/resources/db/schema.sql`(매 기동, IF NOT EXISTS) · `seed.sql`(app_seed 로 1회)
+- P2 이후 화면 수정은 `src/main/resources/` 가 기준. `frontend/` 는 데모용으로 필요할 때만 함께 수정.
+- 비밀정보는 `.env`(gitignore) 또는 환경변수만 사용 – 형식은 `.env.example`. `frontend/`·`static/` 에 키를 두지 않는다.
 
 ## Conventions
-- Stack: HTML5, CSS3, Vanilla JS, Bootstrap 5.3.3 (CDN + SRI), Font Awesome 6.5.2, Google Material Symbols, Google Fonts (Noto Sans KR, Montserrat)
-- 이미지: Unsplash – `js/data.js`의 `EZ_PHOTO` 키 사용 (`<img data-img="key" data-w="800">`, `data-bg="key"`)
-- 공통 레이아웃: `js/common.js`가 `#ez-header`/`#ez-footer`(공개 페이지) 또는 `#ez-sidebar`/`#ez-topbar`(`data-layout="console"`)를 렌더링
-- 페이지 body 속성: `data-root`("./" 또는 "../"), `data-page`, 콘솔은 `data-title`
-- 모든 경로는 상대경로 (절대경로 `/...` 금지 – 하위 경로 서빙/Live Server 호환)
-- 목업 데이터는 `js/data.js`(`EZ_DATA`), 차트는 `js/mini-chart.js`(`MiniChart`)
-- 커스텀 CSS 클래스는 `ez-` 접두어 우선
+- 서버: 컨트롤러 DTO 는 record + Bean Validation, 오류는 `ApiException` → `{"message"}`; 권한은 `LoginInterceptor(Level)` + `PageController`
+- SQL 은 MySQL 8 / TiDB / H2(MODE=MySQL) 공용 문법만 사용 (`CREATE INDEX IF NOT EXISTS` 금지 → 인라인 INDEX)
+- generated key 는 `prepareStatement(sql, new String[]{"id"})` (H2 는 RETURN_GENERATED_KEYS 시 모든 기본값 컬럼 반환)
+- 시간은 Asia/Seoul 기준 (`ReservationService.KST`, JVM 기본 시간대 설정)
+- 프런트: Bootstrap 5.3.3 (CDN+SRI), Font Awesome 6.5.2, Material Symbols, Google Fonts, Unsplash(`EZ_PHOTO` 키)
+- JS: 서버 데이터는 `EZ.api()`, 오류는 `EZ.fail()`, 출력은 `EZ.esc()`; 모든 경로 상대경로 유지 (`/pages/*.html` URL 구조)
 
 ## Run / Verify
 ```bash
-cd frontend
-python -m http.server 5500 --bind 127.0.0.1
-# http://127.0.0.1:5500   (VS Code Live Server는 .vscode/settings.json 에서 root=/frontend)
+./gradlew bootRun --args='--spring.profiles.active=local'   # H2, admin@ezpark.kr / ezpark1234
+./gradlew test                                              # 단위 5 + 통합 7
+./gradlew bootJar
+cd frontend && python -m http.server 5500                   # P1 데모
 ```
-- Node는 설치되어 있지 않음. 검증은 Python Playwright(`channel='chrome'`)로 각 페이지 콘솔 에러/가로 스크롤(390px) 확인.
+- 이 PC 의 PATH 에는 node 가 없지만 `C:\Users\whyei\anaconda3\Lib\site-packages\playwright\driver\node.exe --check <file>` 로 JS 문법 검사 가능.
+- 화면 검증은 Python Playwright(`channel='chrome'`)로 콘솔 에러·흐름 확인.
+- 정적 리소스 수정 후에는 bootRun 재시작 필요 (build/resources 에서 서빙).
+- Python heredoc 으로 JS 를 치환할 때 `\n` 이 실제 줄바꿈으로 들어갈 수 있으니 수정 후 `node --check` 로 확인.
